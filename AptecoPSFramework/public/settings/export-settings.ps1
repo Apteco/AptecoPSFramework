@@ -1,4 +1,4 @@
-Function Export-Settings {
+﻿Function Export-Settings {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)][string]$Path
@@ -28,11 +28,11 @@ Function Export-Settings {
                     { $PSItem -in @( ".yml", ".yaml" ) } {
                         ConvertTo-Yaml $script:settings -OutFile $absolutePath #-KeepArray
                     }
-    
+
                     default {
                         ConvertTo-Json -InputObject $script:settings -Depth 99 | Set-Content -Path $absolutePath -Encoding utf8
                     }
-    
+
                 }
 
                 # Resolve the path now to an absolute path

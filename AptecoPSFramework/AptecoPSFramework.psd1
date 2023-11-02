@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.6'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -144,7 +144,7 @@ PrivateData = @{
         IconUri = 'https://www.apteco.de/sites/default/files/favicon_3.ico'
 
         # release channel
-        #Prerelease = 'alpha3'
+        Prerelease = 'alpha1'
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
