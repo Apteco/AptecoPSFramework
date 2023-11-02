@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/PlagueHO/PSAuth/blob/dev/LICENSE)
+
 
 # Apteco Customs - AptecoPSFramework
 
