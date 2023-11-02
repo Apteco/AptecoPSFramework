@@ -11,10 +11,12 @@ function Get-CRMData {
         ,[Parameter(Mandatory=$false)][Switch]$LoadAllRecords = $false          # To just load all records, us this flag -> this uses paging
         ,[Parameter(Mandatory=$false)][Switch]$AddWrapper = $false              # Include the wrapper with id, properties, createdAt, updatedAt, archived and optionally associations
         ,[Parameter(Mandatory=$false)][Array]$Associations = [Array]@()         # e.g. Companies,Contacts to get connections to other objects/tables
+        ,[Parameter(Mandatory=$false)][Array]$ExtendAssociations = [Array]@()     # Gives your the first entry of the objects, need to define "company_to_contact" and others
         ,[Parameter(Mandatory=$false)][Array]$Filter = [Array]@()               # An Array of [Ordered]@{"propertyName"="hubspotscore";"operator"="GTE";"value"="0"}
         ,[Parameter(Mandatory=$false)][Array]$Sort = [Array]@()                 # An Array of properties names to use for sorting
         ,[Parameter(Mandatory=$false,ParameterSetName='SingleProps')][Array]$Properties = [Array]@()    # Load single properties
         ,[Parameter(Mandatory=$false,ParameterSetName='AllProps')][Switch]$LoadAllProperties = $false   # OR load all properties of this object/table
+
     )
 
     begin {
@@ -76,7 +78,7 @@ function Get-CRMData {
         #-----------------------------------------------
         # ADD ASSOCIATIONS
         #-----------------------------------------------
-
+        
         If ( $Associations.Count -gt 0 ) {
             $query | Add-Member -MemberType NoteProperty -Name "associations" -Value ( $Associations -join "," )
         }
@@ -99,7 +101,7 @@ function Get-CRMData {
                 $body.associations = $Associations
             }
             #$body.PSObject.Properties.Remove("archived")
-
+        
             # Add sort and filter
             $body | Add-Member -MemberType NoteProperty -Name "sorts" -Value $Sort # TODO maybe put this in the invoke for paging?
             $body | Add-Member -MemberType NoteProperty -Name "filterGroups" -Value (
@@ -110,7 +112,7 @@ function Get-CRMData {
                 )
             )
 
-            #Write-Verbose ( $body | convertto-json -depth 99 ) -verbose
+            #Write-Verbose ( $body | convertto-json -depth 99 ) -verbose 
 
         }
 
@@ -118,11 +120,11 @@ function Get-CRMData {
 
     process {
 
-
+        
         #-----------------------------------------------
         # LOAD THE DATA
         #-----------------------------------------------
-
+        
         If ( $LoadAllRecords -eq $true ) {
             $usePaging = $true
         } else {
@@ -145,6 +147,28 @@ function Get-CRMData {
         }
 
         $records = @( Invoke-Hubspot @requestParams )
+
+
+        #-----------------------------------------------
+        # ADD ASSOCIATIONS TO PROPERTIES, IF DEFINED
+        #-----------------------------------------------
+
+        If ( $ExtendAssociations.Count -gt 0 ) {
+            $records.results | ForEach-Object {
+                $rec = $_
+                $ExtendAssociations | ForEach-Object {
+                    $extAss = $_
+                    # Add empty placeholder first any maybe overwrite it later
+                    $rec.properties | Add-Member -MemberType NoteProperty -Name $extAss -Value $null # TODO or maybe an empty string?
+                    $rec.associations.PSObject.Properties.Name | ForEach-Object {
+                        $assObj = $_
+                        $rec.associations.$assObj.results | where-object { $_.type -eq $extAss } | Select-object -first 1 | ForEach-Object {
+                            $rec.properties.$extAss = $_.id
+                        }
+                    }
+                }
+            }
+        }
 
 
         #-----------------------------------------------

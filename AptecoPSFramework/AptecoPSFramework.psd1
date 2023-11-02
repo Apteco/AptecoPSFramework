@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.5'
+ModuleVersion = '0.1.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -138,7 +138,7 @@ PrivateData = @{
         LicenseUri = 'https://gist.github.com/gitfvb/58930387ee8677b5ccef93ffc115d836'
 
         # Eine URL zur Hauptwebsite für dieses Projekt.
-        ProjectUri = 'https://github.com/Apteco/AptecoPSModules/tree/dev/AptecoPSFramework'
+        ProjectUri = 'https://github.com/Apteco/AptecoPSFramework'
 
         # Eine URL zu einem Symbol, das das Modul darstellt.
         IconUri = 'https://www.apteco.de/sites/default/files/favicon_3.ico'
@@ -148,6 +148,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.1.6 Added a change for Hubspot to load associations into the properties
 0.1.5 Fixed a problem in CleverReach when reading and parsing the headers from the csv
       Improved the CleverReach logging when something aborts
 0.1.4 Changed the uploadsize from 2 to 80 for Hubspot
