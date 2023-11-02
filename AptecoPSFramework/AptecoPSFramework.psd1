@@ -148,6 +148,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.2.0 Added yaml as a new functionality to save and load settings - please make sure to install your dependencies again
 0.1.6 Added a change for Hubspot to load associations into the properties
 0.1.5 Fixed a problem in CleverReach when reading and parsing the headers from the csv
       Improved the CleverReach logging when something aborts
