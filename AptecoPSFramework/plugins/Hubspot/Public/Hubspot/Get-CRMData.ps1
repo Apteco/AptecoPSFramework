@@ -78,7 +78,7 @@ function Get-CRMData {
         #-----------------------------------------------
         # ADD ASSOCIATIONS
         #-----------------------------------------------
-        
+
         If ( $Associations.Count -gt 0 ) {
             $query | Add-Member -MemberType NoteProperty -Name "associations" -Value ( $Associations -join "," )
         }
@@ -101,7 +101,7 @@ function Get-CRMData {
                 $body.associations = $Associations
             }
             #$body.PSObject.Properties.Remove("archived")
-        
+
             # Add sort and filter
             $body | Add-Member -MemberType NoteProperty -Name "sorts" -Value $Sort # TODO maybe put this in the invoke for paging?
             $body | Add-Member -MemberType NoteProperty -Name "filterGroups" -Value (
@@ -112,7 +112,7 @@ function Get-CRMData {
                 )
             )
 
-            #Write-Verbose ( $body | convertto-json -depth 99 ) -verbose 
+            #Write-Verbose ( $body | convertto-json -depth 99 ) -verbose
 
         }
 
@@ -120,11 +120,11 @@ function Get-CRMData {
 
     process {
 
-        
+
         #-----------------------------------------------
         # LOAD THE DATA
         #-----------------------------------------------
-        
+
         If ( $LoadAllRecords -eq $true ) {
             $usePaging = $true
         } else {
