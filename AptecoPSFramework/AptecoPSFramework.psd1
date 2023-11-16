@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.6'
+ModuleVersion = '0.1.8'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -148,6 +148,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.1.8 Changing CleverReach to support other mailing types than html/text
 0.1.7 Adding a psmodulepath hardcoded to module and boilerplate as it seems to misinterpreted when called by C# runspaces
 0.1.6 Added a change for Hubspot to load associations into the properties
 0.1.5 Fixed a problem in CleverReach when reading and parsing the headers from the csv
