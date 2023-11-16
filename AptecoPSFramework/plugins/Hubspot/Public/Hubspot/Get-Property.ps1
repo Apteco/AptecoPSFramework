@@ -6,6 +6,8 @@ function Get-Property {
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
          [Parameter(Mandatory=$true)][String]$Object
         ,[Parameter(Mandatory=$false)][Switch]$Archived = $false
+        ,[Parameter(Mandatory=$false)][Switch]$IncludeObjectName = $false       # Include the object name like "contacts"
+
     )
 
     begin {
@@ -20,6 +22,9 @@ function Get-Property {
 
         $properties = @( Invoke-Hubspot -Object "crm" -Path "properties/$( $Object )" -Query ([PSCustomObject]@{"archived"=$loadArchived}) -Method GET )
 
+        If ( $IncludeObjectName -eq $true ) {
+            $properties.results | Add-Member -MemberType NoteProperty -Name "object" -Value $Object
+        }
         $properties.results
 
     }

@@ -10,6 +10,7 @@ function Get-CRMData {
         ,[Parameter(Mandatory=$false)][Switch]$Archived = $false                # Load also archived records
         ,[Parameter(Mandatory=$false)][Switch]$LoadAllRecords = $false          # To just load all records, us this flag -> this uses paging
         ,[Parameter(Mandatory=$false)][Switch]$AddWrapper = $false              # Include the wrapper with id, properties, createdAt, updatedAt, archived and optionally associations
+        ,[Parameter(Mandatory=$false)][Switch]$IncludeObjectName = $false       # Include the object name like "contacts"
         ,[Parameter(Mandatory=$false)][Array]$Associations = [Array]@()         # e.g. Companies,Contacts to get connections to other objects/tables
         ,[Parameter(Mandatory=$false)][Array]$ExtendAssociations = [Array]@()     # Gives your the first entry of the objects, need to define "company_to_contact" and others
         ,[Parameter(Mandatory=$false)][Array]$Filter = [Array]@()               # An Array of [Ordered]@{"propertyName"="hubspotscore";"operator"="GTE";"value"="0"}
@@ -176,8 +177,15 @@ function Get-CRMData {
         #-----------------------------------------------
 
         If ( $AddWrapper -eq $true ) {
+            If ( $IncludeObjectName -eq $true ) {
+                $records.results | Add-Member -MemberType NoteProperty -Name "object" -Value $Object
+            }
             $records.results
+
         } else {
+            If ( $IncludeObjectName -eq $true ) {
+                $records.results.properties | Add-Member -MemberType NoteProperty -Name "object" -Value $Object
+            }
             $records.results.properties
         }
 

@@ -406,6 +406,13 @@ Install-Module PowerShellGet -Force -AllowClobber
 
 Please restart your FastStats service if you have problems after an update.
 
+## Unable to get messages with Exception / Unable to get lists with Exception
+
+This should not happen, but shows that your PSModulePath cannot be loaded properly from C# runspaces.
+
+To manually fix this, just add `C:\Program Files\WindowsPowerShell\Modules` to the system environment variable `PSModulePath`
+
+
 # TODO / TEST
 
 - [x] support external plugin folder => done! Test it!

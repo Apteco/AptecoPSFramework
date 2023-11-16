@@ -22,8 +22,8 @@ $debug = $false
 #-----------------------------------------------
 
 $modulePath = @( [System.Environment]::GetEnvironmentVariable("PSModulePath") -split ";" ) + @(
-    #C:\Program Files\PowerShell\Modules
-    #c:\program files\powershell\7\Modules
+    "C:\Program Files\WindowsPowerShell\Modules"
+    #C:\Program Files\powershell\7\Modules
     "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Modules"
     "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Modules"
     "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Modules"
