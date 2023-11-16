@@ -360,7 +360,6 @@ function Invoke-Broadcast{
                 Write-Log "No replacement of preheader"
                 $html = $htmlTemplate
 
-
             }
 
 
@@ -370,15 +369,36 @@ function Invoke-Broadcast{
 
             Write-Log -message "Creating a copy of the mailing"
 
+            # Choose the mailing content type
+            Switch ( $templateSource."m_type" ) {
+                1 {
+                    $mailingType = "text"
+                    $mailingHtml = ""
+                    $mailingText = $templateSource.body_text
+                }
+                2 {
+                    $mailingType = "html"
+                    $mailingHtml = $html
+                    $mailingText = ""
+                }
+                #3 {}
+                Default {
+                    $mailingType = "html/text" #$Script:settings.broadcast.defaultContentType
+                    $mailingHtml = $html
+                    $mailingText = $templateSource.body_text
+                }
+            }
+
+            # Build the parameter for mailing creation
             $mailingSettings = [PSCustomObject]@{
                 "name" = $newMailingName
                 "subject" = $templateSource.subject
                 "sender_name" = $templateSource.sender_name
                 "sender_email" = $templateSource.sender_email
                 "content" = [PSCustomObject]@{
-                    "type" = $Script:settings.broadcast.defaultContentType
-                    "html" = $html
-                    "text" = $templateSource.body_text
+                    "type" = $mailingType
+                    "html" = $mailingHtml
+                    "text" = $mailingText
                 }
                 "receivers" = [PSCustomObject]@{
                     #"groups" = [Array]@(, $groupId )
