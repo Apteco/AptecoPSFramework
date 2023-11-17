@@ -18,6 +18,17 @@ $debug = $false
 
 
 #-----------------------------------------------
+# LOG ENVIRONMENT VARIABLES, IF DEBUG
+#-----------------------------------------------
+
+If ( $debug -eq $true ) {
+    [System.Environment]::GetEnvironmentVariables([System.EnvironmentVariableTarget]::Process).GetEnumerator() | ForEach {
+        Write-Log "$( $_.Name ) = $( $_.Value )"
+    }
+}
+
+
+#-----------------------------------------------
 # ADD MODULE PATH, IF NOT PRESENT
 #-----------------------------------------------
 
