@@ -4,7 +4,7 @@
     "providername" = "PSDemo"
 
     "messages" = @(
-        "a","b","c"
+        "First Message","Second Message","Third Message"
     )
 
 }

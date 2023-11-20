@@ -10,7 +10,7 @@ Function Set-Settings {
 
     Process {
 
-        # Exchange relativ paths
+        # Exchange relative paths
         $resolvedLogPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($PSCustom."logfile")
         $PSCustom."logfile" = $resolvedLogPath
 

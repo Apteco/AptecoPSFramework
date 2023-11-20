@@ -39,9 +39,23 @@ function Get-Messages {
         # LOAD MAILINGS
         #-----------------------------------------------
 
+        
+
         # TODO load this later from the settings.json
         # This collection could be loaded from an ESP through REST
         $msg = [System.Collections.ArrayList]::new()
+
+        For ( $i = 0 ; $i -lt $Script:settings.messages.count ; $i++ ) {
+
+            [void]$msg.add(
+                [PSCustomObject]@{
+                    id = $i + 1
+                    name = $Script:settings.messages[$i]
+                }
+            )
+
+        }
+        <#
         [void]$msg.add(
             [PSCustomObject]@{
                 id = "1"
@@ -60,6 +74,7 @@ function Get-Messages {
                 name = "Message 3"
             }
         )
+        #>
 
         Write-Log "Loaded $( $msg.Count ) mailing drafts from Dummy" -severity INFO #-WriteToHostToo $false
 
