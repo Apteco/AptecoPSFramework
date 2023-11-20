@@ -29,12 +29,14 @@ $tempScriptFile = Join-Path $Env:Temp -ChildPath "install_aptecopsframework.ps1"
 #-----------------------------------------------
 # LOAD CURRENT PATH
 #-----------------------------------------------
-
+<#
 if ($MyInvocation.MyCommand.CommandType -eq "ExternalScript") {
     $scriptPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 } else {
     $scriptPath = Split-Path -Parent -Path ([Environment]::GetCommandLineArgs()[0])
 }
+#>
+$scriptPath = ( Resolve-Path -Path "." ).Path
 
 Write-Verbose "Current Path: $( $scriptPath )" -Verbose
 
@@ -137,8 +139,9 @@ If ( $isElevated -eq $false ) {
 
         #Start-Process powershell -Verb RunAs
 
-        # Download the script, create arguments with current directory and open elevated PowerShell with that folder and execute the script again
+        # Download the script, unblock it, create arguments with current directory and open elevated PowerShell with that folder and execute the script again
         Invoke-WebRequest -Uri $scriptSourceUrl -UseBasicParsing -Method GET -OutFile $tempScriptFile
+        Unblock-File -Path $tempScriptFile # This does not seem to be needed, but doesn't hurt
         $CommandLineArgumentList = "-NoExit", "-Command", "Set-Location ""$( $scriptPath )"";. ""$( $tempScriptFile )"""
         Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList $CommandLineArgumentList
 

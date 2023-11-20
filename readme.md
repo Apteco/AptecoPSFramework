@@ -5,7 +5,7 @@
 
 This framework is mainly created for installing and using custom channels in Apteco Orbit and PeopleStage. The channel implementations are written in PowerShell and already implemented as "Plugins" in this module. But there is a function implemented so you can refer to your own channels that are not getting overwritten if you update this module. The development of this module is done here, but it is published through [PowerShell Gallery](https://www.powershellgallery.com/packages?q=%23apteco).
 
-# Current integrations
+# Current integrations/plugins
 
 Type|Vendor|API name|Technology|Features
 -|-|-|-|-
@@ -14,133 +14,9 @@ CRM|SalesForce SalesCloud|REST/Bulk API|REST|Load CRM Data, Upload to CampaignMe
 CRM|Hubspot|CRM API v3|REST|Download all CRM object data full/delta, Upload to Marketing Lists
 CRM|Microsoft Dynamics 365 CRM|DataVerse oData WebAPI|REST|Download all CRM object data and picklists full/delta
 
-# Installation
+# Installation / Update / Uninstall
 
-You can just download the whole repository here and pick this script or your can use PSGallery through PowerShell commands directly.
-
-The installation needs to be done on the "Apteco APP Server", so the "Apteco Service" can talk to this module.
-
-## PSGallery
-
-This is the easier option if your machine is allowed to talk to the internet. If not, look at the next option, because you can also build a local repository that can be used for installation and updates.
-
-Let us check if you have the needed prerequisites
-
-```PowerShell
-# Check your executionpolicy: https:/go.microsoft.com/fwlink/?LinkID=135170
-Get-ExecutionPolicy
-
-# Either set it to Bypass to generally allow scripts for current user
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
-# or
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# Make sure to have PowerShellGet >= 1.6.0
-Get-InstalledModule -Name PowerShellGet -MinimumVersion 1.6.0
-```
-
-### Installation via Install-Module
-
-For installation execute this for all users scope (or with a users scope, but this needs to be the exact user that executes the "Apteco Service").
-
-It is recommended, to use at minimum the module `PowerShellGet` with version `1.6.0` to avoid problems with loading prerelease versions. To check this, run
-
-```PowerShell
-Get-InstalledModule -Name PowerShellGet -MinimumVersion 1.6.0
-```
-
-If you have no result, then execute
-
-```PowerShell
-install-module powershellget -Verbose -AllowClobber -force
-```
-
-to update that module. Now proceed with installing apteco modules:
-
-```PowerShell
-# Execute this with elevated rights or with the user you need to execute it with, e.g. the apteco service user
-install-script install-dependencies, import-dependencies
-install-module writelog
-Install-Dependencies -module aptecopsframework
-```
-
-You can check the installed module with
-
-```PowerShell
-Get-InstalledModule AptecoPSFramework
-```
-
-If you want to find more [Apteco scripts in PSGallery](https://www.powershellgallery.com/packages?q=Tags%3A%22Apteco%22), please search with
-
-```PowerShell
-Find-Module -Repository "PSGallery" -Tag "Apteco"
-```
-
-To update the module, just execute the `Install-Module` command again with `-Force` like
-
-```PowerShell
-Find-Module -Repository "PSGallery" -Name "AptecoPSFramework" -IncludeDependencies | Install-Module -Verbose -Scope AllUsers -Force
-```
-
-
-### Installation via local Repository
-
-If your machine does not have an online connection you can use another machine to save the script from PSGallery website as a local file via your browser. You should have download a file with an `.nupkg` extension. Please don't forget to download all dependencies, too. You could simply unzip the file(s) and put the script somewhere you need it OR do it in an updatable manner and create a local repository if you don't have it already with
-
-```PowerShell
-Set-Location "$( $env:USERPROFILE )\Downloads"
-New-Item -Name "PSRepo" -ItemType Directory
-Register-PSRepository -Name "LocalRepo" -SourceLocation "$( $env:USERPROFILE )\Downloads\PSRepo"
-Get-PSRepository
-```
-
-Then put your downloaded `.nupkg` file into the new created `PSRepo` folder and you should see the module via 
-
-```PowerShell
-Find-Module -Repository LocalRepo
-```
-
-Then install the script like 
-
-```PowerShell
-# Execute this with elevated rights or with the user you need to execute it with, e.g. the apteco service user
-install-script install-dependencies, import-dependencies
-install-module writelog
-Find-Module -Repository LocalRepo -Name AptecoPSFramework -IncludeDependencies | Install-Module -Scope CurrentUser -Verbose
-```
-
-That way you can exchange the `.nupkg` files and update them manually from time to time.
-
-### Update
-
-If you want to update this module and dependencies, just update it and check the modules
-
-```PowerShell
-Install-Module AptecoPSFramework -Force
-Import-Module AptecoPSFramework -Verbose
-Install-AptecoPSFramework
-```
-
-More information about the update is in the installation section above.
-
-If the channel does not work after an update, you should try to restart the FastStats service.
-
-### Uninstall
-
-If you don't want to use the script anymore, just remove it with 
-
-```PowerShell
-Uninstall-Module -Name AptecoPSFramework
-```
-
-
-## Github
-
-Download the whole repository and to load the module, just replace your path with the parent folder of the `AptecoPSFramework.psm1` file and execute this command. The `-verbose` is not needed, it just tells you more information.
-
-```PowerShell
-Import-Module "D:\Scripts\PSModules\AptecoPSFramework" -Verbose
-```
+This has been put into the wiki: https://github.com/Apteco/AptecoPSFramework/wiki/Installation-and-Update
 
 
 
@@ -179,16 +55,9 @@ Now you should find a `create_settings.ps1` file in your boilerplate folder. Ple
 
 You are able to use already integrated plugins, but can also develop your own plugins and load it via this module and use the already existing framework with logging, error handling, encryption and much more comfort. The idea is to have a `settings.json` which can also have a different name. That file contains all information to drive the module and integration with Apteco. You can have as many settings files for the same or different plugins as you want.
 
-## Built-In plugins
+Please consider to create a channel multiple times, e.g. for every table level.
 
-Guid|Name|Description|More information
--|-|-|-
-07f5de5b-1c83-4300-8f17-063a5fdec901|Demo||[Documentation](AptecoPSFramework/plugins/Demo)
-3adb8696-c219-49c7-906b-92680727a1c1|CleverReach||[Documentation](AptecoPSFramework/plugins/CleverReach)
-
-
-
-## Create your settings json file
+## Create your settings json/yaml file
 
 The first target is to create your settings json file, because that contains all the information that the module needs for being triggered by PeopleStage. In the boiletplate you can find a rough example of how to create that file. But specific for the chosen plugins you can set more or less parameters. They can be changed through that `create_settings.ps1` script or later in your json file. It depends on how often you change the settings json file. This path to the settings file json needs to be exchanged in the channel editor settings in the integration parameter. This needs to be an absolute path.
 
@@ -249,19 +118,9 @@ $settings.token.tokenFilePath = "D:\Scripts\CleverReach\check-token\cr.token"
 #-----------------------------------------------
 
 Set-Settings -PSCustom $settings
-Export-Settings -Path ".\settings.json"
+Export-Settings -Path ".\settings.yaml"
 ```
 
-## Updating your plugins settings
-
-If you want to update your current settings after an update of the PowerShell Module, you can refresh your settings json file with importing the settings and export them again. With this way, the settings are getting loaded first, then merged with the plugins settings and then synchronised/updated with the settings json file you have imported.
-
-```PowerShell
-Import-Settings -Path ".\settings.json"
-Export-Settings -Path ".\settings.json"
-```
-
-This step ist needed, but ensures that you get new parameters from the default settings than you can override in the settings json file.
 
 ## Create your own plugin or change an existing one
 
@@ -376,17 +235,9 @@ Test-Send        Test-Send
 ```
 
 
-# Settings
-
-Path|Setting|Default|Explanation
--|-|-|-
-/|base|https://rest.cleverreach.com/v3/|The default API address for CleverReach
-
-
-
 # Errors
 
-## Die Eingabezeichenfolge hat das falsche Format.
+## Die Eingabezeichenfolge hat das falsche Format
 
 When you get this error
 
@@ -411,11 +262,3 @@ Please restart your FastStats service if you have problems after an update.
 This should not happen, but shows that your PSModulePath cannot be loaded properly from C# runspaces.
 
 To manually fix this, just add `C:\Program Files\WindowsPowerShell\Modules` to the system environment variable `PSModulePath`
-
-
-# TODO / TEST
-
-- [x] support external plugin folder => done! Test it!
-- [x] implement dependencies
-- [x] Add more explanations for settings
-- [ ] Add a hint that you should create one channel per table level
