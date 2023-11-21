@@ -463,6 +463,7 @@ function Invoke-Upload{
             $v = 0  # valid counter
             $j = 0  # uploaded entries counter
             $k = 0  # upload batches counter
+            $l = 0  # failed uploads
             $checkObject = [System.Collections.ArrayList]@()
             $uploadObject = [System.Collections.ArrayList]@()
             while ($reader.Peek() -ge 0) {
@@ -644,7 +645,7 @@ function Invoke-Upload{
                     If ( $Script:settings.upload.validateReceivers -eq $true -and $createNewGroup -eq $false ) {
                         # TODO validate receivers through cleverreach, check abount bounces
 
-                        Write-Log "Validate email addresses"
+                        Write-Log "  Validate email addresses (already existing)"
                         Write-Log "  $( $checkObject.count ) rows"
 
                         $validateObj = [PSCustomObject]@{
@@ -652,7 +653,7 @@ function Invoke-Upload{
                             "group_id" = $groupId
                             "invert" = $false
                         }
-                        $validatedAddresses = @(, (Invoke-CR -Object "receivers" -Path "/isvalid" -Method POST -Verbose -Body $validateObj ))
+                        $validatedAddresses = @( Invoke-CR -Object "receivers" -Path "/isvalid" -Method POST -Verbose -Body $validateObj )
                         #$Script:debug = $validatedAddresses
                         $v += $validatedAddresses.count
 
@@ -695,7 +696,8 @@ function Invoke-Upload{
 
                     Do {
 
-                        Write-Log "  $( ( $uploadObject[0..$uploadSize] ).count ) objects/rows will be uploaded"
+                        $currentUploadCounter = ( $uploadObject[0..$uploadSize] ).count
+                        Write-Log "  $( $currentUploadCounter ) objects/rows will be uploaded"
 
                         $uploadBody = $uploadObject[0..( $uploadSize - 1 )]
 
@@ -714,6 +716,11 @@ function Invoke-Upload{
                             # Count the successful upserted profiles
                             $j += $upload.count
                             $k += 1
+                            Write-Log "  $( $upload.count ) OK"
+
+                            # And the failed ones
+                            $l += $currentUploadCounter - $upload.count
+                            Write-Log "  $( $currentUploadCounter - $upload.count ) FAIL"
 
                             # Output the response body for debug purposes
                             If ( $Script:debugMode -eq $true ) {
@@ -748,6 +755,7 @@ function Invoke-Upload{
             Write-Log "  $( $v ) valid rows"
             Write-Log "  $( $j ) uploaded records"
             Write-Log "  $( $k ) uploaded batches"
+            Write-Log "  $( $l ) failed records" # TODO log the failed entries somewhere? Or make an option for this?
 
 
             #-----------------------------------------------
@@ -826,7 +834,7 @@ function Invoke-Upload{
             Write-Log -Message "Needed $( [int]$processDuration.TotalSeconds ) seconds in total"
 
             If ( $tags.length -gt 0 ) {
-                Write-Log "Uploaded $( $j ) record. Confirmed $( $tagcount ) receivers with tag '$( $tags )'" -severity INFO
+                Write-Log "Uploaded $( $j ) records, $( $l ) failed. Confirmed $( $tagcount ) receivers with tag '$( $tags )'" -severity INFO
             }
 
         }

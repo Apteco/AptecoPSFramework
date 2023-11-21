@@ -171,6 +171,9 @@ function Show-Preview {
             # PUT PREVIEW RECEIVER IN THAT GROUP
             #-----------------------------------------------
 
+            $globalAtts = @( $attributes.global | Where-Object { $_.name -in $headers } )
+            $headersLower = @( $headers.tolower() )
+
             $uploadEntry = [PSCustomObject]@{
                 "email" = $testRecipient.Email
                 "global_attributes" = [PSCustomObject]@{}
@@ -179,14 +182,14 @@ function Show-Preview {
             }
 
             # Adding global attributes
-            $attributes.global | Where-Object { $_.name -in $headers } | ForEach-Object {
+            $globalAtts | Where-Object { $_.name -in $headers } | ForEach-Object {
 
-                $attrName = $_.name # using description now rather than name, because the comparison is made on descriptions
-                $attrDescription = $_.description
+                $attrName = $_.name.toLower() # using description now rather than name, because the comparison is made on descriptions
+                $attrDescription = $_.description.toLower()
                 $value = $null
 
-                $nameIndex = $headers.IndexOf($attrName)
-                $descriptionIndex = $headers.IndexOf($attrDescription)
+                $nameIndex = $headersLower.IndexOf($attrName)
+                $descriptionIndex = $headersLower.IndexOf($attrDescription)
                 # If nothing found, the index is -1
                 If ( $nameIndex -ge 0) {
                     $value = $testRecipient.Personalisation.($attrName) #$values[$nameIndex]
@@ -204,12 +207,12 @@ function Show-Preview {
             $usedAttributes = [System.Collections.ArrayList]@()
             $attributes.new | ForEach-Object {
 
-                $attrName = $_.name # using description now rather than name, because the comparison is made on descriptions
-                $attrDescription = $_.description
+                $attrName = $_.name.toLower() # using description now rather than name, because the comparison is made on descriptions
+                $attrDescription = $_.description.toLower()
                 $value = $null
 
-                $nameIndex = $headers.IndexOf($attrName)
-                $descriptionIndex = $headers.IndexOf($attrDescription)
+                $nameIndex = $headersLower.IndexOf($attrName)
+                $descriptionIndex = $headersLower.IndexOf($attrDescription)
                 # If nothing found, the index is -1
                 If ( $nameIndex -ge 0) {
                     $value = $testRecipient.Personalisation.($attrName) #$values[$nameIndex]
@@ -226,12 +229,12 @@ function Show-Preview {
             # Existing local attributes
             $attributes.local | ForEach-Object {
 
-                $attrName = $_.name # using description now rather than name, because the comparison is made on descriptions
-                $attrDescription = $_.description
+                $attrName = $_.name.toLower() # using description now rather than name, because the comparison is made on descriptions
+                $attrDescription = $_.description.toLower()
                 $value = $null
 
-                $nameIndex = $headers.IndexOf($attrName)
-                $descriptionIndex = $headers.IndexOf($attrDescription)
+                $nameIndex = $headersLower.IndexOf($attrName)
+                $descriptionIndex = $headersLower.IndexOf($attrDescription)
                 # If nothing found, the index is -1
                 If ( $nameIndex -ge 0) {
                     $value = $testRecipient.Personalisation.($attrName) #$values[$nameIndex]
