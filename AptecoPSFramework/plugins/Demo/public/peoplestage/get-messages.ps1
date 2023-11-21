@@ -39,7 +39,7 @@ function Get-Messages {
         # LOAD MAILINGS
         #-----------------------------------------------
 
-        
+
 
         # TODO load this later from the settings.json
         # This collection could be loaded from an ESP through REST
