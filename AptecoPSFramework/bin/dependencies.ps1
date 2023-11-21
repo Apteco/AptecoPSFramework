@@ -10,6 +10,7 @@ $psModules = [Array]@(
     "EncryptCredential"
     "ExtendFunction"
     "ConvertUnixTimestamp"
+    "powershell-yaml"
     #"Microsoft.PowerShell.Utility"
     #"PSOAUth"  # is defined in the local plugins where it is needed
 )

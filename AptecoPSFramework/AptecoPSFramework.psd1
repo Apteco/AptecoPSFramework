@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.8'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -144,10 +144,11 @@ PrivateData = @{
         IconUri = 'https://www.apteco.de/sites/default/files/favicon_3.ico'
 
         # release channel
-        #Prerelease = 'alpha3'
+        Prerelease = 'alpha2'
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.2.0 Added yaml as a new functionality to save and load settings - please make sure to install your dependencies again
 0.1.8 Changing CleverReach to support other mailing types than html/text
 0.1.7 Adding a psmodulepath hardcoded to module and boilerplate as it seems to misinterpreted when called by C# runspaces
       Adding a flag to Hubspot to forward the input object name

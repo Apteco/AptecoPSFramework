@@ -9,6 +9,9 @@ Function Import-Settings {
         # Try to resolve the path
         $absolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
 
+        # Work out the extension - the file does not need to exist for that
+        $pathExtension = [System.IO.Path]::GetExtension($Path)
+
         try {
 
             If ( ( Test-Path -Path $absolutePath -IsValid ) -eq $true ) {
@@ -17,7 +20,20 @@ Function Import-Settings {
 
                     # Load the new settings file
                     try {
-                        $settings = Get-Content -Path $absolutePath -Encoding utf8 -Raw | ConvertFrom-Json
+
+                        # Now save the settings file
+                        Switch ( $pathExtension ) {
+
+                            { $PSItem -in @( ".yml", ".yaml" ) } {
+                                $settings = Get-Content -Path $absolutePath -Encoding utf8 -Raw | ConvertFrom-Yaml | ConvertTo-Yaml -JsonCompatible | ConvertFrom-Json
+                            }
+
+                            default {
+                                $settings = Get-Content -Path $absolutePath -Encoding utf8 -Raw | ConvertFrom-Json
+                            }
+
+                        }
+
                     } catch {
                         Write-Error "There is a problem loading the settings file"
                     }
