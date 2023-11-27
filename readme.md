@@ -61,6 +61,8 @@ Please consider to create a channel multiple times, e.g. for every table level.
 
 The first target is to create your settings json file, because that contains all the information that the module needs for being triggered by PeopleStage. In the boiletplate you can find a rough example of how to create that file. But specific for the chosen plugins you can set more or less parameters. They can be changed through that `create_settings.ps1` script or later in your json file. It depends on how often you change the settings json file. This path to the settings file json needs to be exchanged in the channel editor settings in the integration parameter. This needs to be an absolute path.
 
+Tool tip: If you want to visualise (and edit) the JSON, this tool can help: https://jsoncrack.com/editor
+
 ```PowerShell
 
 #-----------------------------------------------
