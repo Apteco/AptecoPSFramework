@@ -264,3 +264,30 @@ Please restart your FastStats service if you have problems after an update.
 This should not happen, but shows that your PSModulePath cannot be loaded properly from C# runspaces.
 
 To manually fix this, just add `C:\Program Files\WindowsPowerShell\Modules` to the system environment variable `PSModulePath`
+
+
+## DuckDB cannot be opened
+
+Since 0.3.0 there is DuckDB integrated in this framework. If you have problems to get it work like
+
+```PowerShell
+Import-Module AptecoPSFramework
+Open-DuckDBConnection
+```
+
+and it fails with something like
+
+```PowerShell
+PS C:\Users\WDAGUtilityAccount> Open-DuckDBConnection
+Exception calling "Open" with "0" argument(s): "The type initializer for
+'DuckDB.NET.Data.DuckDBConnectionStringBuilder' threw an exception."
+At C:\Users\WDAGUtilityAccount\Downloads\AptecoPSFramework\public\duckdb\Open-DuckDBConnection.ps1:18 char:13
++             $Script:duckDb.Open()
++             ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodInvocationException
+    + FullyQualifiedErrorId : TypeInitializationException
+```
+
+then you need to install the newest version of `vcredist` from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+
+If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`

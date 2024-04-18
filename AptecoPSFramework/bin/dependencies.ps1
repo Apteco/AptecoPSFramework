@@ -44,6 +44,9 @@ $psLocalPackages = [Array]@(
 
     #>
 
+    "DuckDB.NET.Bindings.Full"
+    "DuckDB.NET.Data.Full"
+
 )
 
 $psAssemblies = [Array]@(

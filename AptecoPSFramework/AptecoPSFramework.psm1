@@ -122,6 +122,7 @@ New-Variable -Name pluginFolders -Value $null -Scope Script -Force  # Folders ar
 New-Variable -Name plugins -Value $null -Scope Script -Force        # Plugins collection for all registered plugins
 New-Variable -Name pluginPath -Value $null -Scope Script -Force     # The path of the chosen plugin
 New-Variable -Name plugin -value $null -Scope Script -Force         # The plugin pscustomobject
+New-Variable -Name duckDb -Value $null -Scope Script -Force         # New Variable for saving the DuckDB connection
 
 # Set the variables now
 $Script:timestamp = [datetime]::Now

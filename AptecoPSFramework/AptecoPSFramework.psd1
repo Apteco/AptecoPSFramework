@@ -106,6 +106,11 @@ FunctionsToExport = @(
     "Set-ProcessIdentifier"
     "Set-Settings"
     "Install-Plugin"
+    "Open-DuckDBConnection"
+    "Get-DuckDBConnection"
+    "Close-DuckDBConnection"
+    "Read-DuckDBQueryAsReader"
+    "Read-DuckDBQueryAsScalar"
 ) #'*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -148,6 +153,10 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.3.0 Adding DuckDB as dependencies to the framework by default so the campaign file can be read (and written) through DuckDB query
+      more effectively than through a .NET streamreader or streamwriter when you want to transform the file
+      If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`
+      Fixed the installation script to also install local and global packages
 0.2.0 Added yaml as a new functionality to save and load settings - please make sure to install your dependencies again
       CleverReach - Fixed output for validations (showed 1 as valid when there is 0 valid entries)
       CleverReach - Putting failed entries also in log and returns it to Orbit Monitoring
