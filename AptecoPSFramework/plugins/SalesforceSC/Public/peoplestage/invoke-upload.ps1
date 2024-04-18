@@ -348,7 +348,7 @@ function Invoke-Upload{
             Write-Log "Converted $( $newCsv.count ) lines"
 
 
-            $nf = "$( $Env:TEMP )\$( [guid]::NewGuid().toString() ).csv" #New-TemporaryFile
+            $nf = Join-Path -Path $Env:tmp -ChildPath "$( [guid]::newguid().toString() ).csv" #New-TemporaryFile
             Write-Log "Using temporary file $( $nf )"
             # TODO [ ] Not the best way when you have quotes in values
             $newCsvContent = $newCsv | convertto-csv -NoTypeInformation -Delimiter "`t" | % {$_ -replace '"',''}

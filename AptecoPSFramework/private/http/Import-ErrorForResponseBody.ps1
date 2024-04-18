@@ -18,21 +18,28 @@ function Import-ErrorForResponseBody() {
         $Err
     )
 
-    # Only needed in PS5.1, not in Pwsh
-    if ($PSVersionTable.PSVersion.Major -lt 6) {
-        if ($err.Exception.Response) {
-            $Reader = New-Object System.IO.StreamReader($Err.Exception.Response.GetResponseStream())
-            $Reader.BaseStream.Position = 0
-            $Reader.DiscardBufferedData()
-            $ResponseBody = $Reader.ReadToEnd()
-            if ($ResponseBody.StartsWith('{')) {
-                $ResponseBody = $ResponseBody | ConvertFrom-Json
+    try {
+
+        # Only needed in PS5.1, not in Pwsh
+        if ($PSVersionTable.PSVersion.Major -lt 6) {
+            if ($err.Exception.Response) {
+                $Reader = New-Object System.IO.StreamReader($Err.Exception.Response.GetResponseStream())
+                $Reader.BaseStream.Position = 0
+                $Reader.DiscardBufferedData()
+                $ResponseBody = $Reader.ReadToEnd()
+                if ($ResponseBody.StartsWith('{')) {
+                    $ResponseBody = $ResponseBody | ConvertFrom-Json
+                }
+                return $ResponseBody
             }
-            return $ResponseBody
+        } else {
+            return $Err.ErrorDetails.Message
         }
-    }
-    else {
+
+    } catch {
+        
         return $Err.ErrorDetails.Message
+
     }
 
 }

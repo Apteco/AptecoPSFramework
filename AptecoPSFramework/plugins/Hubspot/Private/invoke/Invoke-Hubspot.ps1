@@ -3,7 +3,7 @@ function Invoke-Hubspot {
 
     [CmdletBinding()]
     param (
-         [Parameter(Mandatory=$true)][String]$Object                                # The cleverreach object like groups or mailings (first part after the main url)
+         [Parameter(Mandatory=$true)][String]$Object                                # The hubspot object like groups or mailings (first part after the main url)
         ,[Parameter(Mandatory=$false)][String]$Path = ""                            # The path in the url after the object
         ,[Parameter(Mandatory=$false)][PSCustomObject]$Query = [PSCustomObject]@{}  # Query parameters for the url
         ,[Parameter(Mandatory=$false)][Switch]$Paging = $false                      # Automatic paging through the result, only needed for a few calls
@@ -101,13 +101,13 @@ function Invoke-Hubspot {
         $rawToken = ""
 
         # Add auth header or just set it
-        If ( $updatedParameters.ContainsKey("Header") -eq $true ) {
+        If ( $updatedParameters.ContainsKey("Headers") -eq $true ) {
             $header.Keys | ForEach-Object {
                 $key = $_
                 $updatedParameters.Header.Add( $key, $header.$key )
             }
         } else {
-            $updatedParameters.add("Header",$header)
+            $updatedParameters.add("Headers",$header)
         }
 
 
@@ -117,7 +117,7 @@ function Invoke-Hubspot {
 
         # Add additional headers from the settings, e.g. for api gateways or proxies
         $Script:settings.additionalHeaders.PSObject.Properties | ForEach-Object {
-            $updatedParameters.add($_.Name, $_.Value)
+            $updatedParameters.Headers.add($_.Name, $_.Value)
         }
 
 
@@ -279,7 +279,7 @@ function Invoke-Hubspot {
                     try {
                         $newToken = Save-NewToken
                         Write-Log -Severity WARNING -Message "Successful token refresh"
-                        $wrInput.Params.Header.Authorization = "Bearer $( $newToken )"
+                        $wrInput.Params.Headers.Authorization = "Bearer $( $newToken )"
                         $continueAfterTokenRefresh = $true
                     } catch {
                         Write-Log -Severity ERROR -Message "Token refresh not successful"

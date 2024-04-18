@@ -148,6 +148,14 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.2.1 Feature: New internal function for plugins to allow multipart uploads via `Prepare-MultipartUpload`
+      Feature: Addition for Hubspot to load single or multiple properties by name in `Get-Property`
+      Feature: New function for Hubspot to allow the loading of a pipeline
+      Feature: New function for Hubspot to load "owners"
+      Fix: Invoking hubspot has not used the correct headers which is now fixed
+      Fix: Better error handling dependent from PS version in `Import-ErrorForResponseBody`^
+      Fix: Improved input file handling for Salesforce plugin
+      Fix: The get messages boilerplate was outdated and has now been updated
 0.2.0 Added yaml as a new functionality to save and load settings - please make sure to install your dependencies again
       CleverReach - Fixed output for validations (showed 1 as valid when there is 0 valid entries)
       CleverReach - Putting failed entries also in log and returns it to Orbit Monitoring
