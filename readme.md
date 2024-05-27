@@ -290,4 +290,6 @@ At C:\Users\WDAGUtilityAccount\Downloads\AptecoPSFramework\public\duckdb\Open-Du
 
 then you need to install the newest version of `vcredist` from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
+The direct permalink is: https://aka.ms/vs/17/release/vc_redist.x64.exe
+
 If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`

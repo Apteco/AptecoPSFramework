@@ -228,6 +228,28 @@ try {
 
 
 #-----------------------------------------------
+# INSTALL VCREDIST
+#-----------------------------------------------
+
+If ( $os -eq "Windows" ) {
+
+    # Set the paths
+    $vcredistPermalink = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+    $vcredistTargetFile = Join-Path -Path ( [System.Environment]::GetEnvironmentVariable("TMP")) -ChildPath "vc_redist.x64.exe"
+
+    # Download file - iwr is a bit slow, but works on all operating system
+    #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile
+    
+    # Downlading with Bits as this package is windows only
+    Start-BitsTransfer -Destination $vcredistTargetFile -Source $vcredistPermalink
+
+    # Install file quietly
+    Start-Process -FilePath $vcredistTargetFile -ArgumentList "/install /q /norestart" -Verb RunAs -Wait
+    
+}
+
+
+#-----------------------------------------------
 # INSTALL BASE SCRIPTS AND MODULES
 #-----------------------------------------------
 
