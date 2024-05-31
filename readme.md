@@ -264,3 +264,17 @@ Please restart your FastStats service if you have problems after an update.
 This should not happen, but shows that your PSModulePath cannot be loaded properly from C# runspaces.
 
 To manually fix this, just add `C:\Program Files\WindowsPowerShell\Modules` to the system environment variable `PSModulePath`
+
+## Missing dependency, execute: 'Install-Script Install-Dependencies'
+
+There is a script missing to install other dependencies. To solve this, simply run
+
+```PowerShell
+Install-Script Install-Dependencies
+```
+
+After that you can proceed with your installation like
+
+```PowerShell
+Install-AptecoPSFramework -Verbose
+```
