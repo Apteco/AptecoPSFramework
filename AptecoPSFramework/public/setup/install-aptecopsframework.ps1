@@ -74,6 +74,8 @@ Calling with one of the Flags, just does this part
         # INSTALL/UPDATE VCREDIST
         #-----------------------------------------------
 
+        # Needed for duckdb
+
         If ( $os -eq "Windows" ) {
 
             # Set the paths
@@ -82,13 +84,13 @@ Calling with one of the Flags, just does this part
 
             # Download file - iwr is a bit slow, but works on all operating system
             #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile
-            
+
             # Downlading with Bits as this package is windows only
             Start-BitsTransfer -Destination $vcredistTargetFile -Source $vcredistPermalink
 
             # Install/Update file quietly
             Start-Process -FilePath $vcredistTargetFile -ArgumentList "/install /q /norestart" -Verb RunAs -Wait
-            
+
         }
 
 

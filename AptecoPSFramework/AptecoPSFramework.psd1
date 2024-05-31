@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -20,7 +20,7 @@ Author = 'florian.von.bracht@apteco.de'
 CompanyName = 'Apteco GmbH'
 
 # Copyright statement for this module
-Copyright = '(c) 2023 Apteco GmbH. All rights reserved.'
+Copyright = '(c) 2024 Apteco GmbH. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Apteco PS Modules - Framework
@@ -157,6 +157,10 @@ PrivateData = @{
       more effectively than through a .NET streamreader or streamwriter when you want to transform the file
       If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`
       Fixed the installation script to also install local and global packages
+      Adding a default protocol handler that is recommended by Microsoft, if setting the setting `changeTLS` to `false`
+      Added some hints about DuckDB in the readme.md
+      Added a better handling for lib folder with other names or other paths than the default
+      Added DuckDB functions to read data as pscustom or execute a scalar query
 0.2.0 Added yaml as a new functionality to save and load settings - please make sure to install your dependencies again
       CleverReach - Fixed output for validations (showed 1 as valid when there is 0 valid entries)
       CleverReach - Putting failed entries also in log and returns it to Orbit Monitoring

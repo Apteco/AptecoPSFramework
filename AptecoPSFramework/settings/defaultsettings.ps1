@@ -25,6 +25,9 @@
     # PowerShell
     "powershellExePath" =  "powershell.exe"                 # Could be changed to something like pwsh.exe for the scheduled task of refreshing token and response gathering
 
+    # Local lib folder
+    "localLibFolder" = "./lib"
+
     # DuckDB
     "defaultDuckDBConnection" = "Data Source=:memory:;"     # Default DuckDB connection -> In-Memory connection, could also be a file
 

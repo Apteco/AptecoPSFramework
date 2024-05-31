@@ -80,6 +80,10 @@ if ( $Script:settings.changeTLS ) {
     # Microsoft is using this setting in examples
     #[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
+} else {
+
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
 }
 
 # TODO look for newer version of this network stuff
@@ -156,8 +160,31 @@ try {
 
 
 # Load packages from current local libfolder
+# If you delete packages manually, this can increase performance but there could be some functionality missing
 If ( $psLocalPackages.Count -gt 0 ) {
-    Import-Dependencies -LoadWholePackageFolder
+
+    try {
+
+        # Work out the local lib folder
+        $localLibFolder = Resolve-Path -Path $Script:settings.localLibFolder
+        $localLibFolderItem = get-item $localLibFolder.Path
+
+        # Remember current location and change folder
+        $currentLocation = Get-Location
+        Set-Location $localLibFolderItem.Parent.FullName
+
+        # Import the dependencies
+        Import-Dependencies -LoadWholePackageFolder -LocalPackageFolder $localLibFolderItem.name
+
+        # Go back, if needed
+        Set-Location -Path $currentLocation.Path
+        
+    } catch {
+
+        Write-Warning "There was a problem importing packages in the local lib folder, but proceeding..."
+
+    }
+
 }
 
 

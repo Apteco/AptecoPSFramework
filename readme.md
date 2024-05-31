@@ -236,6 +236,59 @@ Test-Send        Test-Send
 #>
 ```
 
+# DuckDB support
+
+Since version `0.3.0` this module integrates DuckDB out-of-the-box, if you run `Install-AptecoPSFramework`. This downloads a few modules into a local "lib" folder.
+
+This folder should be the folder, where you put your settings json/yaml files.
+
+This is a quick start example to use DuckDB
+
+```PowerShell
+# this should be the place where you have your json/yaml settings files and your lib folder
+Set-Location "c:\Users\MMustermann\Scripts\AptecoPSFramework" 
+
+# Import the Framework
+Import-Module AptecoPSFramework
+
+<#
+
+You should see something in the console like
+
+WARNING: There is no variable '$processId' present on 'Script' scope. Created one with
+'bd8a69ce-0795-4f0a-b5ea-395c54473f60'
+VERBOSE: ----------------------------------------------------
+VERBOSE: Using PowerShell version 5.1.22621.3672 and Desktop edition
+VERBOSE: Using OS: Windows
+VERBOSE: User: 9709FBAA-7534-4\WDAGUtilityAccount
+VERBOSE: Elevated: True
+VERBOSE: Loaded 0 modules
+VERBOSE: Loading libs...
+VERBOSE: There are 3 packages to load
+VERBOSE: Load status:
+VERBOSE:   Modules loaded: 0
+VERBOSE:   Lib/ref loaded: 3
+VERBOSE:   Lib/ref failed: 0
+VERBOSE:   Runtime loaded: 1
+VERBOSE:   Runtime failed: 0
+
+#>
+
+# Open the connection to the default DuckDB database
+Open-DuckDBConnection
+
+# Perform a simple scalar query, which returns just a number
+Read-DuckDBQueryAsScalar -Query "Select 10+15"
+
+# Should return 25
+
+# Perform a more advanced example to load a remote parquet file and query it in one go
+$q = "CREATE TABLE train_services AS FROM 's3://duckdb-blobs/train_services.parquet';SELECT * FROM train_services LIMIT 10;"
+Read-DuckDBQueryAsReader $q -ReturnAsPSCustom | ft
+
+```
+
+You can influence the database (default in-memory, but could also be a persistent one) by changing your settings at `defaultDuckDBConnection`
 
 # Errors
 
