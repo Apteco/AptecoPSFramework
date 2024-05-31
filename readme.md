@@ -273,8 +273,9 @@ There is a script missing to install other dependencies. To solve this, simply r
 Install-Script Install-Dependencies
 ```
 
-After that you can proceed with your installation like
+open a new PowerShell window and after that you can proceed with your installation like
 
 ```PowerShell
-Install-AptecoPSFramework -Verbose
+Import-Module AptecoPSFramework
+Install-AptecoPSFramework
 ```
