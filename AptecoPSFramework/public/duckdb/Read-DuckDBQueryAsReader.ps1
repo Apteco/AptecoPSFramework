@@ -8,14 +8,15 @@ Function Read-DuckDBQueryAsReader {
         [cmdletbinding()]
         param(
             [Parameter(Mandatory=$true)][String]$Query
+            ,[Parameter(Mandatory=$false)][String]$ConnectionName = ""
             ,[Parameter(Mandatory=$false)][Switch]$ReturnAsPSCustom = $false
+            ,[Parameter(Mandatory=$false)][Switch]$AsStream = $false
         )
 
         Begin {
 
-            # TODO check if all requisites are OK for streaming
-
-            $duckCommand = $Script:duckDb.createCommand()
+            $conn = Get-DuckDBConnection -Name $ConnectionName
+            $duckCommand = $conn.connection.createCommand()
 
             # Example: "Select * from read_csv('C:\Users\Florian\Downloads\example.txt', all_varchar = true, allow_quoted_nulls = true)"
             # You can define more options for loading csv through https://duckdb.org/docs/data/csv/overview
@@ -25,6 +26,12 @@ Function Read-DuckDBQueryAsReader {
             # SELECT * FROM train_services LIMIT 10;
             $duckCommand.CommandText = $Query
 
+            # Set streaming parameter, less RAM, possibly slower query, but the whole result is streamed rather than saved in one go
+            If ( $AsStream -eq $true ) {
+                $duckCommand.UseStreamingMode = $true
+            }
+
+            # Execute the reader
             $reader = $duckCommand.ExecuteReader()
 
             # return as [System.Data.Common.DbDataReader]
@@ -46,9 +53,9 @@ Function Read-DuckDBQueryAsReader {
             #>
 
             If ( $ReturnAsPSCustom -eq $true ) {
-                
-                $returnPSCustomArrayList = [System.Collections.ArrayList]@()
-
+                If ( $AsStream -eq $false ) {
+                    $returnPSCustomArrayList = [System.Collections.ArrayList]@()
+                }
             }
 
             # TODO implement as datatable
@@ -60,7 +67,7 @@ Function Read-DuckDBQueryAsReader {
             [void]$dt.Columns.Add("IDGAF")
 
 
-            (1..250000).ForEach{    
+            (1..250000).ForEach{
                 [void]$dt.Rows.Add($_, ($_ * 100), '0')
             }
             #>
@@ -70,7 +77,7 @@ Function Read-DuckDBQueryAsReader {
         Process {
 
             If ( $ReturnAsPSCustom -eq $true ) {
-                
+
                 While ($reader.read()) {
 
                     # Create object and fill it
@@ -83,11 +90,21 @@ Function Read-DuckDBQueryAsReader {
                             $returnPSCustom | Add-Member -MemberType NoteProperty -Name $reader.GetName($x) -Value $reader.GetValue($x) #$reader.GetString($x)
                         }
                     }
-                    [void]$returnPSCustomArrayList.Add($returnPSCustom)
+
+                    If ( $AsStream -eq $true ) {
+                        # return directly if it is a stream
+                        $returnPSCustom
+                    } else {
+                        # otherwise add to a collection
+                        [void]$returnPSCustomArrayList.Add($returnPSCustom)
+                    }
 
                 }
 
-                $returnPSCustomArrayList
+                # Return as collection in once, if not streaming
+                If ( $AsStream -eq $false ) {
+                    $returnPSCustomArrayList
+                }
 
             } else {
 

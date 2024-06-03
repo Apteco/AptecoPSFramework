@@ -1,4 +1,4 @@
-
+﻿
 #-----------------------------------------------
 # NOTES
 #-----------------------------------------------
@@ -140,6 +140,9 @@ $Script:plugin = [PSCustomObject]@{
     #"abc" = "def"
 }
 
+# Initialize DuckDB with an empty arraylist
+$Script:duckDb = [System.Collections.ArrayList]@()
+
 
 #-----------------------------------------------
 # IMPORT MODULES
@@ -178,7 +181,7 @@ If ( $psLocalPackages.Count -gt 0 ) {
 
         # Go back, if needed
         Set-Location -Path $currentLocation.Path
-        
+
     } catch {
 
         Write-Warning "There was a problem importing packages in the local lib folder, but proceeding..."

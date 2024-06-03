@@ -39,6 +39,7 @@ This framework brings lots of useful features with it like
 - Easy updates via PowerShellGallery
 - Easy integration of proxies, custom headers, REST handling
 - Using secure oAuth for connected apps like Microsoft Dynamics, Salesforce SalesCloud and CleverReach
+- Using DuckDB by default since 0.3.0 to allow easy data transformation
 - Much more to follow...
 
 Your help is appreciated. Just contact me.
@@ -111,6 +112,8 @@ FunctionsToExport = @(
     "Close-DuckDBConnection"
     "Read-DuckDBQueryAsReader"
     "Read-DuckDBQueryAsScalar"
+    "Invoke-DuckDBQueryAsNonExecute"
+    "Add-DuckDBConnection"
 ) #'*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
