@@ -164,7 +164,7 @@ try {
 
 # Load packages from current local libfolder
 # If you delete packages manually, this can increase performance but there could be some functionality missing
-If ( $psLocalPackages.Count -gt 0 ) {
+If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
 
     try {
 

@@ -26,6 +26,7 @@
     "powershellExePath" =  "powershell.exe"                 # Could be changed to something like pwsh.exe for the scheduled task of refreshing token and response gathering
 
     # Local lib folder
+    "loadlocalLibFolder" = $true
     "localLibFolder" = "./lib"
 
     # DuckDB
