@@ -275,6 +275,8 @@ VERBOSE:   Runtime failed: 0
 #>
 
 # Open the connection to the default DuckDB database
+# You can also use Add-DuckDBConnection for more connections, but Open-DuckDBConnection
+# will add the default connection from settings automatically
 Open-DuckDBConnection
 
 # Perform a simple scalar query, which returns just a number
@@ -285,6 +287,36 @@ Read-DuckDBQueryAsScalar -Query "Select 10+15"
 # Perform a more advanced example to load a remote parquet file and query it in one go
 $q = "CREATE TABLE train_services AS FROM 's3://duckdb-blobs/train_services.parquet';SELECT * FROM train_services LIMIT 10;"
 Read-DuckDBQueryAsReader $q -ReturnAsPSCustom | ft
+
+# Instead of the combined command you could do it also separately
+Invoke-DuckDBQueryAsNonExecute -Query "CREATE TABLE train_services AS FROM 's3://duckdb-blobs/train_services.parquet'"
+Read-DuckDBQueryAsReader -Query "SELECT * FROM train_services LIMIT 10" -ReturnAsPSCustom | ft
+
+# To stream data of a bigger resultset, you should add the -AsStream switch like
+Read-DuckDBQueryAsReader -Query "SELECT * FROM train_services LIMIT 10" -ReturnAsPSCustom -AsStream
+
+# Close default connection
+Close-DuckDBConnection 
+
+```
+
+To do something directly with a sqlite database (instead of attaching it in the query), you can do something like this
+
+```PowerShell
+# Make sure you have the sqlite extension installed
+Invoke-DuckDBQueryAsNonExecute -Query "INSTALL sqlite"
+
+# Add a sqlite database directly in the connection string
+Add-DuckDBConnection -Name "Aachen" -ConnectionString "DataSource=C:\Users\WDAGUtilityAccount\Downloads\ac.sqlite;ACCESS_MODE=READ_ONLY"
+
+# Open the database connection
+Open-DuckDBConnection -Name "Aachen"
+
+# Show first 10 rows of the table and show as Out-GridView
+Read-DuckDBQueryAsReader -Query "SELECT * FROM ac LIMIT 10" -ReturnAsPSCustom -ConnectionName "Aachen" | Out-GridView
+
+# Close connection
+Close-DuckDBConnection -Name "Aachen"
 
 ```
 
