@@ -59,7 +59,7 @@ function Invoke-SFSC {
         $updatedParameters = Skip-UnallowedBaseParameters -Base "Invoke-WebRequest" -Parameters $PSBoundParameters
 
         # Output parameters in debug mode
-        If ( $Script:debugMode -eq $true ) {
+        If ( $Script:debugMode -eq $true -or $Verbose -eq $true ) {
             Write-Host "INPUT: $( Convertto-json -InputObject $PSBoundParameters -Depth 99 )"
         }
 
@@ -191,7 +191,7 @@ function Invoke-SFSC {
             try {
 
                 # Output parameters in debug mode
-                If ( $Script:debugMode -eq $true ) {
+                If ( $Script:debugMode -eq $true -or $Verbose -eq $true ) {
                     Write-Host "REST: $( Convertto-json -InputObject $updatedParameters -Depth 99 )"
                 }
 
