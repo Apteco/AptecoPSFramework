@@ -18,7 +18,15 @@ CRM|Microsoft Dynamics 365 CRM|DataVerse oData WebAPI|REST|Download all CRM obje
 
 This has been put into the wiki: https://github.com/Apteco/AptecoPSFramework/wiki/Installation-and-Update
 
+But this is the Quickstart
 
+```PowerShell
+Install-Module WriteLog
+Install-Script Install-Dependencies, Import-Dependencies
+Install-Module AptecoPSFramework
+Import-Module AptecoPSFramework
+Install-AptecoPSFramework
+```
 
 # Getting started with the Framework
 
