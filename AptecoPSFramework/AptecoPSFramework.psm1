@@ -169,18 +169,30 @@ If ( $psLocalPackages.Count -gt 0 ) {
     try {
 
         # Work out the local lib folder
-        $localLibFolder = Resolve-Path -Path $Script:settings.localLibFolder
-        $localLibFolderItem = get-item $localLibFolder.Path
 
-        # Remember current location and change folder
-        $currentLocation = Get-Location
-        Set-Location $localLibFolderItem.Parent.FullName
+        #$localLibFolder = Resolve-Path -Path $Script:settings.localLibFolder
+        $localLibFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Script:settings.localLibFolder)
 
-        # Import the dependencies
-        Import-Dependencies -LoadWholePackageFolder -LocalPackageFolder $localLibFolderItem.name
+        If ( Test-Path -Path $localLibFolder ) {
 
-        # Go back, if needed
-        Set-Location -Path $currentLocation.Path
+            $localLibFolderItem = get-item $localLibFolder.Path
+
+            # Remember current location and change folder
+            $currentLocation = Get-Location
+            Set-Location $localLibFolderItem.Parent.FullName
+
+            # Import the dependencies
+            Import-Dependencies -LoadWholePackageFolder -LocalPackageFolder $localLibFolderItem.name
+
+            # Go back, if needed
+            Set-Location -Path $currentLocation.Path
+
+        } else {
+
+            Write-Warning "You have no local lib folder to load. Not necessary a problem. Proceeding..."
+
+        }
+        
 
     } catch {
 
