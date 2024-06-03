@@ -150,7 +150,7 @@ function Invoke-CR {
         }
 
         # Add additional headers from the settings, e.g. for api gateways or proxies
-        $Script:settings.additionalHeaders.PSObject.Properties | ForEach-Object {
+        $Script:settings.additionalHeaders.PSObject.Properties | Where-Object { $_.MemberType -eq "NoteProperty" } | ForEach-Object {
             $updatedParameters.Headers.add($_.Name, $_.Value)
         }
 

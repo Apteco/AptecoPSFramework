@@ -148,6 +148,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Fix: Added a where-object for CleverReach when not using additional parameters like proxy etc. 
 0.2.1 Feature: New internal function for plugins to allow multipart uploads via `Prepare-MultipartUpload`
       Feature: Addition for Hubspot to load single or multiple properties by name in `Get-Property`
       Feature: New function for Hubspot to allow the loading of a pipeline
