@@ -152,7 +152,7 @@ PrivateData = @{
         IconUri = 'https://www.apteco.de/sites/default/files/favicon_3.ico'
 
         # release channel
-        #Prerelease = 'alpha2'
+        Prerelease = 'alpha1'
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
