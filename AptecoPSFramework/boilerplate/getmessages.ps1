@@ -22,7 +22,7 @@ $debug = $false
 #-----------------------------------------------
 
 If ( $debug -eq $true ) {
-    [System.Environment]::GetEnvironmentVariables([System.EnvironmentVariableTarget]::Process).GetEnumerator() | ForEach {
+    [System.Environment]::GetEnvironmentVariables([System.EnvironmentVariableTarget]::Process).GetEnumerator() | ForEach-Object {
         Write-Log "$( $_.Name ) = $( $_.Value )"
     }
 }

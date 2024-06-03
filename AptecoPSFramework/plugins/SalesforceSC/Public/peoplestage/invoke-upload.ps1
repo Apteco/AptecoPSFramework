@@ -351,7 +351,7 @@ function Invoke-Upload{
             $nf = "$( $Env:TEMP )\$( [guid]::NewGuid().toString() ).csv" #New-TemporaryFile
             Write-Log "Using temporary file $( $nf )"
             # TODO [ ] Not the best way when you have quotes in values
-            $newCsvContent = $newCsv | convertto-csv -NoTypeInformation -Delimiter "`t" | % {$_ -replace '"',''}
+            $newCsvContent = $newCsv | convertto-csv -NoTypeInformation -Delimiter "`t" | ForEach-Object { $_ -replace '"','' }
             #$newCsvContent | set-content -Path $nf -Encoding UTF8
 
             [IO.File]::WriteAllLines($nf, $newCsvContent)
