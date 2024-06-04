@@ -16,6 +16,7 @@ function Invoke-WebRequestWithErrorHandling {
         ,[Parameter(Mandatory=$false)][int]$MaxTriesSpecific = 3                    # Specific http errors that are catched, see $RetryHttpErrorList
         ,[Parameter(Mandatory=$false)][int]$MaxTriesGeneric = 1                     # Generic errors that are not specifically catched
         ,[Parameter(Mandatory=$false)][int]$MillisecondsDelay = 200                 # Delay for the case of an exception
+        ,[Parameter(Mandatory=$false)][Switch]$ForceUTF8Return = $false             # Sometimes the returned result is not correctly encoded, this switch fixes it
     )
 
     begin {
@@ -35,7 +36,11 @@ function Invoke-WebRequestWithErrorHandling {
 
             try {
 
-                $response = Invoke-WebRequest @Params -ErrorAction Stop -UseBasicParsing
+                If ( $ForceUTF8Return -eq $true ) {
+                    $response = Invoke-WebRequestUTF8 @Params -ErrorAction Stop -UseBasicParsing
+                } else {
+                    $response = Invoke-WebRequest @Params -ErrorAction Stop -UseBasicParsing
+                }
                 $completed = $true
 
             } catch {
