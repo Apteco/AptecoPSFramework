@@ -11,6 +11,7 @@ $psModules = [Array]@(
     "ExtendFunction"
     "ConvertUnixTimestamp"
     "powershell-yaml"
+    "InvokeWebRequestUTF8"
     #"Microsoft.PowerShell.Utility"
     #"PSOAUth"  # is defined in the local plugins where it is needed
 )
