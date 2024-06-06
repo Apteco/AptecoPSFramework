@@ -14,6 +14,7 @@ $psModules = [Array]@(
     "InvokeWebRequestUTF8"
     #"Microsoft.PowerShell.Utility"
     #"PSOAUth"  # is defined in the local plugins where it is needed
+    "PackageManagement"
 )
 
 
@@ -44,6 +45,9 @@ $psLocalPackages = [Array]@(
     }
 
     #>
+
+    "DuckDB.NET.Bindings.Full"
+    "DuckDB.NET.Data.Full"
 
 )
 

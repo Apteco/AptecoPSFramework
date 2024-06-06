@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -20,7 +20,7 @@ Author = 'florian.von.bracht@apteco.de'
 CompanyName = 'Apteco GmbH'
 
 # Copyright statement for this module
-Copyright = '(c) 2023 Apteco GmbH. All rights reserved.'
+Copyright = '(c) 2024 Apteco GmbH. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Apteco PS Modules - Framework
@@ -39,6 +39,7 @@ This framework brings lots of useful features with it like
 - Easy updates via PowerShellGallery
 - Easy integration of proxies, custom headers, REST handling
 - Using secure oAuth for connected apps like Microsoft Dynamics, Salesforce SalesCloud and CleverReach
+- Using DuckDB by default since 0.3.0 to allow easy data transformation
 - Much more to follow...
 
 Your help is appreciated. Just contact me.
@@ -106,6 +107,15 @@ FunctionsToExport = @(
     #"Set-ProcessIdentifier"
     "Set-Settings"
     "Install-Plugin"
+    "Open-DuckDBConnection"
+    "Get-DuckDBConnection"
+    "Close-DuckDBConnection"
+    "Read-DuckDBQueryAsReader"
+    "Read-DuckDBQueryAsScalar"
+    "Invoke-DuckDBQueryAsNonExecute"
+    "Add-DuckDBConnection"
+    "Get-DebugMode"
+    "Import-Lib"
 ) #'*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -144,10 +154,20 @@ PrivateData = @{
         IconUri = 'https://www.apteco.de/sites/default/files/favicon_3.ico'
 
         # release channel
-        #Prerelease = 'alpha2'
+        Prerelease = 'alpha1'
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      
+0.3.0 Feature: Adding DuckDB as dependencies to the framework by default so the campaign file can be read (and written) through DuckDB query
+               more effectively than through a .NET streamreader or streamwriter when you want to transform the file
+               If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`
+      Feature: Fixed the installation script to also install local and global packages
+      Feature: Adding a default protocol handler that is recommended by Microsoft, if setting the setting `changeTLS` to `false`
+      Feature: Added some hints about DuckDB in the readme.md
+      Feature: Added a better handling for lib folder with other names or other paths than the default
+      Feature: Added DuckDB functions to read data as pscustom or execute a scalar query
+      Feature: DuckDB will be loaded automatically when plugin is loaded, otherwise you can use the function Import-Lib
       Fix: Added a where-object for CleverReach when not using additional parameters like proxy etc. 
 0.2.1 Feature: New internal function for plugins to allow multipart uploads via `Prepare-MultipartUpload`
       Feature: Addition for Hubspot to load single or multiple properties by name in `Get-Property`

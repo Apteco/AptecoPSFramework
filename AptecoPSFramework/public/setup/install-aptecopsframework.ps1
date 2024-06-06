@@ -40,6 +40,61 @@ Calling with one of the Flags, just does this part
     Process {
 
         #-----------------------------------------------
+        # CHECKING PS AND OS
+        #-----------------------------------------------
+
+        Write-Verbose "Check PowerShell and Operating system" -Verbose
+
+        # Check if this is Pwsh Core
+        $isCore = ($PSVersionTable.Keys -contains "PSEdition") -and ($PSVersionTable.PSEdition -ne 'Desktop')
+
+        Write-Verbose -Message "Using PowerShell version $( $PSVersionTable.PSVersion.ToString() ) and $( $PSVersionTable.PSEdition ) edition" -Verbose
+
+        # Check the operating system, if Core
+        if ($isCore -eq $true) {
+            $os = If ( $IsWindows -eq $true ) {
+                "Windows"
+            } elseif ( $IsLinux -eq $true ) {
+                "Linux"
+            } elseif ( $IsMacOS -eq $true ) {
+                "MacOS"
+            } else {
+                throw "Unknown operating system"
+            }
+        } else {
+            # [System.Environment]::OSVersion.VersionString()
+            # [System.Environment]::Is64BitOperatingSystem
+            $os = "Windows"
+        }
+
+        Write-Verbose -Message "Using OS: $( $os )" -Verbose
+
+
+        #-----------------------------------------------
+        # INSTALL/UPDATE VCREDIST
+        #-----------------------------------------------
+
+        # Needed for duckdb
+
+        If ( $os -eq "Windows" ) {
+
+            # Set the paths
+            $vcredistPermalink = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+            $vcredistTargetFile = Join-Path -Path ( [System.Environment]::GetEnvironmentVariable("TMP")) -ChildPath "vc_redist.x64.exe"
+
+            # Download file - iwr is a bit slow, but works on all operating system
+            #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile
+
+            # Downlading with Bits as this package is windows only
+            Start-BitsTransfer -Destination $vcredistTargetFile -Source $vcredistPermalink
+
+            # Install/Update file quietly
+            Start-Process -FilePath $vcredistTargetFile -ArgumentList "/install /q /norestart" -Verb RunAs -Wait
+
+        }
+
+
+        #-----------------------------------------------
         # CHECK AND INSTALL DEPENDENCIES
         #-----------------------------------------------
 
@@ -52,7 +107,7 @@ Calling with one of the Flags, just does this part
         . ( Join-Path -Path $Script:moduleRoot -ChildPath "/bin/dependencies.ps1" )
 
         # Call the script to install dependencies
-        Install-Dependencies -Script $psScripts -Module $psModules -LocalPackage $psPackages
+        Install-Dependencies -Script $psScripts -Module $psModules -LocalPackage $psLocalPackages -GlobalPackage $psGlobalPackages
 
 
         #-----------------------------------------------

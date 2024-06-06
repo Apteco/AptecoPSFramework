@@ -244,6 +244,105 @@ Test-Send        Test-Send
 #>
 ```
 
+# DuckDB support
+
+Since version `0.3.0` this module integrates DuckDB out-of-the-box, if you run `Install-AptecoPSFramework`. This downloads a few modules into a local "lib" folder.
+
+This folder should be the folder, where you put your settings json/yaml files.
+
+## Using DuckDB from CLI
+
+This is a quick start example to use DuckDB
+
+```PowerShell
+# this should be the place where you have your json/yaml settings files and your lib folder
+Set-Location "c:\Users\MMustermann\Scripts\AptecoPSFramework" 
+
+# Import the Framework
+Import-Module AptecoPSFramework
+
+# Load Dependencies without loading a plugin
+# Loading a plugin will automatically load the packages in that folder
+Import-Lib
+
+<#
+
+You should see something in the console like
+
+WARNING: There is no variable '$processId' present on 'Script' scope. Created one with
+'bd8a69ce-0795-4f0a-b5ea-395c54473f60'
+VERBOSE: ----------------------------------------------------
+VERBOSE: Using PowerShell version 5.1.22621.3672 and Desktop edition
+VERBOSE: Using OS: Windows
+VERBOSE: User: 9709FBAA-7534-4\WDAGUtilityAccount
+VERBOSE: Elevated: True
+VERBOSE: Loaded 0 modules
+VERBOSE: Loading libs...
+VERBOSE: There are 3 packages to load
+VERBOSE: Load status:
+VERBOSE:   Modules loaded: 0
+VERBOSE:   Lib/ref loaded: 3
+VERBOSE:   Lib/ref failed: 0
+VERBOSE:   Runtime loaded: 1
+VERBOSE:   Runtime failed: 0
+
+#>
+
+# Open the connection to the default DuckDB database
+# You can also use Add-DuckDBConnection for more connections, but Open-DuckDBConnection
+# will add the default connection from settings automatically
+Open-DuckDBConnection
+
+# Perform a simple scalar query, which returns just a number
+Read-DuckDBQueryAsScalar -Query "Select 10+15"
+
+# Should return 25
+
+# Perform a more advanced example to load a remote parquet file and query it in one go
+$q = "CREATE TABLE train_services AS FROM 's3://duckdb-blobs/train_services.parquet';SELECT * FROM train_services LIMIT 10;"
+Read-DuckDBQueryAsReader $q -ReturnAsPSCustom | ft
+
+# Instead of the combined command you could do it also separately
+Invoke-DuckDBQueryAsNonExecute -Query "CREATE TABLE train_services AS FROM 's3://duckdb-blobs/train_services.parquet'"
+Read-DuckDBQueryAsReader -Query "SELECT * FROM train_services LIMIT 10" -ReturnAsPSCustom | ft
+
+# To stream data of a bigger resultset, you should add the -AsStream switch like
+Read-DuckDBQueryAsReader -Query "SELECT * FROM train_services LIMIT 10" -ReturnAsPSCustom -AsStream
+
+# Close default connection
+Close-DuckDBConnection 
+
+```
+
+To do something directly with a sqlite database (instead of attaching it in the query), you can do something like this
+
+```PowerShell
+# Make sure you have the sqlite extension installed
+Invoke-DuckDBQueryAsNonExecute -Query "INSTALL sqlite"
+
+# Add a sqlite database directly in the connection string
+Add-DuckDBConnection -Name "Aachen" -ConnectionString "DataSource=C:\Users\WDAGUtilityAccount\Downloads\ac.sqlite;ACCESS_MODE=READ_ONLY"
+
+# Open the database connection
+Open-DuckDBConnection -Name "Aachen"
+
+# Show first 10 rows of the table and show as Out-GridView
+Read-DuckDBQueryAsReader -Query "SELECT * FROM ac LIMIT 10" -ReturnAsPSCustom -ConnectionName "Aachen" | Out-GridView
+
+# Close connection
+Close-DuckDBConnection -Name "Aachen"
+
+```
+
+You can influence the database (default in-memory, but could also be a persistent one) by changing your settings at `defaultDuckDBConnection`
+
+## Using DuckDB from Orbit/PeopleStage
+
+Be aware that when Orbit/PeopleStage are calling PowerShell, this is currently 32bit and DuckDB is 64bit only. For this case you can put
+another parameter in your `IntegrationParameters` in your channel to enforce 64bit. To do this, this parameter needs to be defined like
+`settingsFile=C:\Apteco\Scripts\AptecoPSFramework\settings.yaml;Force64bit=true` or similar.
+
+
 
 # Errors
 
@@ -287,3 +386,35 @@ open a new PowerShell window and after that you can proceed with your installati
 Import-Module AptecoPSFramework
 Install-AptecoPSFramework
 ```
+
+## DuckDB cannot be opened
+
+Since 0.3.0 there is DuckDB integrated in this framework. If you have problems to get it work like
+
+```PowerShell
+Import-Module AptecoPSFramework
+Open-DuckDBConnection
+```
+
+and it fails with something like
+
+```PowerShell
+PS C:\Users\WDAGUtilityAccount> Open-DuckDBConnection
+Exception calling "Open" with "0" argument(s): "The type initializer for
+'DuckDB.NET.Data.DuckDBConnectionStringBuilder' threw an exception."
+At C:\Users\WDAGUtilityAccount\Downloads\AptecoPSFramework\public\duckdb\Open-DuckDBConnection.ps1:18 char:13
++             $Script:duckDb.Open()
++             ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], MethodInvocationException
+    + FullyQualifiedErrorId : TypeInitializationException
+```
+
+then you need to install the newest version of `vcredist` from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+
+The direct permalink is: https://aka.ms/vs/17/release/vc_redist.x64.exe
+
+If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`
+
+## There was no parameter found named "-Destination"
+
+This message could be slightly different. But this results from an older 32 bit package of `Packagemanagement` that comes with Windows. And that one is outdated and not supported by this Framework. Make sure you have a newer version available. Best is to open a PowerShell as Administrator and install it via `Install-Module "PackageManagement" -Scope AllUsers`. Or update an existing one with `Update-Module PackageManagement`. Because when PowerShell is called via C#, it can load the older PackageManagement. You can safely remove it from `C:\Program Files (x86)\WindowsPowerShell\Modules`. The new installed one should be in `C:\Program Files\WindowsPowerShell\Modules`.

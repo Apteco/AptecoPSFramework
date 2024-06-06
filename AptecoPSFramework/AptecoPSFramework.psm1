@@ -1,4 +1,4 @@
-
+﻿
 #-----------------------------------------------
 # NOTES
 #-----------------------------------------------
@@ -80,6 +80,10 @@ if ( $Script:settings.changeTLS ) {
     # Microsoft is using this setting in examples
     #[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
+} else {
+
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
 }
 
 # TODO look for newer version of this network stuff
@@ -122,6 +126,7 @@ New-Variable -Name pluginFolders -Value $null -Scope Script -Force  # Folders ar
 New-Variable -Name plugins -Value $null -Scope Script -Force        # Plugins collection for all registered plugins
 New-Variable -Name pluginPath -Value $null -Scope Script -Force     # The path of the chosen plugin
 New-Variable -Name plugin -value $null -Scope Script -Force         # The plugin pscustomobject
+New-Variable -Name duckDb -Value $null -Scope Script -Force         # New Variable for saving the DuckDB connection
 
 # Set the variables now
 $Script:timestamp = [datetime]::Now
@@ -134,6 +139,9 @@ $Script:moduleRoot = $PSScriptRoot.ToString()
 $Script:plugin = [PSCustomObject]@{
     #"abc" = "def"
 }
+
+# Initialize DuckDB with an empty arraylist
+$Script:duckDb = [System.Collections.ArrayList]@()
 
 
 #-----------------------------------------------
@@ -153,18 +161,59 @@ try {
     Exit 0
 }
 
+<#
+# !
+# This is needed in the plugins itself and not in the parenting Framework
+# !
 
 # Load packages from current local libfolder
-If ( $psLocalPackages.Count -gt 0 ) {
-    Import-Dependencies -LoadWholePackageFolder
+# If you delete packages manually, this can increase performance but there could be some functionality missing
+If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
+
+    try {
+
+        # Work out the local lib folder
+
+        #$localLibFolder = Resolve-Path -Path $Script:settings.localLibFolder
+        $localLibFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Script:settings.localLibFolder)
+
+        If ( Test-Path -Path $localLibFolder ) {
+
+            $localLibFolderItem = get-item $localLibFolder.Path
+
+            # Remember current location and change folder
+            $currentLocation = Get-Location
+            Set-Location $localLibFolderItem.Parent.FullName
+
+            # Import the dependencies
+            Import-Dependencies -LoadWholePackageFolder -LocalPackageFolder $localLibFolderItem.name
+
+            # Go back, if needed
+            Set-Location -Path $currentLocation.Path
+
+        } else {
+
+            Write-Warning "You have no local lib folder to load. Not necessary a problem. Proceeding..."
+
+        }
+        
+
+    } catch {
+
+        Write-Warning "There was a problem importing packages in the local lib folder, but proceeding..."
+
+    }
+
 }
 
+#>
 
 # Load assemblies
 $psAssemblies | ForEach-Object {
     $ass = $_
     Add-Type -AssemblyName $_
 }
+
 
 
 #-----------------------------------------------
@@ -204,6 +253,3 @@ Export-ModuleMember -Function $Public.Basename #-verbose  #+ "Set-Logfile"
 # Set a new process id first, but this can be overridden later
 $processId = [guid]::NewGuid().toString()
 Set-ProcessId -Id ( [guid]::NewGuid().toString() )
-$Script:processId = $processId
-
-# the path for the log file will be set with loading the settings
