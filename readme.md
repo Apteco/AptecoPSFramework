@@ -242,6 +242,8 @@ Since version `0.3.0` this module integrates DuckDB out-of-the-box, if you run `
 
 This folder should be the folder, where you put your settings json/yaml files.
 
+## Using DuckDB from CLI
+
 This is a quick start example to use DuckDB
 
 ```PowerShell
@@ -250,6 +252,10 @@ Set-Location "c:\Users\MMustermann\Scripts\AptecoPSFramework"
 
 # Import the Framework
 Import-Module AptecoPSFramework
+
+# Load Dependencies without loading a plugin
+# Loading a plugin will automatically load the packages in that folder
+Import-Lib
 
 <#
 
@@ -322,6 +328,14 @@ Close-DuckDBConnection -Name "Aachen"
 
 You can influence the database (default in-memory, but could also be a persistent one) by changing your settings at `defaultDuckDBConnection`
 
+## Using DuckDB from Orbit/PeopleStage
+
+Be aware that when Orbit/PeopleStage are calling PowerShell, this is currently 32bit and DuckDB is 64bit only. For this case you can put
+another parameter in your `IntegrationParameters` in your channel to enforce 64bit. To do this, this parameter needs to be defined like
+`settingsFile=C:\Apteco\Scripts\AptecoPSFramework\settings.yaml;Force64bit=true` or similar.
+
+
+
 # Errors
 
 ## Die Eingabezeichenfolge hat das falsche Format
@@ -378,3 +392,7 @@ then you need to install the newest version of `vcredist` from: https://learn.mi
 The direct permalink is: https://aka.ms/vs/17/release/vc_redist.x64.exe
 
 If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`
+
+## There was no parameter found named "-Destination"
+
+This message could be slightly different. But this results from an older 32 bit package of `Packagemanagement` that comes with Windows. And that one is outdated and not supported by this Framework. Make sure you have a newer version available. Best is to open a PowerShell as Administrator and install it via `Install-Module "PackageManagement" -Scope AllUsers`. Or update an existing one with `Update-Module PackageManagement`. Because when PowerShell is called via C#, it can load the older PackageManagement. You can safely remove it from `C:\Program Files (x86)\WindowsPowerShell\Modules`. The new installed one should be in `C:\Program Files\WindowsPowerShell\Modules`.
