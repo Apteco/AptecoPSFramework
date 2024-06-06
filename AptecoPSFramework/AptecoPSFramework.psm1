@@ -168,7 +168,7 @@ try {
 
 # Load packages from current local libfolder
 # If you delete packages manually, this can increase performance but there could be some functionality missing
-If ( $psLocalPackages.Count -gt 0 -and $ -eq $true ) {
+If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
 
     try {
 
@@ -251,6 +251,5 @@ Export-ModuleMember -Function $Public.Basename #-verbose  #+ "Set-Logfile"
 #-----------------------------------------------
 
 # Set a new process id first, but this can be overridden later
+$processId = [guid]::NewGuid().toString()
 Set-ProcessId -Id ( [guid]::NewGuid().toString() )
-
-# the path for the log file will be set with loading the settings

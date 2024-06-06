@@ -166,6 +166,15 @@
 
 
             #-----------------------------------------------
+            # START LOG
+            #-----------------------------------------------
+
+            Set-ProcessId -Id $InputPlugin.variables.processId
+            Write-Log -message $logDivider
+            Write-Log -Message "Using the process id $( $InputPlugin.variables.processId )"
+
+
+            #-----------------------------------------------
             # LOAD PARENT AND PLUGIN DEPENDENCIES
             #-----------------------------------------------
 
@@ -226,7 +235,7 @@
                         #Set-Location $localLibFolderItem.Parent.FullName
 
                         # Import the dependencies
-                        Write-Log "Loading $( $localLibFolder )"
+                        Write-Log "Loading lib folder from: '$( $localLibFolder )'"
                         $dependencyParams.Add("LoadWholePackageFolder", $true)
                         $dependencyParams.Add("LocalPackageFolder", $localLibFolder)
 
@@ -262,6 +271,8 @@
                 Exit 0
             }
 
+           
+
 
             # Load assemblies
             $psAssemblies | ForEach-Object {
@@ -294,9 +305,11 @@
         # RETURN
         #-----------------------------------------------
 
-        $success = $true
+        Write-Log "Plugin successfully loaded" -Severity VERBOSE
 
-        $success
+        #$success = $true
+
+        #$success
 
 
     }

@@ -44,9 +44,11 @@ Function Open-DuckDBConnection {
 
                 # Open the connection with the default name
                 Write-Log "Opening DuckDB connection named '$( $conn.name )' to '$( $conn.connection.ConnectionString )'" -Severity INFO
-
+                try {
                 $conn.connection.Open()
-
+                } catch {
+                    Write-Log -Message $_.exception -Severity ERROR
+                }
             } else {
 
                 throw "The connection named '$( $conn.name )' to '$( $conn.connection.ConnectionString )' has a different state than open or closed"
