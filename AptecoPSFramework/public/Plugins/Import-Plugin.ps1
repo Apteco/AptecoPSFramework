@@ -193,7 +193,7 @@
             #    Exit 0
             #}
 
-            
+
             # Load packages from current local libfolder
             # If you delete packages manually, this can increase performance but there could be some functionality missing
             #Write-Verbose "Hello test" -verbose
@@ -204,7 +204,7 @@
             #}
             #Write-Verbose "Hello $( ( ) )" -verbose #$InputPlugin.settings.loadlocalLibFolder | convertto-json -Compress
 
-            #Write-Log "Func $((get-command PackageManagement\Get-Package).Parameters.Keys -join ", " ))"            
+            #Write-Log "Func $((get-command PackageManagement\Get-Package).Parameters.Keys -join ", " ))"
 
             $dependencyParams = [Hashtable]@{
                "Module" = @( $psModules + $plugin.dependencies.psModules )
@@ -246,14 +246,14 @@
 
                     } else {
 
-                        Write-Verbose "You have no local lib folder to load. Not necessary a problem. Proceeding..." -verbose #-Severity Warning 
+                        Write-Verbose "You have no local lib folder to load. Not necessary a problem. Proceeding..." -verbose #-Severity Warning
 
                     }
-                    
+
 
                 } catch {
                     Write-Log $_.exception -Severity WARNING
-                    Write-Host "There was a problem importing packages in the local lib folder, but proceeding..."# -Severity Warning 
+                    Write-Host "There was a problem importing packages in the local lib folder, but proceeding..."# -Severity Warning
 
                 }
 
@@ -271,7 +271,7 @@
                 Exit 0
             }
 
-           
+
 
 
             # Load assemblies

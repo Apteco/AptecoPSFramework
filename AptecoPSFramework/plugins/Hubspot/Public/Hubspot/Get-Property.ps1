@@ -11,7 +11,7 @@ function Get-Property {
     )
 
     begin {
-        
+
         $isSingleCall = $false
         If ( $PropertyName -ne "" ) {
             $isSingleCall = $true
@@ -39,7 +39,7 @@ function Get-Property {
 
         # All properties
         } else {
-            [void]$properties.Add( ( Invoke-Hubspot -Object "crm" -Path "properties/$( $Object )" -Query ([PSCustomObject]@{"archived"=$loadArchived}) -Method GET ))            
+            [void]$properties.Add( ( Invoke-Hubspot -Object "crm" -Path "properties/$( $Object )" -Query ([PSCustomObject]@{"archived"=$loadArchived}) -Method GET ))
             $return = $properties.results
         }
 
@@ -48,7 +48,7 @@ function Get-Property {
         }
 
         $return
-        
+
 
     }
 

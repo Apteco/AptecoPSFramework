@@ -1,9 +1,9 @@
-
+﻿
 Function Import-Dependencies {
     <#
-    
+
     ...
-    
+
     #>
     [cmdletbinding()]
     param(
@@ -41,7 +41,7 @@ Function Import-Dependencies {
                 Write-Warning "You have no local lib folder to load. Not necessary a problem. Proceeding..."
 
             }
-            
+
 
         } catch {
 

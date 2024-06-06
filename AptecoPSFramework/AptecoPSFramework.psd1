@@ -154,11 +154,10 @@ PrivateData = @{
         IconUri = 'https://www.apteco.de/sites/default/files/favicon_3.ico'
 
         # release channel
-        Prerelease = 'alpha1'
+        Prerelease = 'alpha2'
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
-      
 0.3.0 Feature: Adding DuckDB as dependencies to the framework by default so the campaign file can be read (and written) through DuckDB query
                more effectively than through a .NET streamreader or streamwriter when you want to transform the file
                If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`
@@ -168,7 +167,7 @@ PrivateData = @{
       Feature: Added a better handling for lib folder with other names or other paths than the default
       Feature: Added DuckDB functions to read data as pscustom or execute a scalar query
       Feature: DuckDB will be loaded automatically when plugin is loaded, otherwise you can use the function Import-Lib
-      Fix: Added a where-object for CleverReach when not using additional parameters like proxy etc. 
+      Fix: Added a where-object for CleverReach when not using additional parameters like proxy etc.
 0.2.1 Feature: New internal function for plugins to allow multipart uploads via `Prepare-MultipartUpload`
       Feature: Addition for Hubspot to load single or multiple properties by name in `Get-Property`
       Feature: New function for Hubspot to allow the loading of a pipeline

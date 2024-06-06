@@ -1,4 +1,4 @@
-
+﻿
 function Get-ContactData {
 
     [CmdletBinding()]
@@ -44,7 +44,7 @@ function Get-ContactData {
 		Total : 10
 
 		#>
-        
+
         # Transform data
         $contactList = [System.Collections.ArrayList]@()
         $contactData.Data | ForEach-Object {

@@ -156,7 +156,7 @@ $thisScript = ".\upload.ps1"
 If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq $false -and [System.Environment]::Is64BitOperatingSystem -eq $true ) {
 
     try {
- 
+
         #Write-Verbose "$( $params | ConvertTo-Json -Compress -Depth 99 )" -Verbose
 
         # Input parameter must be a string and for json the double quotes need to be escaped
@@ -169,7 +169,7 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
     } catch {
         Exit 1
     }
-  
+
     # Convert the PSCustomObject back to a hashtable
     #$htOutput = [Hashtable]@{}
     #( $j | convertfrom-json ).psobject.properties | ForEach-Object {

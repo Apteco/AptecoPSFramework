@@ -16,7 +16,7 @@ function Get-Owner {
     process {
 
         $owners = @( Invoke-Hubspot -Object "crm" -Path "owners" -Method GET )
-        $owners.results        
+        $owners.results
 
     }
 

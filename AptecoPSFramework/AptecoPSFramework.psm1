@@ -196,7 +196,7 @@ If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
             Write-Warning "You have no local lib folder to load. Not necessary a problem. Proceeding..."
 
         }
-        
+
 
     } catch {
 
