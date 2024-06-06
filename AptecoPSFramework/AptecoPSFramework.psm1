@@ -202,6 +202,8 @@ Export-ModuleMember -Function $Public.Basename #-verbose  #+ "Set-Logfile"
 #-----------------------------------------------
 
 # Set a new process id first, but this can be overridden later
+$processId = [guid]::NewGuid().toString()
 Set-ProcessId -Id ( [guid]::NewGuid().toString() )
+$Script:processId = $processId
 
 # the path for the log file will be set with loading the settings

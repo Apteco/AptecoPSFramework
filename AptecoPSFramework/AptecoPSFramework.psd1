@@ -103,7 +103,7 @@ FunctionsToExport = @(
     "Register-Plugins"
     "Set-DebugMode"
     "Set-ExecutionDirectory"
-    "Set-ProcessIdentifier"
+    #"Set-ProcessIdentifier"
     "Set-Settings"
     "Install-Plugin"
 ) #'*'
