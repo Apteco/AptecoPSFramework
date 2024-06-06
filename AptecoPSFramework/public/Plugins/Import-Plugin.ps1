@@ -153,26 +153,6 @@
 
 
             #-----------------------------------------------
-            # LOAD PARENT AND PLUGIN DEPENDENCIES
-            #-----------------------------------------------
-
-            # TODO only using modules yet, but also look at packages and scripts
-
-            # Load dependencies
-            . ( Join-Path -Path $moduleRoot -ChildPath "/bin/dependencies.ps1" )
-
-            try {
-                @( $psModules + $plugin.dependencies.psModules ) | ForEach-Object {
-                    $mod = $_
-                    Import-Module -Name $mod -ErrorAction Stop
-                }
-            } catch {
-                Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now"
-                Exit 0
-            }
-
-
-            #-----------------------------------------------
             # DEFINE MORE VARIABLES
             #-----------------------------------------------
 
@@ -183,6 +163,111 @@
 
             #Write-verbose ( Convertto-json $Script:settings -dept 99 ) -Verbose
             $Script:variableCache = [Hashtable]@{}
+
+
+            #-----------------------------------------------
+            # LOAD PARENT AND PLUGIN DEPENDENCIES
+            #-----------------------------------------------
+
+            # TODO only using modules yet, but also look at packages and scripts
+
+            # Load dependencies
+            . ( Join-Path -Path $moduleRoot -ChildPath "/bin/dependencies.ps1" )
+
+            #try {
+            #    @( $psModules + $plugin.dependencies.psModules ) | ForEach-Object {
+            #        $mod = $_
+            #        Import-Module -Name $mod -ErrorAction Stop
+            #    }
+            #} catch {
+            #    Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now"
+            #    Exit 0
+            #}
+
+            
+            # Load packages from current local libfolder
+            # If you delete packages manually, this can increase performance but there could be some functionality missing
+            #Write-Verbose "Hello test" -verbose
+            #Write-Log "Hello $( $psLocalPackages.Count )"
+            #Write-Verbose " $( ( $settings | convertto-json -Depth 99 ) ) " -Verbose
+            #Get-Variable | % {
+            #    Write-Verbose "Var $( $_.Name ) - $( $_.Value )" -VErbose
+            #}
+            #Write-Verbose "Hello $( ( ) )" -verbose #$InputPlugin.settings.loadlocalLibFolder | convertto-json -Compress
+
+            #Write-Log "Func $((get-command PackageManagement\Get-Package).Parameters.Keys -join ", " ))"            
+
+            $dependencyParams = [Hashtable]@{
+               "Module" = @( $psModules + $plugin.dependencies.psModules )
+            }
+
+            $p = get-command "get-package"
+            write-log "Using this PackageManagement to load packages: $( $p.DLL )"
+            #Write-log $p.Version
+
+            If ( $psLocalPackages.Count -gt 0  -and $settings.loadlocalLibFolder -eq $true ) {
+                Write-Verbose "Loading local packages" -verbose
+                try {
+
+                    # Work out the local lib folder
+
+                    #$localLibFolder = Resolve-Path -Path $Script:settings.localLibFolder
+                    $localLibFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($settings.localLibFolder)
+
+                    #Write-Log "$( ( Get-Package -Name "PackageManagement" ).Version )"
+
+                    If ( Test-Path -Path $localLibFolder ) {
+                        Write-Verbose "Loading from $( $localLibFolder )" -verbose
+
+                        #$localLibFolderItem = get-item $localLibFolder.Path
+
+                        # Remember current location and change folder
+                        #$currentLocation = Get-Location
+                        #Set-Location $localLibFolderItem.Parent.FullName
+
+                        # Import the dependencies
+                        Write-Log "Loading $( $localLibFolder )"
+                        $dependencyParams.Add("LoadWholePackageFolder", $true)
+                        $dependencyParams.Add("LocalPackageFolder", $localLibFolder)
+
+                         #$localLibFolderItem.fullname
+
+                        # Go back, if needed
+                        #Set-Location -Path $currentLocation.Path
+
+                    } else {
+
+                        Write-Verbose "You have no local lib folder to load. Not necessary a problem. Proceeding..." -verbose #-Severity Warning 
+
+                    }
+                    
+
+                } catch {
+                    Write-Log $_.exception -Severity WARNING
+                    Write-Host "There was a problem importing packages in the local lib folder, but proceeding..."# -Severity Warning 
+
+                }
+
+            }
+
+            # Load modules and packages
+            try {
+                #@( $psModules + $plugin.dependencies.psModules ) | ForEach-Object {
+                #    $mod = $_
+                #    Import-Module -Name $mod -ErrorAction Stop
+                #}
+                Import-Dependencies @dependencyParams
+            } catch {
+                Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now"
+                Exit 0
+            }
+
+
+            # Load assemblies
+            $psAssemblies | ForEach-Object {
+                $ass = $_
+                Add-Type -AssemblyName $_
+            }
 
 
             #-----------------------------------------------

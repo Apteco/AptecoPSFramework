@@ -161,10 +161,14 @@ try {
     Exit 0
 }
 
+<#
+# !
+# This is needed in the plugins itself and not in the parenting Framework
+# !
 
 # Load packages from current local libfolder
 # If you delete packages manually, this can increase performance but there could be some functionality missing
-If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
+If ( $psLocalPackages.Count -gt 0 -and $ -eq $true ) {
 
     try {
 
@@ -202,12 +206,14 @@ If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
 
 }
 
+#>
 
 # Load assemblies
 $psAssemblies | ForEach-Object {
     $ass = $_
     Add-Type -AssemblyName $_
 }
+
 
 
 #-----------------------------------------------

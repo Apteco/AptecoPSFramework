@@ -115,6 +115,7 @@ FunctionsToExport = @(
     "Invoke-DuckDBQueryAsNonExecute"
     "Add-DuckDBConnection"
     "Get-DebugMode"
+    "Import-Lib"
 ) #'*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -165,6 +166,7 @@ PrivateData = @{
       Added some hints about DuckDB in the readme.md
       Added a better handling for lib folder with other names or other paths than the default
       Added DuckDB functions to read data as pscustom or execute a scalar query
+      DuckDB will be loaded automatically when plugin is loaded, otherwise you can use the function Import-Dependencies
 0.2.0 Added yaml as a new functionality to save and load settings - please make sure to install your dependencies again
       CleverReach - Fixed output for validations (showed 1 as valid when there is 0 valid entries)
       CleverReach - Putting failed entries also in log and returns it to Orbit Monitoring
