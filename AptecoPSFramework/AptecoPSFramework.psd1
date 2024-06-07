@@ -168,6 +168,7 @@ PrivateData = @{
       Feature: Added DuckDB functions to read data as pscustom or execute a scalar query
       Feature: DuckDB will be loaded automatically when plugin is loaded, otherwise you can use the function Import-Lib
       Fix: Added a where-object for CleverReach when not using additional parameters like proxy etc.
+      Fix: Special characters are getting removed vom CleverReach mailing and group names via Regex `[^\w\s]`
 0.2.1 Feature: New internal function for plugins to allow multipart uploads via `Prepare-MultipartUpload`
       Feature: Addition for Hubspot to load single or multiple properties by name in `Get-Property`
       Feature: New function for Hubspot to allow the loading of a pipeline
