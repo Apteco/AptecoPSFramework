@@ -18,9 +18,8 @@ Param(
 
 # If this script is called by itself, re-transform the escaped json string input back into a hashtable
 If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
-    $jsonInput = $jsonParams -replace '\"', '"'
     $params = [Hashtable]@{}
-    ( $jsonInput | convertfrom-json ).psobject.properties | ForEach-Object {
+    ( $jsonParams | convertfrom-json ).psobject.properties | ForEach-Object {
         $params[$_.Name] = $_.Value
     }
 }
@@ -149,30 +148,25 @@ $thisScript = ".\test.ps1"
 # Start this if 64 is needed to enforce when this process is 32 bit and system is able to handle it
 If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq $false -and [System.Environment]::Is64BitOperatingSystem -eq $true ) {
 
-    try {
- 
-        #Write-Verbose "$( $params | ConvertTo-Json -Compress -Depth 99 )" -Verbose
+    $markerGuid = [guid]::NewGuid().toString()
 
-        # Input parameter must be a string and for json the double quotes need to be escaped
-        $paramInput = ( ConvertTo-Json $params -Compress -Depth 99 ) -replace '"', '\"'
+    try {
+
+        # Input parameter must be a string and for json the double quotes need to be escaped        
+        $params.Add("markerGuid", $markerGuid)
+        $paramInput = ( ConvertTo-Json $params -Compress -Depth 99 ) -replace '"', '"""'
 
         # This inputs a string into powershell exe at a virtual place "sysnative"
         # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-        $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat xml -File $thisScript -JsonParams $paramInput
+        $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text  -File $thisScript -JsonParams $paramInput
 
     } catch {
         Exit 1
     }
   
     # Convert the PSCustomObject back to a hashtable
-    #$htOutput = [Hashtable]@{}
-    #( $j | convertfrom-json ).psobject.properties | ForEach-Object {
-    #    $htOutput[$_.Name] = $_.Value
-    #}
-
-    # Return the hashtable
-    #$htOutput
-    $j.return
+    $markerRow = $j.IndexOf($markerGuid)
+    ( convertfrom-json $j[$markerRow+1] ) #.trim()
 
     Exit 0
 
@@ -189,9 +183,11 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
 # IMPORT MODULE
 #-----------------------------------------------
 
-Import-Module "AptecoPSFramework" -Verbose
-#Import-Module EncryptCredential # Not needed later, if we don't encrypt here
-#Set-ExecutionDirectory -Path $dir
+If ($debug -eq $true) {
+    Import-Module "AptecoPSFramework" -Verbose
+} else {
+    Import-Module "AptecoPSFramework"
+}
 
 
 #-----------------------------------------------
@@ -251,14 +247,11 @@ try {
 
     # Return the values, if succeeded
     If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
-        #return ( $return | ConvertTo-Json -Depth 99 -Compress )
-        [Hashtable]@{
-            "return" = $return
-        }
+        $params.markerGuid  # Output a guid to find out the separator
+        ConvertTo-Json $return -Depth 99 -Compress # output the result as json
     } else {
         $return
     }
-
 
 } catch {
 
