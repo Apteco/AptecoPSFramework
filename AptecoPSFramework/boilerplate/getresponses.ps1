@@ -110,15 +110,11 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 # IMPORT MODULE
 #-----------------------------------------------
 
-Import-Module "AptecoPSFramework" -Verbose
-#Set-ExecutionDirectory -Path $dir
-
-
-#-----------------------------------------------
-# ADD MORE PLUGINS
-#-----------------------------------------------
-
-#Add-PluginFolder "D:\Scripts\CleverReach\Plugins"
+If ($debug -eq $true) {
+    Import-Module "AptecoPSFramework" -Verbose
+} else {
+    Import-Module "AptecoPSFramework"
+}
 
 
 #-----------------------------------------------
