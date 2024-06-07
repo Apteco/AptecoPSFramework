@@ -1,5 +1,5 @@
 ﻿
-Function Import-Dependencies {
+Function Import-Lib {
     <#
 
     ...
