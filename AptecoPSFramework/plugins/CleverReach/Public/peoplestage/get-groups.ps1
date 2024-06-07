@@ -56,7 +56,7 @@ function Get-Groups {
             [void]$groupsList.add(
                 [MailingList]@{
                     mailingListId=$group.id
-                    mailingListName=$group.name
+                    mailingListName=( $group.name -replace '[^\w\s]', '' )
                 }
             )
         }

@@ -88,7 +88,7 @@ Switch ( $InputHashtable.mode ) {
             [void]$mailingsList.add(
                 [Mailing]@{
                     mailingId=$mailing.id
-                    mailingName=$mailing.name
+                    mailingName=( $mailing.name -replace '[^\w\s]', '' )
                 }
             )
         }
