@@ -158,7 +158,7 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
 
         # This inputs a string into powershell exe at a virtual place "sysnative"
         # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-        $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text  -File $thisScript -JsonParams $paramInput
+        $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text  -File $thisScript -JsonParams $paramInput -InformationAction "Continue"
 
     } catch {
         Exit 1
