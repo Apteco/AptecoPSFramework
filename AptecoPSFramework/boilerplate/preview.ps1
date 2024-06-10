@@ -9,17 +9,18 @@
 Param(
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName='HashtableInput')]
-    [hashtable]$params,
+    [hashtable]$params = [Hashtable]@{},
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName='JsonInput')]
-    [String]$jsonParams
+    [String]$jsonParams = ""
 
 )
 
 # If this script is called by itself, re-transform the escaped json string input back into a hashtable
 If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
     $params = [Hashtable]@{}
-    ( $jsonParams | convertfrom-json ).psobject.properties | ForEach-Object {
+    ( $jsonParams.replace("'",'"') | convertfrom-json ).psobject.properties | ForEach-Object {
+        Write-verbose "$( $_.Name ) - $( $_.Value )"
         $params[$_.Name] = $_.Value
     }
 }
@@ -66,7 +67,7 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 # INPUT PARAMETERS, IF DEBUG IS TRUE
 #-----------------------------------------------
 
-if ( $debug -eq $true ) {
+if ( $debug -eq $true -and $jsonParams -eq "" ) {
     $params = [hashtable]@{
 
         # Automatic parameters
@@ -153,7 +154,7 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
 
         # Input parameter must be a string and for json the double quotes need to be escaped        
         $params.Add("markerGuid", $markerGuid)
-        $paramInput = ( ConvertTo-Json $params -Compress -Depth 99 ) -replace '"', '"""'
+        $paramInput = ( ConvertTo-Json $params -Compress -Depth 99 ).replace('"',"'")
 
         # This inputs a string into powershell exe at a virtual place "sysnative"
         # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
@@ -165,7 +166,7 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
   
     # Convert the PSCustomObject back to a hashtable
     $markerRow = $j.IndexOf($markerGuid)
-    ( convertfrom-json $j[$markerRow+1] ) #.trim()
+    ( convertfrom-json $j[$markerRow+1].replace("'",'"') ) #.trim()
 
     Exit 0
 
@@ -245,7 +246,7 @@ try {
     # Return the values, if succeeded
     If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
         $params.markerGuid  # Output a guid to find out the separator
-        ConvertTo-Json $return -Depth 99 -Compress # output the result as json
+        ( ConvertTo-Json $return -Depth 99 -Compress ).replace('"',"'") # output the result as json
     } else {
         $return
     }
