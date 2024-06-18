@@ -1,14 +1,10 @@
 
-
-
-
-
-function Get-ListCount {
+function Get-List {
     [CmdletBinding()]
     param (
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
         #[Parameter(Mandatory=$false)][Switch] $DebugMode = $false
-        [Parameter(Mandatory=$true)][Int] $ListId
+        #[Parameter(Mandatory=$true)][Int] $ListId
 
     )
 
@@ -29,9 +25,9 @@ function Get-ListCount {
 
         $emarsys = $Script:variableCache.emarsys
 
-        $count = $emarsys.countList($ListId)
+        $lists = $emarsys.getLists()
 
-        $count
+        $lists
 
     }
 

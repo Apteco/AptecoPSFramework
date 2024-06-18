@@ -8,6 +8,8 @@ function Get-ListContacts {
     param (
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
         #[Parameter(Mandatory=$false)][Switch] $DebugMode = $false
+        [Parameter(Mandatory=$true)][Int] $ListId
+
     )
 
     begin {
@@ -27,7 +29,7 @@ function Get-ListContacts {
 
         $emarsys = $Script:variableCache.emarsys
 
-        $fetch = $emarsys.fetchListContacts("31000652")
+        $fetch = $emarsys.fetchListContacts([String]$ListId)
 
         $fetch
 
