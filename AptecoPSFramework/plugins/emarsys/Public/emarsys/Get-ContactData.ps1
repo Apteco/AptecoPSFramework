@@ -8,6 +8,8 @@ function Get-ContactData {
     param (
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
         #[Parameter(Mandatory=$false)][Switch] $DebugMode = $false
+        [Parameter(Mandatory=$true)][System.Collections.ArrayList]$InputEmail
+        
     )
 
     begin {
@@ -26,15 +28,14 @@ function Get-ContactData {
 # $c = Invoke-emarsys -cred $cred -uri "$( $settings.base )field/translate/de" -method Get
 
         $emarsys = $Script:variableCache.emarsys
-        $fields = [System.Collections.ArrayList]@(1,2,3,31)
+        $fields = [System.Collections.ArrayList]@(1,2,3,31,9,46,11,12)
 
         <#
         $keys = [System.Collections.ArrayList]@(378808151,378808960)
         $fetch = $emarsys.getContactData("id",$fields,$keys)
         #>
 
-        $keys = [System.Collections.ArrayList]@("florian.von.bracht@apteco.tld","florian.friedrichs@apteco.tld")
-        $fetch = $emarsys.getContactData("3",$fields,$keys)
+        $fetch = $emarsys.getContactData("id",$fields,$InputEmail)
 
         $fetch
 
