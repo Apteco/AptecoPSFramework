@@ -49,7 +49,7 @@ function Invoke-Ae {
         }
 
         # Reduce input parameters to only allowed ones
-        $updatedParameters = Skip-UnallowedBaseParameters -Base "Invoke-RestMethod" -Parameters $PSBoundParameters
+        $updatedParameters = Skip-UnallowedBaseParameters -Base "Invoke-WebRequest" -Parameters $PSBoundParameters
 
         # Output parameters in debug mode
         If ( $Script:debugMode -eq $true ) {
