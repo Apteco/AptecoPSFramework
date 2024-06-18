@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.3.0'
+ModuleVersion = '0.3.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -158,6 +158,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.3.1 Fix: Throwing full exceptions via iwr and irm to catch more details of exception in the plugin
 0.3.0 Feature: Adding DuckDB as dependencies to the framework by default so the campaign file can be read (and written) through DuckDB query
                more effectively than through a .NET streamreader or streamwriter when you want to transform the file
                If you already have installed the AptecoPSFramework, make sure to re-install the dependencies in your settings file directory with `Install-AptecoPSFramework`

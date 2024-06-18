@@ -172,7 +172,7 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
     $j | ForEach-Object {
         $jrow = $_
         Switch -Wildcard ( $jrow ) {
-            
+
             "INFO*" {
                 Write-Information -MessageData $jrow -Tags @("Info") -InformationAction Continue
             }

@@ -52,7 +52,7 @@ function Invoke-RestMethodWithErrorHandling {
 
                 # directly throw an exception so we can catch it in the caller
                 if ( $errResponse.StatusCode.value__ -eq 401 ) {
-                    throw $e.exception
+                    throw $e #.exception
                 }
 
                 # retry if a specific http error happens
@@ -65,7 +65,7 @@ function Invoke-RestMethodWithErrorHandling {
                         Write-Log -Message "Request $( $specificCounter ) failed with $( $errResponse.StatusCode.value__ ) $( $errResponse.StatusCode.ToString() ). Command failed the maximum number of $( $MaxTriesSpecific ) times."  -Severity WARNING
                         #Write-Log -Message $_.Exception.Message -Severity ERROR
                         Write-Log -Message "RESPONSE: $( ConvertTo-Json -InputObject $errBody -Depth 99 -Compress)" -Severity WARNING
-                        throw $_.Exception
+                        throw $e #.Exception
 
                     # Not all specific tries used yet, repeat
                     } else {
@@ -84,7 +84,7 @@ function Invoke-RestMethodWithErrorHandling {
                         Write-Log -Message "Request $( $genericCounter ) failed. Command failed the maximum number of $( $MaxTriesGeneric ) times." -Severity WARNING
                         #Write-Log -Message $_.Exception.Message -Severity ERROR
                         Write-Log -Message "RESPONSE: $( ConvertTo-Json -InputObject $errBody -Depth 99 -Compress)"
-                        throw $_.Exception
+                        throw $e #.Exception
 
                     # Not all generic tries used yet, repeat
                     } else {
