@@ -3,10 +3,10 @@
 
 
 
-function Get-ListCount {
+function Get-Field {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)][Int] $ListId
+        [Parameter(Mandatory=$false)][String] $LanguageId = ""
     )
 
     begin {
@@ -17,9 +17,13 @@ function Get-ListCount {
 
         # Create params
         $params = [Hashtable]@{
-            "Object" = "contactlist"
-            "Path" = "$( $ListId )/count"
+            "Object" = "field"
             "Method" = "GET"
+        }
+
+        # Handle language id
+        If ( $LanguageId -ne "" ) {
+            $params.Add("Path", "translate/$( $LanguageId )")
         }
 
         # add verbose flag, if set
@@ -28,10 +32,10 @@ function Get-ListCount {
 		}
 
         # Request fields
-        $count = Invoke-EmarsysCore @params #-Object "field" -Path "translate/de"
+        $fields = Invoke-EmarsysCore @params #-Object "field" -Path "translate/de"
 
         # return
-        $count
+        $fields
 
     }
 
