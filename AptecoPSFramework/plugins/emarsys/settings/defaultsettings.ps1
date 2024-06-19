@@ -5,7 +5,7 @@
 
     # API
     "base" = "https://api.emarsys.net/api/v2/"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
-    "contentType" = "application/json; charset=utf-8"       # content type string that is always used for API requests
+    "contentType" = "application/json;charset=utf-8"       # content type string that is always used for API requests
     "pageSize" = 500                                        # if paging is used for the API requests, this is the default setting for a pagesize
     #"mailingLimit" = 999
     #"additionalHeaders" = [PSCustomObject]@{
