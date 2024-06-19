@@ -2,6 +2,7 @@
 
 # Quickstart
 
+This is all about the emarsys core API
 
 ```PowerShell
 
@@ -38,7 +39,7 @@ Export-Settings -Path $settingsFile
 
 ```
 
-# Functions
+# Functions / Examples
 
 
 ```PowerShell
@@ -50,5 +51,10 @@ Import-Settings -Path "C:\faststats\scripts\channels\emarsys\settings.yaml"
 # List all commands of this plugin
 get-command -module "*emarsys*"
 
+# Get lists, filtered by name
+get-list | where { $_.name -like "*DEMO*" }
+
+# Count a list by id
+Get-ListCount -ListId 1932108413
 
 ```
