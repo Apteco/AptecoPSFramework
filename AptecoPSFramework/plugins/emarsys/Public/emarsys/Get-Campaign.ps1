@@ -2,12 +2,29 @@
 function Get-Campaign {
     [CmdletBinding()]
     param (
-         [Parameter(Mandatory=$false)][String]$BehaviorChannel = "batch_email"      # batch_email|transactional_email
-        ,[Parameter(Mandatory=$false)][Array]$CampaignType = [Array]@()             # adhoc|recurring|newsletter|onevent|testmail|multilanguage|broadcast - multiple values are allowed
+
+         [Parameter(Mandatory=$false)]
+         [ValidateSet("batch_email", "transactional_email", IgnoreCase = $false)]
+         [String]$BehaviorChannel = "batch_email"      # batch_email|transactional_email
+
+        ,[Parameter(Mandatory=$false)]
+         [ValidateSet("adhoc", "recurring", "newsletter", "onevent", "testmail", "multilanguage", "broadcast", IgnoreCase = $false)]
+         [Array]$CampaignType = [Array]@()             # adhoc|recurring|newsletter|onevent|testmail|multilanguage|broadcast - multiple values are allowed
+
         ,[Parameter(Mandatory=$false)][Int]$Contactlist = 0                         #
-        ,[Parameter(Mandatory=$false)][Int]$Launched = -1                           # 0|1
-        ,[Parameter(Mandatory=$false)][String]$ContentType = ""                     # html|template|block
-        ,[Parameter(Mandatory=$false)][Int]$ShowDeleted = -1                        # 0|1
+        
+        ,[Parameter(Mandatory=$false)]
+         [ValidateSet(-1, 0, 1, IgnoreCase = $false)]
+         [Int]$Launched = -1                           # 0|1
+
+        ,[Parameter(Mandatory=$false)]
+         [ValidateSet("", "html", "template", "block", IgnoreCase = $false)]
+         [String]$ContentType = ""                     # html|template|block
+
+        ,[Parameter(Mandatory=$false)]
+         [ValidateSet(-1, 0, 1, IgnoreCase = $false)]
+         [Int]$ShowDeleted = -1                        # 0|1
+        
         ,[Parameter(Mandatory=$false)][String]$FromDate = ""                        # string like 2024-06-16
         ,[Parameter(Mandatory=$false)][String]$ToDate = ""                          # string like 2024-06-16
     )
