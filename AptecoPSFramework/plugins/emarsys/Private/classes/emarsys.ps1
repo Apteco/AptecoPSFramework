@@ -1581,7 +1581,6 @@ function Invoke-emarsys {
         }
 
         $result = Invoke-RestMethod @params #-UseBasicParsing
-        #$result.headers | ConvertTo-Json -Depth 99 | Set-Content -Path "C:\Users\Administrator.kikapp\Downloads\exporte\$( ([guid]::NewGuid().toString()) )" -Encoding utf8
 
     }
     

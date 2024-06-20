@@ -13,6 +13,9 @@ Email|CleverReach|v3|REST|Tagging, Upload, Broadcast-Preparation, Broadcast, Rec
 CRM|SalesForce SalesCloud|REST/Bulk API|REST|Load CRM Data, Upload to CampaignMembers
 CRM|Hubspot|CRM API v3|REST|Download all CRM object data full/delta, Upload to Marketing Lists
 CRM|Microsoft Dynamics 365 CRM|DataVerse oData WebAPI|REST|Download all CRM object data and picklists full/delta
+Email|emarsys (An SAP Company)|Emarsys Core API|REST|Adding Lists and Contacts, get lists, campaigns, fields, contact data
+Email|ActiveCampaign||REST|Still under development
+Email|Apteco email||REST|Get lists and contacts on that list
 
 # Installation / Update / Uninstall
 
