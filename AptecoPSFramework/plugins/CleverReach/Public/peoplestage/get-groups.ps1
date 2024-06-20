@@ -46,7 +46,7 @@ function Get-Groups {
         $param = [PSCustomObject]@{
             order = "changed DESC" # TODO put this maybe into settings
         }
-        $groups = Invoke-CR -Object "groups" -Query $param -Method "GET" -Verbose
+        $groups = Invoke-CR -Object "groups" -Query $param -Method "GET" #-Verbose
         Write-Log "Loaded $( $groups.Count ) groups from CleverReach" -severity INFO #-WriteToHostToo $false
 
         # Load and filter list into array of mailings objects

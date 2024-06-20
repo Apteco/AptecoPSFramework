@@ -110,7 +110,7 @@ function Show-Preview {
                     "locked" = $false
                     "backup" = $false
                 }
-                $previewGroup = Invoke-CR -Object "groups" -Method POST -Verbose -body $newGroupBody
+                $previewGroup = Invoke-CR -Object "groups" -Method POST -body $newGroupBody # -Verbose
                 Write-log -message "Created a new group '$( $previewGroup.mame )' with id '$( $previewGroup.id )'"
             } else {
                 # There is a problem, because multiple previewgroups are existing
@@ -119,7 +119,7 @@ function Show-Preview {
             }
 
             # Get that groups details
-            $group = Invoke-CR -Object "groups" -Path "/$( $previewGroup.id )" -Method GET -Verbose
+            $group = Invoke-CR -Object "groups" -Path "/$( $previewGroup.id )" -Method GET #-Verbose
 
 
             #-----------------------------------------------
@@ -265,7 +265,7 @@ function Show-Preview {
             # REMOVE ATTRIBUTES ON GROUP THAT ARE NOT NEEDED
             #-----------------------------------------------
 
-            $localAttributes = @( (Invoke-CR -Object "attributes" -Method "GET" -Verbose -Query ( [PSCustomObject]@{ "group_id" = $group.id } )) )
+            $localAttributes = @( (Invoke-CR -Object "attributes" -Method "GET" -Query ( [PSCustomObject]@{ "group_id" = $group.id } )) )
             $notNeededAttributes = @( $localAttributes | Where-Object { $_.name -notin $usedAttributes } )
             #$script:plugindebug = $notNeededAttributes.name
 
@@ -276,7 +276,7 @@ function Show-Preview {
 
                     $att = $_
                     Write-Log "  $( $att.name ) ($( $att.id ))"
-                    $del += Invoke-CR -Object "attributes" -Method "DELETE" -Verbose -Path "/$( $att.id )"
+                    $del += Invoke-CR -Object "attributes" -Method "DELETE" -Path "/$( $att.id )" #-Verbose
 
                 }
 
@@ -301,7 +301,7 @@ function Show-Preview {
             }
 
             # As a response we get the full profiles of the receiver back
-            $upload = @( Invoke-CR -Object "groups" -Path "/$( $group.id )/receivers/upsertplus" -Method POST -Verbose -Body $uploadBody )
+            $upload = @( Invoke-CR -Object "groups" -Path "/$( $group.id )/receivers/upsertplus" -Method POST -Body $uploadBody )
 
             # Example
 
@@ -313,7 +313,7 @@ function Show-Preview {
             #-----------------------------------------------
 
             # get details of mailing
-            $templateSource = Invoke-CR -Object "mailings" -Path "/$( $templateId )" -Method GET -Verbose
+            $templateSource = Invoke-CR -Object "mailings" -Path "/$( $templateId )" -Method GET #-Verbose
             #$newMailingName = "$( $templateSource.name ) - $( $processStart.ToString("yyyyMMddHHmmss") )"
             Write-Log -message "Looked up the mailing '$( $templateId )' with name '$( $templateSource.Name )'"
             #Write-Log -message "New mailing name: '$( $newMailingName )'"
@@ -365,7 +365,7 @@ function Show-Preview {
             #$script:plugindebug = $previewParametersJson
 
             #$renderedPreview = Invoke-CR -Object "gomailer" -Path "/preview" -Method POST -Verbose -body $previewParameters
-            $renderedPreview = Invoke-RestMethod -Uri "https://rest.cleverreach.com/gomailer/preview" -ContentType $Script:settings.contentType -body $previewParametersJson -Verbose -Method POST
+            $renderedPreview = Invoke-RestMethod -Uri "https://rest.cleverreach.com/gomailer/preview" -ContentType $Script:settings.contentType -body $previewParametersJson -Method POST #-Verbose
 
             #Invoke-RestMethod -Method Post -Uri "https://rest.cleverreach.com/gomailer/preview" -Body $j
 

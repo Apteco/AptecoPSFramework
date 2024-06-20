@@ -123,7 +123,7 @@ function Invoke-Broadcast{
 
             Write-Log "Getting stats for group $( $groupId ):"
 
-            $groupStats = Invoke-CR -Object "groups" -Path "/$( $groupId )/stats" -Method GET -Verbose
+            $groupStats = Invoke-CR -Object "groups" -Path "/$( $groupId )/stats" -Method GET #-Verbose
 
             <#
             {
@@ -158,7 +158,7 @@ function Invoke-Broadcast{
                     "group_id" = $groupId
                     "active" = $true
                 }
-                $tagCount = Invoke-CR -Object "tags" -Path "/count" -Method GET -Verbose -Query $tagQuery
+                $tagCount = Invoke-CR -Object "tags" -Path "/count" -Method GET -Query $tagQuery #-Verbose
 
                 Write-Log "Got $( $tagCount ) receivers for tag $( $t ) in group $( $groupId )"
 
@@ -257,7 +257,7 @@ function Invoke-Broadcast{
                 "rules" = $rules
             }
 
-            $segment = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters" -Method POST -Verbose -Body $filterBody
+            $segment = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters" -Method POST -Body $filterBody #-Verbose
 
             #$script:debug = $segment
 
@@ -273,7 +273,7 @@ function Invoke-Broadcast{
             # COUNT SEGMENT
             #-----------------------------------------------
 
-            $segmentCount = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters/$( $segment.id )/count" -Method GET -Verbose
+            $segmentCount = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters/$( $segment.id )/count" -Method GET #-Verbose
 
             If ( $segmentCount -gt 0 ) {
                 Write-Log "Count of this segment: $( $segmentCount )"
@@ -336,7 +336,7 @@ function Invoke-Broadcast{
             $script:debug = $mailingSettings
 
             # put it all together
-            $copiedMailing = Invoke-CR -Object "mailings" -Method POST -Verbose -body $mailingSettings
+            $copiedMailing = Invoke-CR -Object "mailings" -Method POST -body $mailingSettings #-Verbose
 
             Write-Log -message "Created a copy of the mailing with the new id $( $copiedMailing.id )"
 

@@ -13,7 +13,7 @@ function Register-NewTokenViaApi {
     }
     process {
 
-        $newToken = Invoke-CR -Object "debug" -Path "exchange.json" -Method GET -Verbose
+        $newToken = Invoke-CR -Object "debug" -Path "exchange.json" -Method GET #-Verbose
 
         $newToken
 

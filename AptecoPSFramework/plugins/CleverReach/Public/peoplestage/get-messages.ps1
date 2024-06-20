@@ -54,7 +54,7 @@ Switch ( $InputHashtable.mode ) {
             "limit" = $Script:settings.mailingLimit
             "page" = 0
         }
-        $tags = Invoke-CR -Object "tags" -Query $param -Method "GET" -Verbose
+        $tags = Invoke-CR -Object "tags" -Query $param -Method "GET" #-Verbose
         Write-Log "Loaded $( $mailings.draft.Count ) tags from CleverReach" -severity INFO #-WriteToHostToo $false
 
         # Load and filter list into array of mailings objects
@@ -78,7 +78,7 @@ Switch ( $InputHashtable.mode ) {
             "state" = "draft"
             "limit" = $Script:settings.mailingLimit
         }
-        $mailings = Invoke-CR -Object "mailings" -Query $param -Method "GET" -Verbose
+        $mailings = Invoke-CR -Object "mailings" -Query $param -Method "GET" #-Verbose
         Write-Log "Loaded $( $mailings.draft.Count ) mailing drafts from CleverReach" -severity INFO #-WriteToHostToo $false
 
         # Load and filter list into array of mailings objects

@@ -12,8 +12,8 @@ function Register-Plugins {
 
         # Initiate the variable if needed
         #If ( $Script:plugins -eq $null ) {
-            $Script:plugins = [System.Collections.ArrayList]::new()
-            #}
+        $Script:plugins = [System.Collections.ArrayList]::new()
+        #}
 
         $Script:pluginFolders | ForEach-Object {
             $pluginFolder = $_

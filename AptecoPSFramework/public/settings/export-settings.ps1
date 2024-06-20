@@ -19,7 +19,7 @@
                 If ( Test-Path -Path $absolutePath ) {
                     $backupPath = "$( $absolutePath ).$( [Datetime]::Now.ToString("yyyyMMddHHmmss") )"
                     Write-Verbose -message "Moving previous settings file '$( $absolutePath )' to $( $backupPath )"
-                    Move-Item -Path $absolutePath -Destination $backupPath -Verbose
+                    Move-Item -Path $absolutePath -Destination $backupPath #-Verbose
                 }
 
                 # Now save the settings file

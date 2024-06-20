@@ -166,7 +166,7 @@ function Invoke-Upload{
                 Write-Log "Got chosen list/group entry with id '$( $list.mailingListId )' and name '$( $list.mailingListName )'"
 
                 # Asking for details and possibly throw an exception
-                $g = Invoke-CR -Object "groups" -Path "/$( $groupId )" -Method GET -Verbose
+                $g = Invoke-CR -Object "groups" -Path "/$( $groupId )" -Method GET #-Verbose
 
             } catch {
 
@@ -174,7 +174,7 @@ function Invoke-Upload{
                 if ( $InputHashtable.ListName -ne $InputHashtable.MessageName ) {
 
                     # Try to search for that group and select the first matching entry or throw exception
-                    $groups =  Invoke-CR -Object "groups" -Method "GET" -Verbose
+                    $groups =  Invoke-CR -Object "groups" -Method "GET" #-Verbose
 
                     # Check how many matches are available
                     $matchingGroups = @( $groups | where-object { $_.name -eq $InputHashtable.ListName } ) # put an array around because when the return is one object, it will become a pscustomobject
@@ -218,7 +218,7 @@ function Invoke-Upload{
                 $body = [PSCustomObject]@{
                     "name" = "$( $listName )"
                 }
-                $newGroup = Invoke-CR -Object "groups" -Body $body -Method "POST" -Verbose
+                $newGroup = Invoke-CR -Object "groups" -Body $body -Method "POST" #-Verbose
                 $groupId = $newGroup.id
                 Write-Log -message "Created a new group with id $( $groupId )" -severity INFO
 
@@ -653,7 +653,7 @@ function Invoke-Upload{
                             "group_id" = $groupId
                             "invert" = $false
                         }
-                        $validatedAddresses = @( Invoke-CR -Object "receivers" -Path "/isvalid" -Method POST -Verbose -Body $validateObj )
+                        $validatedAddresses = @( Invoke-CR -Object "receivers" -Path "/isvalid" -Method POST -Body $validateObj )
                         #$Script:debug = $validatedAddresses
                         $v += $validatedAddresses.count
 
@@ -711,7 +711,7 @@ function Invoke-Upload{
                             }
 
                             # As a response we get the full profiles of the receivers back
-                            $upload = @( Invoke-CR -Object "groups" -Path "/$( $groupId )/receivers/upsertplus" -Method POST -Verbose -Body $uploadBody )
+                            $upload = @( Invoke-CR -Object "groups" -Path "/$( $groupId )/receivers/upsertplus" -Method POST -Body $uploadBody )
 
                             # Count the successful upserted profiles
                             $j += $upload.count
@@ -800,7 +800,7 @@ function Invoke-Upload{
                 "active" = $true
             }
             $tagCount = 0
-            $tagCount += Invoke-CR -Object "tags" -Path "/count" -Method GET -Verbose -Query $tagQuery
+            $tagCount += Invoke-CR -Object "tags" -Path "/count" -Method GET -Query $tagQuery
 
             Write-Log "Got confirmed $( $tagCount ) receivers for tag $( $tags ) in group $( $groupId )"
 

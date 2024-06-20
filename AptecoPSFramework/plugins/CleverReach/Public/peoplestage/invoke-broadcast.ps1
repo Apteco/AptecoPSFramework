@@ -160,7 +160,7 @@ function Invoke-Broadcast{
                     "group_id" = $groupId
                     "active" = $true
                 }
-                $tagCount = Invoke-CR -Object "tags" -Path "/count" -Method GET -Verbose -Query $tagQuery
+                $tagCount = Invoke-CR -Object "tags" -Path "/count" -Method GET -Query $tagQuery #-Verbose
 
                 Write-Log "Got $( $tagCount ) receivers for tag $( $t ) in group $( $groupId )"
 
@@ -172,7 +172,7 @@ function Invoke-Broadcast{
             #-----------------------------------------------
 
             # get details of mailing
-            $templateSource = Invoke-CR -Object "mailings" -Path "/$( $templateId )" -Method GET -Verbose
+            $templateSource = Invoke-CR -Object "mailings" -Path "/$( $templateId )" -Method GET #-Verbose
             $newMailingName = "$( $templateSource.name ) - $( $processStart.ToString("yyyyMMddHHmmss") )"
             Write-Log -message "Looked up the mailing '$( $templateId )' with name '$( $templateSource.Name )'"
             Write-Log -message "New mailing name: '$( $newMailingName )'"
@@ -259,7 +259,7 @@ function Invoke-Broadcast{
                 "rules" = $rules
             }
 
-            $segment = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters" -Method POST -Verbose -Body $filterBody
+            $segment = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters" -Method POST -Body $filterBody #-Verbose
 
             #$script:debug = $segment
 
@@ -275,7 +275,7 @@ function Invoke-Broadcast{
             # COUNT SEGMENT
             #-----------------------------------------------
 
-            $segmentCount = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters/$( $segment.id )/count" -Method GET -Verbose
+            $segmentCount = Invoke-CR -Object "groups" -Path "/$( $groupId )/filters/$( $segment.id )/count" -Method GET #-Verbose
 
             If ( $segmentCount -gt 0 ) {
                 Write-Log "Count of this segment: $( $segmentCount )"
@@ -447,7 +447,7 @@ function Invoke-Broadcast{
             $script:debug = $mailingSettings
 
             # put it all together
-            $copiedMailing = Invoke-CR -Object "mailings" -Method POST -Verbose -body $mailingSettings
+            $copiedMailing = Invoke-CR -Object "mailings" -Method POST -body $mailingSettings #-Verbose 
 
             Write-Log -message "Created a copy of the mailing with the new id $( $copiedMailing.id )"
 
@@ -462,7 +462,7 @@ function Invoke-Broadcast{
                 $releaseBody = [PSCustomObject]@{
                     time  = [int]$releaseTimestamp
                 }
-                Invoke-CR -Object "mailings" -Path "/$( $copiedMailing.id )/release" -Method POST -Verbose -body $releaseBody
+                Invoke-CR -Object "mailings" -Path "/$( $copiedMailing.id )/release" -Method POST -body $releaseBody #-Verbose
 
                 Write-Log "Released mailing for unix timestamp at $( $releaseTimestamp )"
 
@@ -479,7 +479,7 @@ function Invoke-Broadcast{
                         $i += $secondsToWait
 
                         # Ask for the current status
-                        $mailingStatus = Invoke-CR -Object "mailings" -Path "/$( $copiedMailing.id )" -Method GET -Verbose
+                        $mailingStatus = Invoke-CR -Object "mailings" -Path "/$( $copiedMailing.id )" -Method GET #-Verbose
 
                     } Until ( $i -gt $maxWaitTime -or $mailingStatus.state -eq "finished" )
 

@@ -239,7 +239,7 @@ function Get-Response {
             #-----------------------------------------------
 
             $globalUrnAttribute = $false
-            $globalAttributes = @( (Invoke-CR -Object "attributes" -Method "GET" -Verbose ) )
+            $globalAttributes = @( (Invoke-CR -Object "attributes" -Method "GET" ) )
             $urnField = @( $globalAttributes | Where-Object { $_.name -eq $Script:settings.responses.urnFieldName } )
             If ( $urnField.count -eq 0 ) {
                 Write-Log -message "Looks like the urn is not on global level. It tries to load it from local attributes"
@@ -261,7 +261,7 @@ function Get-Response {
                 start = $messageStartTimestamp
                 end = $endTimestamp
             }
-            $reports = @( Invoke-CR -Object "reports" -Query $reportsQuery -Method "GET" -Verbose -Paging -Pagesize 80 )
+            $reports = @( Invoke-CR -Object "reports" -Query $reportsQuery -Method "GET" -Paging -Pagesize 80 )
 
             Write-Log -message "Found $( $reports.Count ) reports for the last $( $Script:settings.responses.messagePeriod ) days"
 
@@ -343,7 +343,7 @@ function Get-Response {
                                 Write-Log -message "  Downloading link $( $linkId )"
                             }
 
-                            $result = @( Invoke-CR -Object "reports" -Path "/$( $reportId )/receivers/$( $responseType )" -Query $query -Method "GET" -Verbose -Paging )
+                            $result = @( Invoke-CR -Object "reports" -Path "/$( $reportId )/receivers/$( $responseType )" -Query $query -Method "GET" -Paging )
                             #$script:pluginDebug = $result
                             If ( $result.count -gt 0 ) {
                                 $responses.AddRange(@( $result | Select-Object @{name="state";expression={ $responseType }},@{name="report";expression={ $reportId }},@{name="linkid";expression={ $linkId }}, * ))

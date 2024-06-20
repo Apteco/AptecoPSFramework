@@ -45,8 +45,8 @@
 
             # Load online attributes
             $object = "attributes"
-            $globalAttributes = @( (Invoke-CR -Object $object -Method "GET" -Verbose ) )
-            $localAttributes = @( (Invoke-CR -Object $object -Method "GET" -Verbose -Query ( [PSCustomObject]@{ "group_id" = $groupId } )) )
+            $globalAttributes = @( (Invoke-CR -Object $object -Method "GET" ) )
+            $localAttributes = @( (Invoke-CR -Object $object -Method "GET" -Query ( [PSCustomObject]@{ "group_id" = $groupId } )) )
 
             # Log
             Write-Log -message "Loaded global attributes names: $( $globalAttributes.name -join ", " )"
@@ -178,7 +178,7 @@
                     #"default_value" = "Bruce Wayne"     # optional
                 }
 
-                $newAttributes += Invoke-CR -Object "groups" -Method "POST" -Path "/$( $groupId )/attributes" -Body $body -Verbose
+                $newAttributes += Invoke-CR -Object "groups" -Method "POST" -Path "/$( $groupId )/attributes" -Body $body #-Verbose
                 #$newAttributes += Invoke-RestMethod -Uri $endpoint -Method Post -Headers $header -Body $bodyJson -ContentType $contentType -Verbose
 
             }
@@ -187,7 +187,7 @@
                 Write-Log -message "Created new local attributes in CleverReach: $( $newAttributes.name.Tolower() -join ", " )" -Severity WARNING
 
                 # Get details for new created atributes as the creation only delivers since 202309
-                $newAttributesDetails = @( (Invoke-CR -Object $object -Method "GET" -Verbose -Query ( [PSCustomObject]@{ "group_id" = $groupId } )) | Where-Object { $_.name.ToLower() -in $newAttributes.name.Tolower() } )
+                $newAttributesDetails = @( (Invoke-CR -Object $object -Method "GET" -Query ( [PSCustomObject]@{ "group_id" = $groupId } )) | Where-Object { $_.name.ToLower() -in $newAttributes.name.Tolower() } )
 
 
             } else {

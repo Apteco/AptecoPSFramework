@@ -11,7 +11,7 @@
 
         try {
 
-            $ttl = Invoke-CR -Object "debug" -Path "/ttl.json" -Method "GET" -Verbose
+            $ttl = Invoke-CR -Object "debug" -Path "/ttl.json" -Method "GET" #-Verbose
 
             Write-Log "Token is still valid for $( [math]::floor( $ttl.ttl/60/60 ) ) hours"
 

@@ -70,7 +70,7 @@ function Register-NewTokenViaOauth {
             #"resource"
         }
 
-        write-verbose ( $body | convertto-json)  -verbose
+        write-verbose ( $body | convertto-json)  #-verbose
 
 
         #-----------------------------------------------

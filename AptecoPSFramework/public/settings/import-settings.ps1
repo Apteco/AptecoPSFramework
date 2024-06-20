@@ -1,7 +1,7 @@
 Function Import-Settings {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$false)][string]$Path = "./settings.json"
+        [Parameter(Mandatory=$false)][string]$Path = "./settings.yaml"
     )
 
     Process {

@@ -11,7 +11,7 @@
     process {
 
 
-        $success = $false
+        #$success = $false
 
 
         #-----------------------------------------------
@@ -215,7 +215,7 @@
             #Write-log $p.Version
 
             If ( $psLocalPackages.Count -gt 0  -and $settings.loadlocalLibFolder -eq $true ) {
-                Write-Verbose "Loading local packages" -verbose
+                Write-Verbose "Loading local packages" #-verbose
                 try {
 
                     # Work out the local lib folder
@@ -226,7 +226,7 @@
                     #Write-Log "$( ( Get-Package -Name "PackageManagement" ).Version )"
 
                     If ( Test-Path -Path $localLibFolder ) {
-                        Write-Verbose "Loading from $( $localLibFolder )" -verbose
+                        Write-Verbose "Loading from $( $localLibFolder )" #-verbose
 
                         #$localLibFolderItem = get-item $localLibFolder.Path
 
@@ -246,7 +246,7 @@
 
                     } else {
 
-                        Write-Verbose "You have no local lib folder to load. Not necessary a problem. Proceeding..." -verbose #-Severity Warning
+                        Write-Verbose "You have no local lib folder to load. Not necessary a problem. Proceeding..." #-verbose #-Severity Warning
 
                     }
 
@@ -271,13 +271,10 @@
                 Exit 0
             }
 
-
-
-
             # Load assemblies
             $psAssemblies | ForEach-Object {
                 $ass = $_
-                Add-Type -AssemblyName $_
+                Add-Type -AssemblyName $ass
             }
 
 
