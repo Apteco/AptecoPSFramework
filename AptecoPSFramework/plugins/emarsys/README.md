@@ -39,7 +39,7 @@ Export-Settings -Path $settingsFile
 
 ```
 
-# Functions / Examples
+# Functions
 
 
 ```PowerShell
@@ -51,10 +51,19 @@ Import-Settings -Path "C:\faststats\scripts\channels\emarsys\settings.yaml"
 # List all commands of this plugin
 get-command -module "*emarsys*"
 
+
+```
+
+
+```PowerShell
+
 # Get lists, filtered by name
 get-list | where { $_.name -like "*DEMO*" }
 
 # Count a list by id
 Get-ListCount -ListId 1932108413
+
+# Get contacts by email address, resolve fields, ignore errors (e.g. not existing email addresses)
+Get-ContactData @( "florian.friedrichs@apteco.de","florian.von.bracht@apteco.de" ) -Fields "first_name", "last_name","email" -ResolveFields -IgnoreErrors
 
 ```

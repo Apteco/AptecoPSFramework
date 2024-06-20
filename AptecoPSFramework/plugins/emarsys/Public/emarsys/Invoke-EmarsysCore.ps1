@@ -299,7 +299,12 @@ function Invoke-EmarsysCore {
         If ( $Paging -eq $true ) {
             $res
         } else {
-            $wr.data
+            If ( $wr.data ) {
+                $wr.data
+            } else {
+                $wr
+            }
+            
         }
 
     }
