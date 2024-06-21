@@ -10,7 +10,7 @@
 
     process {
 
-        $return = $false
+        #$return = $false
 
         # Check if this needs to be declared first
         If ( $null -eq $Script:pluginFolders ) {
@@ -35,10 +35,10 @@
         $plugins = Register-Plugins
 
         # Switch return value
-        $return = $true
+        #$return = $true
 
         # Return
-        $return
+        #$return
 
     }
 
