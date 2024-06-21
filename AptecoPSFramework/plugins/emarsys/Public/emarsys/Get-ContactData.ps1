@@ -6,7 +6,7 @@
 function Get-ContactData {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)][Array]$KeyValues
+         [Parameter(Mandatory=$true,ValueFromPipeline=$true,Position=0)][String[]]$KeyValues
         ,[Parameter(Mandatory=$false)][String]$KeyId = "email" # Identifies the contact by their id, uid, or the name/integer id of a custom field, such as email
         ,[Parameter(Mandatory=$false)][Array]$Fields = @("id","email")
         ,[Parameter(Mandatory=$false)][Switch]$ResolveFields = $false
@@ -16,27 +16,7 @@ function Get-ContactData {
 
     begin {
 
-        #Invoke-EmarsysLogin
-
-    }
-
-    process {
-
-        #$emarsys = $Script:variableCache.emarsys
-        #$fields = [System.Collections.ArrayList]@(1,2,3,31,9,46,11,12)
-
-        <#
-        $keys = [System.Collections.ArrayList]@(378808151,378808960)
-        $fetch = $emarsys.getContactData("id",$fields,$keys)
-        #>
-
-        #$keys = [System.Collections.ArrayList]@("florian.von.bracht@apteco.tld","florian.friedrichs@apteco.tld")
-        #ä$fetch = $emarsys.getContactData("3",$fields,$InputEmail)
-        #$fetch = $emarsys.getContactData("id",$fields,$InputEmail)
-
-        #$fetch
-
-
+        # build object for call
         $params = [Hashtable]@{
             "Object" = "contact"
             "Method" = "POST"
@@ -44,7 +24,7 @@ function Get-ContactData {
             "Body" = [PSCustomObject]@{
                 'fields' = $Fields
                 'keyId' = $KeyId
-                'keyValues' = $KeyValues
+                'keyValues' = $null
             }
         }
 
@@ -53,62 +33,96 @@ function Get-ContactData {
             $params.Add("Verbose", $true)
         }
 
-        # Request list creation
-        $fetchList = Invoke-EmarsysCore @params
+        $arr = [System.Collections.ArrayList]@()
+        $total = 0
+        $i = 0
 
-        # Rewrite result
-        If ( $ResolveFields -eq $true  ) {
+    }
 
-            # Create a lookup hashtable for field names
-            $fieldHashtable = [hashtable]@{}
-            get-field | ForEach-Object { $fieldHashtable.add($_.id,$_.name) }
+    process {
 
-            $res = [System.Collections.ArrayList]@()
-            $fetchList.result | ForEach-Object {
-    
-                $row = $_
-    
-                $newRow = [PSCustomObject]@{
-                    "id" = $row.id      # always returned
-                    "uid" = $row.uid    # always returned
+        # Support for parameter input
+        foreach ($KeyValue in $KeyValues) {
+
+            [void]$arr.Add($KeyValue)
+            $i += 1
+            $total += 1
+
+            Write-Verbose "Added at i $( $i ) and total $( $total ) of $( $KeyValues.Count )"
+
+            # Request list creation every n
+            If ( $i % 1000 -eq 0 ) {
+
+                Write-Verbose "Calling emarsys at i $( $i ) and total $( $total ) of $( $KeyValues.Count )"
+
+                # Get the data from emarsys
+                $params.Body.keyValues = $arr
+                $fetchList = Invoke-EmarsysCore @params
+
+                # Rewrite result
+                If ( $ResolveFields -eq $true  ) {
+
+                    $rewriteParams = [Hashtable]@{
+                        "FetchList" = $fetchList
+                        "IgnoreErrors" = $IgnoreErrors
+                    }
+                    Resolve-ContactData @rewriteParams
+
+                } else {
+
+                    If ( $IgnoreErrors -eq $true ) {
+                        $fetchList.result
+                    } else {
+                        $fetchList
+                    }
+
                 }
-    
-                $row.PSObject.Properties | Where-Object { $_.MemberType -eq "NoteProperty" -and $_.Name -notin "id","uid" } | ForEach-Object {
-                    #$v = $_
-                    $newRow | Add-Member -MemberType NoteProperty -Name $fieldHashtable[[int]$_.Name]  -Value $_.Value
-                }
 
-                [void]$res.Add($newRow)
-    
+                # Empty the cached values
+                $arr.Clear()
+                $i = 0
+
             }
 
-            # return
-            If ( $IgnoreErrors -eq $true ) {
-                $res
-            } else {
-                [PSCustomObject]@{
-                    "errors" = $fetchList.errors
-                    "result" =  $res
-                }
-            }
-    
-        } else {
-            If ( $IgnoreErrors -eq $true ) {
-                $res.result
-            } else {
-                $fetchList
-            }
         }
-
-
-
-        
-
-        
 
     }
 
     end {
+
+        # Get a last call if there is something left
+        If ( $i -gt 0 ) {
+
+            Write-Verbose "Calling emarsys at i $( $i ) and total $( $total ) of $( $KeyValues.Count )"
+
+            # Get the data from emarsys
+            $params.Body.keyValues = $arr
+            $fetchList = Invoke-EmarsysCore @params
+
+            # Rewrite result
+            If ( $ResolveFields -eq $true  ) {
+
+                $rewriteParams = [Hashtable]@{
+                    "FetchList" = $fetchList
+                    "IgnoreErrors" = $IgnoreErrors
+                }
+                Resolve-ContactData @rewriteParams
+
+            } else {
+
+                If ( $IgnoreErrors -eq $true ) {
+                    $fetchList.result
+                } else {
+                    $fetchList
+                }
+                
+            }
+
+            # Empty the cached values
+            $arr.Clear()
+            $i = 0
+
+        }
 
     }
 

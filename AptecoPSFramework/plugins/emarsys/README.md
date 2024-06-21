@@ -66,4 +66,14 @@ Get-ListCount -ListId 1932108413
 # Get contacts by email address, resolve fields, ignore errors (e.g. not existing email addresses)
 Get-ContactData @( "florian.friedrichs@apteco.de","florian.von.bracht@apteco.de" ) -Fields "first_name", "last_name","email" -ResolveFields -IgnoreErrors
 
+Get-ContactData -KeyValues "10596","10764","13919" -KeyId "id" -Fields "email" -IgnoreErrors
+
+# Or via pipeline input
+"10596", "10764","13919" | Get-ContactData -KeyId "id" -Fields "email" -IgnoreErrors
+
+# Or connect the commands together
+# This process is running with 1 thread. In my tests around 200k contacts need around 300 seconds to load
+$c = Get-ListContact -ListId 1801153297 -all | Get-ContactData -KeyId "id" -Fields "email", "first_name" -ResolveFields -IgnoreErrors
+$c | Select -First 1000 | Out-Gridview
+
 ```
