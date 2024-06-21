@@ -201,7 +201,7 @@ function Invoke-EmarsysCore {
 
             # Prepare Body
             If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
-                $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99
+                $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99 -Compress
                 $updatedParameters.Body = $bodyJson
             }
 
@@ -299,7 +299,7 @@ function Invoke-EmarsysCore {
         If ( $Paging -eq $true ) {
             $res
         } else {
-            If ( $wr.data ) {
+            If ( $wr.data -ne $null ) {
                 $wr.data
             } else {
                 $wr

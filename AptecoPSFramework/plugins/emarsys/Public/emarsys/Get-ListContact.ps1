@@ -21,12 +21,17 @@ function Get-ListContact {
 
     begin {
 
-        $res =  [System.Collections.ArrayList]@()
+        # Count list
+        $listCount = Get-ListCount -ListId $ListId
+
+        #$res =  [System.Collections.ArrayList]@()
 
         if ($PSCmdlet.ParameterSetName -eq 'AllPages') {
             $SkipToken = 0
             $Top = 10000
         }
+
+        $i = 0
 
     }
 
@@ -53,7 +58,8 @@ function Get-ListContact {
     
             # Request list creation
             $fetchList = Invoke-EmarsysCore @params
-            $res.AddRange($fetchList.value)
+            $fetchList.value #return directly
+            #$res.AddRange($fetchList.value)
             
             # Setup next page
             If ( $fetchList.next -ne $null ) {
@@ -63,10 +69,14 @@ function Get-ListContact {
                 #$Top = $nextQueryParams['$top']
             }
 
+            $i += $fetchList.value.count
+            $percent = [math]::Floor(($i/$listCount)*100)
+            Write-Progress -Activity "Loading list contacts" -Status "$( $percent )% complete" -PercentComplete $percent    
+
         } While ( $All -eq $true -and $fetchList.next -ne $null )
 
         # return
-        $res
+        #$res
 
     }
 
