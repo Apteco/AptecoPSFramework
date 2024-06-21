@@ -159,6 +159,8 @@ PrivateData = @{
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
 0.3.2 Feature: Added code for emarsys specific functions like downloading lists, campaigns, fields and contacts
+      Fix: All verbose outputs for plugins do now work with the -verbose flag
+      Fix: Remove the boolean output when adding a pluginfolder
 0.3.1 Fix: Throwing full exceptions via iwr and irm to catch more details of exception in the plugin
 0.3.0 Feature: Adding DuckDB as dependencies to the framework by default so the campaign file can be read (and written) through DuckDB query
                more effectively than through a .NET streamreader or streamwriter when you want to transform the file
