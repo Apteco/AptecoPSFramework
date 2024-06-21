@@ -109,7 +109,7 @@ function Invoke-CR {
         $updatedParameters = Skip-UnallowedBaseParameters -Base "Invoke-RestMethod" -Parameters $PSBoundParameters
 
         # Output parameters in debug mode
-        If ( $Script:debugMode -eq $true -or $Verbose -eq $true ) {
+        If ( $Script:debugMode -eq $true -or $PSBoundParameters["Verbose"].IsPresent -eq $true) {
             Write-Host "INPUT: $( Convertto-json -InputObject $PSBoundParameters -Depth 99 )"
         }
 
@@ -233,7 +233,7 @@ function Invoke-CR {
             try {
 
                 # Output parameters in debug mode
-                If ( $Script:debugMode -eq $true -or $Verbose -eq $true ) {
+                If ( $Script:debugMode -eq $true -or $PSBoundParameters["Verbose"].IsPresent -eq $true) {
                     Write-Host "REST: $( Convertto-json -InputObject $updatedParameters -Depth 99 )"
                 }
 

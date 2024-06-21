@@ -59,7 +59,7 @@ function Invoke-SFSC {
         $updatedParameters = Skip-UnallowedBaseParameters -Base "Invoke-WebRequest" -Parameters $PSBoundParameters
 
         # Output parameters in debug mode
-        If ( $Script:debugMode -eq $true -or $Verbose -eq $true ) {
+        If ( $Script:debugMode -eq $true -or $PSBoundParameters["Verbose"].IsPresent -eq $true) {
             Write-Host "INPUT: $( Convertto-json -InputObject $PSBoundParameters -Depth 99 )"
         }
 
@@ -191,7 +191,7 @@ function Invoke-SFSC {
             try {
 
                 # Output parameters in debug mode
-                If ( $Script:debugMode -eq $true -or $Verbose -eq $true ) {
+                If ( $Script:debugMode -eq $true -or $PSBoundParameters["Verbose"].IsPresent -eq $true) {
                     Write-Host "REST: $( Convertto-json -InputObject $updatedParameters -Depth 99 )"
                 }
 
@@ -284,7 +284,7 @@ function Invoke-SFSC {
 
             #}
 
-            If ( $Verbose -eq $true ) {
+            If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
                 Write-log $wr.Headers."Sforce-Limit-Info" -severity verbose #api-usage=2/15000
             }
 
