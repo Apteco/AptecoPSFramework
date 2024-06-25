@@ -292,6 +292,22 @@ function Invoke-EmarsysCore {
 
         } Until ( $finished -eq $true )
 
+
+        #-----------------------------------------------
+        # SAVE CURRENT RATE
+        #-----------------------------------------------
+
+        If ( $Script:variableCache.Keys -contains "api_rate_remaining" ) {
+            $Script:variableCache."api_rate_limit" = $req.Headers."X-Ratelimit-Limit"               # Request limit per minute
+            $Script:variableCache."api_rate_remaining" = $req.Headers."X-Ratelimit-Remaining"       # The number of requests left for the time window
+            $Script:variableCache."api_rate_reset" = $req.Headers."X-RateLimit-Reset"               # The time when the rate limit window resets as a unix timestamp
+        } else {
+            $Script:variableCache.Add("api_rate_limit", $req.Headers."X-RateLimit-Limit" )          # Request limit per minute
+            $Script:variableCache.Add("api_rate_remaining", $req.Headers."X-Ratelimit-Remaining" )  # The number of requests left for the time window
+            $Script:variableCache.Add("api_rate_reset", $req.Headers."X-RateLimit-Reset" )          # The time when the rate limit window resets as a unix timestamp
+        }
+
+
     }
 
     End {
