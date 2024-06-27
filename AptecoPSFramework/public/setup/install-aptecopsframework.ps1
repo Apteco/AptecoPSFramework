@@ -107,7 +107,9 @@ Calling with one of the Flags, just does this part
         . ( Join-Path -Path $Script:moduleRoot -ChildPath "/bin/dependencies.ps1" )
 
         # Call the script to install dependencies
-        Install-Dependencies -Script $psScripts -Module $psModules -LocalPackage $psLocalPackages -GlobalPackage $psGlobalPackages
+        Install-Dependencies -Script $psScripts -Module $psModules
+        Install-Dependencies -LocalPackage $psLocalPackages -GlobalPackage $psGlobalPackages -ExcludeDependencies
+
 
 
         #-----------------------------------------------

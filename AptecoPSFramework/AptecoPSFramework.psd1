@@ -159,6 +159,7 @@ PrivateData = @{
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
+      Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Removed not needed scripts
 0.3.2 Feature: Added code for emarsys specific functions like downloading lists, campaigns, fields and contacts
       Fix: All verbose outputs for plugins do now work with the -verbose flag
