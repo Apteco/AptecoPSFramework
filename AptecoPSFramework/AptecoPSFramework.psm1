@@ -245,10 +245,11 @@ If ("" -ne $Script:settings.keyfile) {
 Export-ModuleMember -Function $Public.Basename #-verbose  #+ "Set-Logfile"
 #Export-ModuleMember -Function $Private.Basename #-verbose  #+ "Set-Logfile"
 
-
 #-----------------------------------------------
 # SET THE LOGGING
 #-----------------------------------------------
+
+Set-Logfile -Path $Script:settings.logfile
 
 # Set a new process id first, but this can be overridden later
 $processId = [guid]::NewGuid().toString()

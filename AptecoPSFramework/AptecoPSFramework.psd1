@@ -158,6 +158,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
 0.3.2 Feature: Added code for emarsys specific functions like downloading lists, campaigns, fields and contacts
       Fix: All verbose outputs for plugins do now work with the -verbose flag
       Fix: Remove the boolean output when adding a pluginfolder

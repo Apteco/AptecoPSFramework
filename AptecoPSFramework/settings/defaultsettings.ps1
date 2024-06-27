@@ -3,7 +3,7 @@
 [PSCustomObject]@{
 
     # General
-    "logfile" = ""
+    "logfile" = "./logfile.log"                             # default logfile
     "encoding" = "utf8"
     "nameConcatChar" = " ~ "
     "currentDate" = [datetime]::Now.ToString("yyyy-MM-dd HH:mm:ss")
