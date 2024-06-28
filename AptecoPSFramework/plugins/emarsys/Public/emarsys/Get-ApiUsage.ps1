@@ -36,7 +36,7 @@ function Get-ApiUsage {
         $resetAt = [Math]::Abs($resetAt)
 
         # Put a message on the console
-        Write-Verbose "Used $( $Script:variableCache."api_rate_remaining" )/$( $Script:variableCache."api_rate_limit" ), reset in $( $resetAt ) seconds" #-verbose
+        Write-Verbose "Remaining $( $Script:variableCache."api_rate_remaining" )/$( $Script:variableCache."api_rate_limit" ), reset in $( $resetAt ) seconds" #-verbose
 
         # Return
         $Script:variableCache.api_rate_remaining
