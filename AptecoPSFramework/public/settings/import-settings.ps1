@@ -1,3 +1,11 @@
+<#
+
+Inspired by
+
+https://gist.github.com/ksumrall/3b7010a9fbc9c5cb19e9dc8b9ee32fb1
+
+#>
+
 Function Import-Settings {
     [CmdletBinding()]
     param(
@@ -8,6 +16,8 @@ Function Import-Settings {
 
         # Try to resolve the path
         $absolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+
+        Write-Verbose "Try to import the settings file at '$( $absolutePath )'"
 
         # Work out the extension - the file does not need to exist for that
         $pathExtension = [System.IO.Path]::GetExtension($Path)
@@ -35,9 +45,9 @@ Function Import-Settings {
                         }
 
                     } catch {
-                        Write-Error "There is a problem loading the settings file"
+                        #Write-Error "There is a problem loading the settings file"
+                        throw "There is a problem loading the settings file"
                     }
-                    #Write-verbose ( Convertto-json $settings ) -verbose
 
                     # Register all plugins
                     try {
@@ -45,69 +55,51 @@ Function Import-Settings {
                             Add-PluginFolder $_
                         }
                     } catch {
-                        Write-Error "There is a problem registering plugins"
+                        #Write-Error "There is a problem registering plugins"
+                        throw "There is a problem with registering the plugins"
                     }
 
-                    # First extend the default settings with the settings file
-                    <#
-                    try {
-                        $defaultSettings = $Script:defaultSettings.psobject.copy()
-                        $extendedSettings = Add-PropertyRecurse -source $settings -toExtend $defaultSettings
-                        #Write-verbose ( Convertto-json $extendedSettings ) -verbose
-                    } catch {
-                        Write-Error -Message "Settings cannot be added"
-
-                    }
-                    #>
-
-                    # Then make sure to overwrite existing values that are matching
-                    <#
-                    try {
-                        $joinedSettings = Join-Objects -source $extendedSettings -extend $settings
-                    } catch {
-                        Write-Error -Message "Settings cannot be joined"
-                    }
-                    #>
-                    #$script:debug = $joinedSettings
-
+                    # Joining the settings together
                     try {
                         $joinedSettings = Join-PSCustomObject -Left $Script:defaultSettings -Right $settings -AddPropertiesFromRight -MergePSCustomObjects -MergeHashtables #-MergeArrays
                     } catch {
-                        Write-Error -Message "Settings cannot be joined"
+                        #Write-Error -Message "Settings cannot be joined"
+                        throw "Settings cannot be joined"
                     }
 
                     # Set the settings into the module (modules defaultsettings + imported settings)
                     try {
                         Set-Settings -PSCustom $joinedSettings
                     } catch {
-                        Write-Error -Message "Settings cannot be loaded - Round 1"
+                        #Write-Error -Message "Settings cannot be loaded - Round 1"
+                        throw "Settings cannot be loaded"
                     }
 
                     # TODO [x] load the plugins from the settings file, if present
                     try {
                         Import-Plugin -guid $settings.plugin.guid
                     } catch {
-                        Write-Error -Message "Plugin cannot be imported"
+                        #Write-Error -Message "Plugin cannot be imported"
+                        throw "Plugin cannot be imported"
                     }
 
-                    # Set the settings into the module (settings + plugin settings)
-                    # try {
-                    #     Set-Settings -PSCustom $joinedSettings
-                    # } catch {
-                    #     Write-Error -Message "Settings cannot be loaded - Round 2"
-                    # }
+                } else {
+
+                    throw "The settings file '$( $absolutePath )' cannot be found"
 
                 }
 
             } else {
 
-                Write-Error -Message "The settings file '$( $absolutePath )' cannot be loaded."
+                #Write-Error -Message "The settings file '$( $absolutePath )' cannot be loaded."
+                throw "The settings file '$( $absolutePath )' path is not valid"
 
             }
 
         } catch {
 
-            Write-Error -Message "The path '$( $absolutePath )' is invalid."
+            #Write-Error -Message "The path '$( $absolutePath )' is invalid."
+            throw $_ #"The path '$( $absolutePath )' is invalid."
 
         }
 
@@ -116,14 +108,4 @@ Function Import-Settings {
 
     }
 
-
 }
-
-<#
-
-Inspired by
-
-https://gist.github.com/ksumrall/3b7010a9fbc9c5cb19e9dc8b9ee32fb1
-
-
-#>
