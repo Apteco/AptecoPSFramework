@@ -1,4 +1,4 @@
-
+﻿
 function Resolve-ContactData {
     [CmdletBinding()]
     param (
@@ -12,7 +12,7 @@ function Resolve-ContactData {
         If ( $Script:variableCache.fields -eq $null ) {
 
             # Create a lookup hashtable for field names
-            $fieldHashtable = [hashtable]@{}            
+            $fieldHashtable = [hashtable]@{}
             get-field | ForEach-Object {
                 $fieldHashtable.add($_.id,$_.name)
             }
@@ -23,7 +23,7 @@ function Resolve-ContactData {
             $fieldHashtable = $Script:variableCache.fields
 
         }
-        
+
     }
 
     process {

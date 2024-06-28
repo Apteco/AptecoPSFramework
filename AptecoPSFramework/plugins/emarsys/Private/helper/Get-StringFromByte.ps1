@@ -1,4 +1,4 @@
-
+﻿
 # transform bytes into hexadecimal string (e.g. for hash values)
 
 
@@ -11,7 +11,7 @@ function Get-StringFromByte() {
 
     $stringBuilder = ""
     $byteArray | ForEach { $stringBuilder += $_.ToString("x2") }
-    
+
     $stringBuilder
 
 }

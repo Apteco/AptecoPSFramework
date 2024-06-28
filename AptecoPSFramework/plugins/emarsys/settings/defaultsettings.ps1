@@ -52,7 +52,7 @@
         #>
     )
 
-    
+
     # Upload settings
     "upload" = [PSCustomObject]@{
         "countRowsInputFile" = $true

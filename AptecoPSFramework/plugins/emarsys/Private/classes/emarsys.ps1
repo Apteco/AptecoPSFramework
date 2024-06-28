@@ -1,4 +1,4 @@
-<#
+﻿<#
 # https://www.coolgenerator.com/ascii-text-generator
 #>
 
@@ -52,7 +52,7 @@ class DCSPField {
 
     # empty default constructor needed to support hashtable constructor
     DCSPField () {
-    } 
+    }
 
 }
 
@@ -61,10 +61,10 @@ class DCSPFieldChoice {
     [String] $id
     [String] $label
     [String] $description
-    
+
     # empty default constructor needed to support hashtable constructor
     DCSPFieldChoice () {
-    } 
+    }
 
 }
 
@@ -99,11 +99,11 @@ class DCSPList {
 
         $this.init()
 
-    } 
-    
+    }
 
-    DCSPList ( [String]$inputString ) {        
-        
+
+    DCSPList ( [String]$inputString ) {
+
         # If we have a nameconcat char in the settings variable, just use it
         $this.init($inputString)
 
@@ -141,7 +141,7 @@ class DCSPList {
     [String] toString()
     {
         return $this.id, $this.name -join $this.nameConcatChar
-    }    
+    }
 
 }
 
@@ -175,11 +175,11 @@ class DCSPMailing {
 
         $this.init()
 
-    } 
-    
+    }
 
-    DCSPMailing ( [String]$inputString ) {        
-        
+
+    DCSPMailing ( [String]$inputString ) {
+
         # If we have a nameconcat char in the settings variable, just use it
         $this.init($inputString)
 
@@ -217,7 +217,7 @@ class DCSPMailing {
     [String] toString()
     {
         return $this.id, $this.name -join $this.nameConcatChar
-    }    
+    }
 
 }
 
@@ -278,7 +278,7 @@ class EmarsysField : DCSPField {
         if ( $_.id -in @(27, 28, 29, 32, 33) ) {
             $this.excludeForExport = $true
         }
-    } 
+    }
 
     delete() {
 
@@ -291,7 +291,7 @@ class EmarsysField : DCSPField {
             method = "Delete"
         }
         $res = Invoke-emarsys @params
-        
+
     }
 
 }
@@ -309,7 +309,7 @@ class EmarsysList : DCSPList {
 
     [int] $type
     hidden [Emarsys]$emarsys
-    [PSCustomObject]$raw        # the raw source object for this one 
+    [PSCustomObject]$raw        # the raw source object for this one
 
 
     #-----------------------------------------------
@@ -322,7 +322,7 @@ class EmarsysList : DCSPList {
         # TODO [ ] needed?
         #$this.init()
 
-    } 
+    }
 
     #-----------------------------------------------
     # METHODS
@@ -336,9 +336,9 @@ class EmarsysList : DCSPList {
             uri = "$( $this.emarsys.baseUrl)contactlist/$( $this.id )/count"
         }
         [int]$res = Invoke-emarsys @params
-        
+
         return [int]$res
-    }    
+    }
 
 }
 
@@ -350,7 +350,7 @@ class EmarsysMailing : DCSPMailingsEmail {
     #-----------------------------------------------
 
     hidden [Emarsys]$emarsys
-    [PSCustomObject]$raw        # the raw source object for this one 
+    [PSCustomObject]$raw        # the raw source object for this one
     [String]$language
 
 
@@ -364,7 +364,7 @@ class EmarsysMailing : DCSPMailingsEmail {
         # TODO [ ] needed?
         #$this.init()
 
-    } 
+    }
 
     #-----------------------------------------------
     # METHODS
@@ -441,14 +441,14 @@ class EmarsysMailing : DCSPMailingsEmail {
         $res = Invoke-emarsys @params
         return $res
 
-    }    
+    }
 
     [PSCustomObject] getPreview() {
-    
+
         return $this.getPreview("html")
 
     }
-    
+
     # put in html, text, mobile
     [PSCustomObject] getPreview([String]$version) {
 
@@ -470,7 +470,7 @@ class EmarsysMailing : DCSPMailingsEmail {
         return $res
 
     }
-    
+
     [PSCustomObject] sendTest([String]$subject, [EmarsysList]$list) {
 
         # https://dev.emarsys.com/v2/email-campaign-life-cycle/send-a-test-email
@@ -559,7 +559,7 @@ class EmarsysExport {
     #-----------------------------------------------
 
     hidden [Emarsys]$emarsys
-    [PSCustomObject]$raw        # the raw source object for this one 
+    [PSCustomObject]$raw        # the raw source object for this one
 
     [EmarsysField[]]$fields
     [EmarsysList]$list
@@ -587,7 +587,7 @@ class EmarsysExport {
     # empty default constructor needed to support hashtable constructor
     EmarsysExport () {
         $this.init()
-    } 
+    }
 
     #-----------------------------------------------
     # METHODS
@@ -634,7 +634,7 @@ class EmarsysExport {
 
         # Register an event for every passed interval
         Register-ObjectEvent -InputObject $this.timer  -EventName "Elapsed" -SourceIdentifier $this.exportId -MessageData @{ timeout=$timerTimeout; emarsysExport = $this ; downloadImmediatly = $downloadImmediatly } -Action {
-            
+
             # Input
             $emarsysExport = $Event.MessageData.emarsysExport
 
@@ -654,7 +654,7 @@ class EmarsysExport {
 
             }
 
-            # Is timeout reached? Do something!            
+            # Is timeout reached? Do something!
             if ( $timeSpan.TotalSeconds -gt $Event.MessageData.timeout ) {
 
                 # Stop timer now (it is important to do this before the next processes run)
@@ -679,7 +679,7 @@ class EmarsysExport {
         # TODO [ ] export contains multiple files
         # TODO [ ] calculate time when finishing export
         if ( @("ready","done") -contains $this.status ) {
-            
+
             if ($this.raw.type -eq "contactlist") {
                 $listCount = $this.list.count()
                 $rounds = [Math]::Ceiling($listCount/$this.limit)
@@ -711,7 +711,7 @@ class EmarsysExport {
             $this.alreadyDownloaded = $true
 
         }
-        
+
     }
 
 }
@@ -731,13 +731,13 @@ class Emarsys : DCSP {
     #-----------------------------------------------
 
     hidden [pscredential]$cred                 # holds the username and secret
-    hidden [int]$waitSeconds = 10 
+    hidden [int]$waitSeconds = 10
     [String]$baseUrl = "https://api.emarsys.net/api/v2/"
     [DSCPScope[]]$supportedScopes = @(
         [DSCPScope]::Global
         #[DSCPScope]::Local
     )
-    
+
     # Override inherited properties
     [String]$providerName = "emarsys"
     static [bool]$allowNewFieldCreation = $true
@@ -754,9 +754,9 @@ class Emarsys : DCSP {
     # empty default constructor needed to support hashtable constructor
     Emarsys () {
         $this.init()
-    } 
+    }
 
-    Emarsys ( [String]$username, [String]$secret ) {        
+    Emarsys ( [String]$username, [String]$secret ) {
         $this.init( $username, $secret )
     }
 
@@ -825,7 +825,7 @@ class Emarsys : DCSP {
 
         $res = Invoke-emarsys @params
         return $res
-  
+
     }
 
     [string] newField([String]$fieldname, [EmarsysFieldApplicationTypes]$dataType) {
@@ -866,14 +866,14 @@ class Emarsys : DCSP {
             uri = "$( $this.baseUrl)field"
         }
         $res = Invoke-emarsys @params
-        
+
 
         # Transform result to objects
         $fields = [System.Collections.ArrayList]@()
         $res | ForEach {
 
             $f = $_
-            
+
             $choice = [System.Collections.ArrayList]@()
 
             if ( $loadDetails ) {
@@ -896,7 +896,7 @@ class Emarsys : DCSP {
                 }
 
                 # TODO [ ] check multiple choice which is called with /choices
-                
+
             }
 
             $fields.Add([EmarsysField]@{
@@ -917,7 +917,7 @@ class Emarsys : DCSP {
 
         # Return the results
         return $fields
-               
+
     }
 
     [EmarsysList[]] getLists () {
@@ -937,7 +937,7 @@ class Emarsys : DCSP {
         $res | ForEach {
 
             $l = $_
-            
+
             [void]$lists.Add([EmarsysList]@{
                 "emarsys" = $this
                 "id" = $l.id
@@ -956,7 +956,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getSegments () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -969,7 +969,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getSources () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1073,7 +1073,7 @@ class Emarsys : DCSP {
 
         # Call emarsys
         $params = $this.defaultParams + @{
-            uri = "$( $this.baseUrl )contactlist/$( $listId )/contacts" 
+            uri = "$( $this.baseUrl )contactlist/$( $listId )/contacts"
             method = "Get"
         }
         $res = Invoke-emarsys @params
@@ -1093,7 +1093,7 @@ class Emarsys : DCSP {
 
         # Call emarsys
         $params = $this.defaultParams + @{
-            uri = "$( $this.baseUrl )contact/getdata" 
+            uri = "$( $this.baseUrl )contact/getdata"
             method = "Post"
             body = ConvertTo-Json -InputObject $body -Depth 20
 
@@ -1136,9 +1136,9 @@ class Emarsys : DCSP {
         $res | ForEach {
 
             $c = $_
-            
+
             [void]$campaigns.Add([EmarsysMailing]@{
-                
+
                 "id" = $c.id
                 "name" = $c.name
                 "created" = $c.created
@@ -1164,7 +1164,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getConditionalTextRules () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1177,7 +1177,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getEmailTemplates () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1190,7 +1190,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getLinkCategories () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1203,7 +1203,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getExternalEvents () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1216,7 +1216,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getAutomationCenterPrograms () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1229,7 +1229,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getAutoImportProfiles () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1242,7 +1242,7 @@ class Emarsys : DCSP {
 
     [PSCustomObject] getEmailCategories () {
 
-        # TODO  [ ] implement as classes 
+        # TODO  [ ] implement as classes
 
         # Call emarsys
         $params = $this.defaultParams + @{
@@ -1256,14 +1256,14 @@ class Emarsys : DCSP {
 
 
     [EmarsysExport[]] downloadContactList ( [EmarsysList]$list, [String]$outputFolder ) {
-        
+
         $exportJobs = [System.Collections.ArrayList]@()
 
         # split the fields automatically
         # TODO [ ] find out if the primary key is always included
 
         $fields = $this.getFields($false) | where { $_.excludeForExport -eq $false }
-        
+
         # paging through fields and create exports
         $count = $fields.count
         $maxFields = 20 # max from emarsys
@@ -1272,7 +1272,7 @@ class Emarsys : DCSP {
             $start = $i * $maxFields
             $end = ( ( $i + 1 ) * $maxFields ) -1
             $exportFields = $fields[$start..$end]
-            $emarsysExport = $this.downloadContactList($list,$exportFields,$outputFolder) 
+            $emarsysExport = $this.downloadContactList($list,$exportFields,$outputFolder)
             $exportJobs.Add( $emarsysExport )
             #$this.exports += $emarsysExport
         }
@@ -1290,7 +1290,7 @@ class Emarsys : DCSP {
     # Download the contacts synchronously
     [EmarsysExport] downloadContactList ( [EmarsysList]$list, [EmarsysField[]]$fields, [String]$outputFolder ) {
 
-        # TODO [ ] implement as classes 
+        # TODO [ ] implement as classes
         # TODO [ ] make delimiter available as enum
         # TODO [ ] implement language
 
@@ -1312,20 +1312,20 @@ class Emarsys : DCSP {
             method = "Post"
             body = ConvertTo-Json -InputObject $body -Depth 20
         }
-        $exportId = Invoke-emarsys @params        
+        $exportId = Invoke-emarsys @params
 
         # Create the export object now
         $export = ( [EmarsysExport]@{
-            
+
             "emarsys" = $this
             "raw" = $exportId
-            
+
             "outputFolder" = $outputFolder
             "fields" = $fields
             "list" = $list
-        
+
             "exportId" = $exportId.id
-        
+
         })
 
         $this.exports += $export
@@ -1383,7 +1383,7 @@ class Emarsys : DCSP {
                 #13  # Version name
                 #14  # Campaign category
                 15  # Link category
-            ) 
+            )
 
             # optional
             #email_id = 100146526    # The identifier of the email campaign. Returns the contact's responses to the email.
@@ -1399,22 +1399,22 @@ class Emarsys : DCSP {
             method = "Post"
             body = ConvertTo-Json -InputObject $body -Depth 20
         }
-        $exportId = Invoke-emarsys @params    
+        $exportId = Invoke-emarsys @params
 
         # TODO [ ] load the body / parameters into the Export object, too?
 
         # Create the export object now
         $export = ( [EmarsysExport]@{
-            
+
             "emarsys" = $this
             "raw" = $exportId
             "outputFolder" = "."
-        
+
             #"fields" = $fields
             #"list" = $list
-        
+
             "exportId" = $exportId.id
-        
+
         })
 
         $this.exports += $export
@@ -1426,7 +1426,7 @@ class Emarsys : DCSP {
     [int] getResponses([String]$type) {
         return $this.getResponses($type,0)
     }
-    
+
     # Use this endpoint to ask for response data
     # then start polling downloadResponses within 2 minutes
     # the result is available for 2 hourse
@@ -1441,7 +1441,7 @@ class Emarsys : DCSP {
             #"start_date" = "YYYY-MM-DD"
             #"end_date" = "YYYY-MM-DD"
             #"campaign_id" = $this.id # optional
-        }        
+        }
         if ( $campaignId -gt 0 ) {
             $body | Add-Member -MemberType NoteProperty -Name "campaign_id" -Value $campaignId
         }
@@ -1491,7 +1491,7 @@ function Invoke-emarsys {
     )
 
     begin {
-        
+
 
         #-----------------------------------------------
         # AUTH
@@ -1521,7 +1521,7 @@ function Invoke-emarsys {
         # Create nonce
         $randomStringAsHex = Get-RandomString -length 16 | Format-Hex
         $nonce = Get-StringfromByte -byteArray $randomStringAsHex.Bytes
-        
+
         # Format date
         $date = [datetime]::UtcNow.ToString("o")
 
@@ -1540,9 +1540,9 @@ function Invoke-emarsys {
         # Setup content type
         $contentType = "application/json;charset=utf-8"
         #$xwsseArr.Add("Content-type=""$( $contentType )""") # take this out possibly
-        
+
         # Join Escher XWSSE together
-        $xwsse = $xwsseArr -join ", "  
+        $xwsse = $xwsseArr -join ", "
         #$xwsse
 
 
@@ -1556,10 +1556,10 @@ function Invoke-emarsys {
         }
 
     }
-    
+
     process {
-        
-                
+
+
         $params = @{
             "Uri" = $uri
             "Method" = $method
@@ -1583,9 +1583,9 @@ function Invoke-emarsys {
         $result = Invoke-RestMethod @params #-UseBasicParsing
 
     }
-    
+
     end {
-        
+
         if ( $outFile -ne "" ) {
 
             $outFile
@@ -1595,14 +1595,14 @@ function Invoke-emarsys {
             if ( $result.replyCode -eq 0 <# -and $result.replyText -eq "OK" #> ) {
 
                 $result.data
-    
+
             } else {
                 # Errors see here: https://dev.emarsys.com/v2/response-codes/http-400-errors
                 Write-Log -message "Got back $( $result.replyText ) from call to url $( $uri ), throwing exception"
                 throw [System.IO.InvalidDataException]
-                
+
             }
-    
+
         }
 
     }

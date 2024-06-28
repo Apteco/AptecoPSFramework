@@ -1,4 +1,4 @@
-
+﻿
 function Remove-ContactFromList {
     [CmdletBinding()]
     param (
@@ -32,7 +32,7 @@ function Remove-ContactFromList {
         #$res = $emarsys.deleteContactFromList("3", 31000652, $a)
         $res = $emarsys.deleteContactFromList("3", $ListId, $a)
 
-        
+
         #$res = $emarsys.deleteContactFromList("id", 31000652, $a)
 
         $res
