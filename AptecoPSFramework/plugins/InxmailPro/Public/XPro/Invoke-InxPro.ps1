@@ -114,7 +114,7 @@ function Invoke-InxPro {
                 "GET"{
                     #Write-Host "get"
                     $Query | Add-Member -MemberType NoteProperty -Name "pageSize" -Value $currentPagesize  #$Script:settings.pageSize
-                    $Query | Add-Member -MemberType NoteProperty -Name "offset" -Value 0
+                    #$Query | Add-Member -MemberType NoteProperty -Name "offset" -Value 0
                 }
 <#
                 "POST" {
@@ -138,25 +138,25 @@ function Invoke-InxPro {
 
     Process {
 
+        # Prepare query
+        $nvCollection = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
+        $Query.PSObject.Properties | ForEach-Object {
+            $nvCollection.Add( $_.Name, $_.Value )
+        }
+
+        # Prepare URL
+        $uriRequest = [System.UriBuilder]::new("$( $base )$( $object )/$( $Path )")
+        $uriRequest.Query = $nvCollection.ToString()
+        $updatedParameters.Uri = $uriRequest.Uri.OriginalString
+
+        # Prepare Body
+        If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
+            $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99
+            $updatedParameters.Body = $bodyJson
+        }
+
         $finished = $false
         Do {
-
-            # Prepare query
-            $nvCollection = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
-            $Query.PSObject.Properties | ForEach-Object {
-                $nvCollection.Add( $_.Name, $_.Value )
-            }
-
-            # Prepare URL
-            $uriRequest = [System.UriBuilder]::new("$( $base )$( $object )/$( $Path )")
-            $uriRequest.Query = $nvCollection.ToString()
-            $updatedParameters.Uri = $uriRequest.Uri.OriginalString
-
-            # Prepare Body
-            If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
-                $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99
-                $updatedParameters.Body = $bodyJson
-            }
 
             # Execute the request
             try {
@@ -179,7 +179,7 @@ function Invoke-InxPro {
                     "ForceUTF8Return" = $true
                 }
                 $req = @( Invoke-WebRequestWithErrorHandling @wrInput )
-                $Script:pluginDebug = $req
+                
                 $wr =  convertfrom-json -InputObject $req.content
 
             } catch {
@@ -199,18 +199,19 @@ function Invoke-InxPro {
             # Increase page and add results to the collection
             If ( $Paging -eq $true ) {
 
-                #Write-Verbose "Jumping into paging with $( $wr."Count" ) and $( $currentPagesize )"
-                #$Script:pluginDebug = $wr
+                Write-Verbose "Jumping into next page"
+                $Script:pluginDebug = $wr
 
                 # If the result equals the pagesize, try it one more time with the next page
-                If ( $wr.Total -eq $currentPagesize ) {
+                If ( $null -ne $wr."_links".next ) {
 
-                    Write-Verbose "Set pagesize"
+                    Write-Verbose "Set next batch"
 
                     Switch ( $updatedParameters.Method ) {
 
                         "GET"{
-                            $Query.offset += $currentPagesize
+                            #$Query.offset += $currentPagesize
+                            $updatedParameters.Uri = $wr."_links".next.href
                         }
                         <#
                         "POST" {
@@ -234,6 +235,25 @@ function Invoke-InxPro {
                 # If this is only one request without paging -> done!
                 $finished = $true
 
+            }
+
+            #-----------------------------------------------
+            # SAVE CURRENT RATE
+            #-----------------------------------------------
+            
+            #$Script:pluginDebug = $req
+            $apiRateLimit = $req.OriginalResponse.Headers."X-RateLimit-Limit"
+            $apiRateRemaining = $req.OriginalResponse.Headers."X-RateLimit-Remaining"
+            $apiRateReset = ( Get-Unixtime ) + $req.OriginalResponse.Headers."X-RateLimit-Reset"
+            If ( $Script:variableCache.Keys -contains "api_rate_remaining" ) {
+                $Script:variableCache."api_rate_limit" = $apiRateLimit               # Request limit per minute
+                $Script:variableCache."api_rate_remaining" = $apiRateRemaining       # The number of requests left for the time window
+                $Script:variableCache."api_rate_reset" = $apiRateReset               # The time when the rate limit window resets as a unix timestamp
+            } else {
+                #$apiRateReset = ( Get-Unixtime ) + 60 # at the first call this is just 60 seconds by default
+                $Script:variableCache.Add("api_rate_limit", $apiRateLimit )          # Request limit per minute
+                $Script:variableCache.Add("api_rate_remaining", $apiRateRemaining )  # The number of requests left for the time window
+                $Script:variableCache.Add("api_rate_reset", $apiRateReset )          # The time when the rate limit window resets as a unix timestamp
             }
 
         } Until ( $finished -eq $true )

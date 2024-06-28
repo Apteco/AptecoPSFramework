@@ -6,7 +6,7 @@ function Get-List {
         [Parameter(Mandatory=$false)]
         [ValidateSet("STANDARD", "ADMIN", "SYSTEM", IgnoreCase = $false)]
         [Array]$Type = [Array]@()             # STANDARD|ADMIN|SYSTEM - multiple values are allowed
-
+        ,[Parameter(Mandatory=$false)][Switch]$All = $false  # Should the links also be included?
         ,[Parameter(Mandatory=$false)][Switch]$IncludeLinks = $false  # Should the links also be included?
     )
 
@@ -20,6 +20,13 @@ function Get-List {
         $params = [Hashtable]@{
             "Object" = "lists"
             "Method" = "GET"
+            #"PageSize" = 100
+            #"Paging" = $true
+        }
+
+        # Add paging
+        If ( $All -eq $true ) {
+            $params.Add("Paging", $true)
         }
 
         # add verbose flag, if set

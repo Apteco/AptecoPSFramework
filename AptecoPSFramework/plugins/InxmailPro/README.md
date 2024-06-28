@@ -65,3 +65,18 @@ import-settings ".\inx.yaml"
 # EXAMPLES
 #-----------------------------------------------
 
+# Get first page of lists
+get-list -type STANDARD | Out-GridView
+
+# Get all lists
+get-list -type STANDARD -All | Out-GridView
+
+# All approved mailings of type regular mailing
+Get-Mailing -Type REGULAR_MAILING -All -ApprovedOnly
+
+# Show all regular mailings created after first of May 2022
+Get-Mailing -Type REGULAR_MAILING -All -CreatedAfter "1.5.2022" | Out-GridView
+
+# Show the current api usage and when the calls will refresh
+# The numbers get automatically refreshed when other calls are executed
+Get-ApiUsage -verbose -ForceRefresh
