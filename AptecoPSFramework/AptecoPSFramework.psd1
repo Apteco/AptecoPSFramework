@@ -158,6 +158,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Features: Adding an internal Function Add-HttpQueryPart to add new parts to a URI query
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Removed not needed scripts
