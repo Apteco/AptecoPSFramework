@@ -79,4 +79,17 @@ Get-Mailing -Type REGULAR_MAILING -All -CreatedAfter "1.5.2022" | Out-GridView
 
 # Show the current api usage and when the calls will refresh
 # The numbers get automatically refreshed when other calls are executed
-Get-ApiUsage -verbose -ForceRefresh
+Get-ApiUsage -verbose -ForceRefresh# Structure/Hierarchy of data
+
+- Recipients (global list and attributes)
+    |- Lists (recipients list dependent and lists data)
+        |- Mailings
+            |- Sendings
+                |- Sendings protocol
+                |- Bounces
+                |- Clicks
+                |- Web-Beacon-Hits (opens)
+        |- Events/Subscriptions
+        |- Events/Unsubscriptions
+        |- Tracking Permissions
+        |- Target Groups
