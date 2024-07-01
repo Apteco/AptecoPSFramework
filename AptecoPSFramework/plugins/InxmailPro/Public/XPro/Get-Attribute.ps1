@@ -1,14 +1,14 @@
 
 function Get-Attribute {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
-<#
-        [Parameter(Mandatory=$false)]
-        [ValidateSet("STANDARD", "ADMIN", "SYSTEM", IgnoreCase = $false)]
-        [Array]$Type = [Array]@()             # STANDARD|ADMIN|SYSTEM - multiple values are allowed
-        ,[Parameter(Mandatory=$false)][Switch]$All = $false  # Should the links also be included?
-#>
-        [Parameter(Mandatory=$false)][Switch]$IncludeLinks = $false  # Should the links also be included?
+
+        [Parameter(Mandatory=$true, ParameterSetName = 'Single')][Int]$Id
+
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [Switch]$IncludeLinks = $false  # Should the links also be included?
+
     )
 
     begin {
@@ -17,18 +17,35 @@ function Get-Attribute {
 
     process {
 
-        # Create params
-        $params = [Hashtable]@{
-            "Object" = "attributes"
-            "Method" = "GET"
-            #"PageSize" = 100
-            #"Paging" = $true
-        }
+        switch ($PSCmdlet.ParameterSetName) {
+            'Single' {
 
-        # Add paging
-        # If ( $All -eq $true ) {
-        #     $params.Add("Paging", $true)
-        # }
+                # Create params
+                $params = [Hashtable]@{
+                    "Object" = "attributes"
+                    "Method" = "GET"
+                    "Path" = $Id
+                }
+
+                break
+            }
+
+            'Collection' {
+
+                # Create params
+                $params = [Hashtable]@{
+                    "Object" = "attributes"
+                    "Method" = "GET"
+                }
+
+                # # Add paging
+                # If ( $All -eq $true ) {
+                #     $params.Add("Paging", $true)
+                # }
+                
+                break
+            }
+        }
 
         # add verbose flag, if set
 		If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
@@ -45,11 +62,31 @@ function Get-Attribute {
         #     $listsToFilter = $lists."_embedded"."inx:lists"
         # }
 
-        # return
-        If ( $IncludeLinks -eq $true ) {
-            $attributes."_embedded"."inx:attributes"
-        } else {
-            $attributes."_embedded"."inx:attributes" | Select-Object * -ExcludeProperty "_links"
+        # Return
+        switch ($PSCmdlet.ParameterSetName) {
+            'Single' {
+
+                # return
+                If ( $IncludeLinks -eq $true ) {
+                    $attributes
+                } else {
+                    $attributes | Select-Object * -ExcludeProperty "_links"
+                }
+
+                break
+            }
+
+            'Collection' {
+
+                # return
+                If ( $IncludeLinks -eq $true ) {
+                    $attributes."_embedded"."inx:attributes"
+                } else {
+                    $attributes."_embedded"."inx:attributes" | Select-Object * -ExcludeProperty "_links"
+                }
+                
+                break
+            }
         }
 
     }

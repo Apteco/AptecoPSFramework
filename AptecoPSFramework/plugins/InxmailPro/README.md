@@ -93,6 +93,15 @@ Remove-List -Id 301
 # Get all STANDARD lists, open a table to choose some of them, and delete the selected ones after pressing "OK"
 Get-List -All -Type STANDARD | Out-GridView -PassThru | Remove-List
 
+# Get all attributes
+Get-Attribute
+
+# Get a single attribute
+Get-Attribute -Id 357
+
+# Get a single mailing
+Get-Mailing -Id 159
+
 ```
 
 # Structure/Hierarchy of data

@@ -61,6 +61,7 @@ function Get-List {
         # Request list(s)
         $lists = Invoke-XPro @params
 
+        # Return
         switch ($PSCmdlet.ParameterSetName) {
             'Single' {
 
