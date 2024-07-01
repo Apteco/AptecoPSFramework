@@ -1,6 +1,6 @@
 ﻿
 
-function Invoke-InxPro {
+function Invoke-XPro {
 
     [CmdletBinding()]
     param (

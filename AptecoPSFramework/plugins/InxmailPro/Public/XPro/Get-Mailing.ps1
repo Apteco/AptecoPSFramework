@@ -164,7 +164,7 @@ function Get-Mailing {
 
 
         # Request mailings
-        $mailings = Invoke-InxPro @params
+        $mailings = Invoke-XPro @params
 
         # Exclude mailings
         # If ( $Type.Count -gt 0 ) {

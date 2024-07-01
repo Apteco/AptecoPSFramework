@@ -29,7 +29,7 @@ function Get-ApiUsage {
         
         If ( $unixtime -eq $resetAt -or $resetAt -ge 0 -or $ForceRefresh -eq $true) {
             # This means it needs a current status and needs to be refreshed
-            Invoke-InxPro -Object "serverinfo" | Out-Null # TODO check if maybe another call should be better for this
+            Invoke-XPro -Object "serverinfo" | Out-Null # TODO check if maybe another call should be better for this
         }
 
         # All good, just relead the value and remove the minus   
