@@ -65,10 +65,10 @@ import-settings ".\inx.yaml"
 # EXAMPLES
 #-----------------------------------------------
 
-# Get first page of lists
+# Get first page of lists (100 by default)
 get-list -type STANDARD | Out-GridView
 
-# Get all lists
+# Get all STANDARD lists
 get-list -type STANDARD -All | Out-GridView
 
 # All approved mailings of type regular mailing
@@ -79,7 +79,23 @@ Get-Mailing -Type REGULAR_MAILING -All -CreatedAfter "1.5.2022" | Out-GridView
 
 # Show the current api usage and when the calls will refresh
 # The numbers get automatically refreshed when other calls are executed
-Get-ApiUsage -verbose -ForceRefresh# Structure/Hierarchy of data
+Get-ApiUsage -verbose -ForceRefresh
+
+# Create a new list
+Add-List -Name "A new list" -Description "This is a new lists description" -SenderAddress "john.doe@example.com"
+
+# Get details of a list by id
+Get-list -Id 301
+
+# Remove a list with a specific id
+Remove-List -Id 301
+
+# Get all STANDARD lists, open a table to choose some of them, and delete the selected ones after pressing "OK"
+Get-List -All -Type STANDARD | Out-GridView -PassThru | Remove-List
+
+```
+
+# Structure/Hierarchy of data
 
 - Recipients (global list and attributes)
     |- Lists (recipients list dependent and lists data)
