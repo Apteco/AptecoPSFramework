@@ -15,6 +15,11 @@ Function Read-DuckDBQueryAsReader {
 
         Begin {
 
+            $isSniffCsv = $false
+            If ( $Query.Contains("sniff_csv") -eq $true ) {
+                $isSniffCsv = $true
+            }
+
             $conn = Get-DuckDBConnection -Name $ConnectionName
             $duckCommand = $conn.connection.createCommand()
 
@@ -86,6 +91,18 @@ Function Read-DuckDBQueryAsReader {
                         # TODO support other return types than string
                         if ($reader.IsDBNull($x) -eq $true ) {
                             $returnPSCustom[$reader.GetName($x)] = $null
+                        } elseif ( $isSniffCsv -eq $true -and $reader.GetName($x) -eq "Columns" ) {
+                            # This is a special subcollection
+                            $subArrayList = [System.Collections.ArrayList]@()
+                            $v = $reader.GetValue($x)
+                            ForEach ( $y in $v ) {
+                                $subPSCustom = [PSCustomObject]@{}
+                                ForEach ($z in $y.Keys) {
+                                    $subPSCustom | Add-Member -MemberType NoteProperty -Name $z -Value $y.$z
+                                }
+                                [void]$subArrayList.Add($subPSCustom)
+                            }
+                            $returnPSCustom[$reader.GetName($x)] = $subArrayList
                         } else {
                             $returnPSCustom[$reader.GetName($x)] = $reader.GetValue($x) #$reader.GetString($x)
                         }

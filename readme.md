@@ -345,7 +345,23 @@ Be aware that when Orbit/PeopleStage are calling PowerShell, this is currently 3
 another parameter in your `IntegrationParameters` in your channel to enforce 64bit. To do this, this parameter needs to be defined like
 `settingsFile=C:\Apteco\Scripts\AptecoPSFramework\settings.yaml;Force64bit=true` or similar.
 
+## Using DuckDB to work with csv files
 
+To find out more about the csv file and their columns, you could do
+
+```PowerShell
+Import-Module AptecoPSFramework
+Import-Settings ".\inx.yaml"
+Open-DuckDBConnection
+
+# Count the rows in a file
+$c = Read-DuckDBQueryAsScalar -Query "Select count(*) from read_csv('.\test.txt', sample_size=1000, delim='\t')"
+
+
+# This query then trys to find out more about the csv file like the delimiter, headers, date formats, column data types and much more
+# The delimiter does not need to be defined explicitely, it expects UTF-8
+$c = Read-DuckDBQueryAsReader -Query "Select * from sniff_csv('.\test.txt', sample_size=1000, delim='\t') limit 10" -ReturnAsPSCustom
+```
 
 # Errors
 
