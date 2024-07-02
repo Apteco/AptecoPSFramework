@@ -64,6 +64,7 @@ function Get-Attribute {
 
         # Return
         switch ($PSCmdlet.ParameterSetName) {
+            
             'Single' {
 
                 # return
