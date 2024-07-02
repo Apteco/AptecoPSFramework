@@ -158,6 +158,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
+      Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Fix: Improved the error handling and messaging for loading settings files
