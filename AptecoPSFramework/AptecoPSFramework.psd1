@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.3.1'
+ModuleVersion = '0.3.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -159,9 +159,12 @@ PrivateData = @{
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
       Features: Adding an internal Function Add-HttpQueryPart to add new parts to a URI query
+      Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
+      Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
-      Removed not needed scripts
+      Fix: Improved the error handling and messaging for loading settings files
+      Maintenance: Removed some not needed scripts
 0.3.2 Feature: Added code for emarsys specific functions like downloading lists, campaigns, fields and contacts
       Fix: All verbose outputs for plugins do now work with the -verbose flag
       Fix: Remove the boolean output when adding a pluginfolder

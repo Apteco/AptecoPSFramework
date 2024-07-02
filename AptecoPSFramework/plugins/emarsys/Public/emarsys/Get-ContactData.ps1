@@ -1,4 +1,4 @@
-
+﻿
 
 
 
@@ -115,7 +115,7 @@ function Get-ContactData {
                 } else {
                     $fetchList
                 }
-                
+
             }
 
             # Empty the cached values

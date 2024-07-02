@@ -1,4 +1,4 @@
-
+﻿
 
 
 
@@ -50,17 +50,17 @@ function Get-ListContact {
                     '$top' = $Top
                 }
             }
-    
+
             # add verbose flag, if set
             If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
                 $params.Add("Verbose", $true)
             }
-    
+
             # Request list creation
             $fetchList = Invoke-EmarsysCore @params
             $fetchList.value #return directly
             #$res.AddRange($fetchList.value)
-            
+
             # Setup next page
             If ( $fetchList.next -ne $null ) {
                 $queryChar = $fetchList.next.IndexOf("?")
@@ -71,7 +71,7 @@ function Get-ListContact {
 
             $i += $fetchList.value.count
             $percent = [math]::Floor(($i/$listCount)*100)
-            Write-Progress -Activity "Loading list contacts" -Status "$( $percent )% complete" -PercentComplete $percent    
+            Write-Progress -Activity "Loading list contacts" -Status "$( $percent )% complete" -PercentComplete $percent
 
         } While ( $All -eq $true -and $fetchList.next -ne $null )
 

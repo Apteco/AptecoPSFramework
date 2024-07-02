@@ -447,7 +447,7 @@ function Invoke-Broadcast{
             $script:debug = $mailingSettings
 
             # put it all together
-            $copiedMailing = Invoke-CR -Object "mailings" -Method POST -body $mailingSettings #-Verbose 
+            $copiedMailing = Invoke-CR -Object "mailings" -Method POST -body $mailingSettings #-Verbose
 
             Write-Log -message "Created a copy of the mailing with the new id $( $copiedMailing.id )"
 

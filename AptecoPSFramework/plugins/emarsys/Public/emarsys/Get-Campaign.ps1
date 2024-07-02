@@ -1,4 +1,4 @@
-
+﻿
 function Get-Campaign {
     [CmdletBinding()]
     param (
@@ -12,7 +12,7 @@ function Get-Campaign {
          [Array]$CampaignType = [Array]@()             # adhoc|recurring|newsletter|onevent|testmail|multilanguage|broadcast - multiple values are allowed
 
         ,[Parameter(Mandatory=$false)][Int]$Contactlist = 0                         #
-        
+
         ,[Parameter(Mandatory=$false)]
          [ValidateSet(-1, 0, 1, IgnoreCase = $false)]
          [Int]$Launched = -1                           # 0|1
@@ -24,7 +24,7 @@ function Get-Campaign {
         ,[Parameter(Mandatory=$false)]
          [ValidateSet(-1, 0, 1, IgnoreCase = $false)]
          [Int]$ShowDeleted = -1                        # 0|1
-        
+
         ,[Parameter(Mandatory=$false)][String]$FromDate = ""                        # string like 2024-06-16
         ,[Parameter(Mandatory=$false)][String]$ToDate = ""                          # string like 2024-06-16
     )
@@ -34,7 +34,7 @@ function Get-Campaign {
     }
 
     process {
-        
+
         #-----------------------------------------------
         # DEFINE QUERY
         #-----------------------------------------------
@@ -57,11 +57,11 @@ function Get-Campaign {
             throw "BehaviorChannel is not valid"
         }
 
-        
+
         $CampaignType | ForEach-Object {
-            
+
             $ct = $_
-            
+
             # Just check all types
             If ( $CampaignType -in @( "adhoc", "recurring", "newsletter", "onevent", "testmail", "multilanguage", "broadcast" ) ) {
             } else {
@@ -94,7 +94,7 @@ function Get-Campaign {
         }
 
 
-        
+
         If ( $FromDate -ne "" ) {
             $f = [Datetime]::Today
             If ( [Datetime]::TryParse($FromDate,[ref]$f) -eq $true ) {
@@ -123,11 +123,11 @@ function Get-Campaign {
         email_category
         is_rti
         parent_campaign_id
-        root_campaign_id        
+        root_campaign_id
         status
         template
         #>
-        
+
 
         #-----------------------------------------------
         # PREPARE PARAMETERS
@@ -144,7 +144,7 @@ function Get-Campaign {
 		If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
 			$params.Add("Verbose", $true)
 		}
-        
+
 
         #-----------------------------------------------
         # REQUEST

@@ -1,4 +1,4 @@
-
+﻿
 
 function Invoke-EmarsysCore {
 
@@ -71,7 +71,7 @@ function Invoke-EmarsysCore {
         # Extract credentials
         $secret = Convert-SecureToPlaintext $Script:settings.login.secret
         $username = $Script:settings.login.username
-        
+
         # Create nonce
         $randomStringAsHex = Get-RandomString -length 16 | Format-Hex
         $nonce = Get-StringfromByte -byteArray $randomStringAsHex.Bytes
@@ -304,7 +304,7 @@ function Invoke-EmarsysCore {
             } else {
                 $wr
             }
-            
+
         }
 
     }
