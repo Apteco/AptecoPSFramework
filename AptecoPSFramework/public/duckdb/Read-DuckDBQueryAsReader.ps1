@@ -81,22 +81,22 @@ Function Read-DuckDBQueryAsReader {
                 While ($reader.read()) {
 
                     # Create object and fill it
-                    $returnPSCustom = [PSCustomObject]@{}
+                    $returnPSCustom = [Ordered]@{}
                     For ($x = 0; $x -lt $reader.FieldCount; $x++ ) {
                         # TODO support other return types than string
                         if ($reader.IsDBNull($x) -eq $true ) {
-                            $returnPSCustom | Add-Member -MemberType NoteProperty -Name $reader.GetName($x) -Value $null
+                            $returnPSCustom[$reader.GetName($x)] = $null
                         } else {
-                            $returnPSCustom | Add-Member -MemberType NoteProperty -Name $reader.GetName($x) -Value $reader.GetValue($x) #$reader.GetString($x)
+                            $returnPSCustom[$reader.GetName($x)] = $reader.GetValue($x) #$reader.GetString($x)
                         }
                     }
 
                     If ( $AsStream -eq $true ) {
                         # return directly if it is a stream
-                        $returnPSCustom
+                        [PSCustomObject]$returnPSCustom
                     } else {
                         # otherwise add to a collection
-                        [void]$returnPSCustomArrayList.Add($returnPSCustom)
+                        [void]$returnPSCustomArrayList.Add([PSCustomObject]$returnPSCustom)
                     }
 
                 }
