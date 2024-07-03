@@ -41,6 +41,11 @@
     # Upload settings
     "upload" = [PSCustomObject]@{
 
+        "countRowsInputFile" = $true
+        "uploadSize" = 1000
+
+        "createNewFields" = $true
+
         # New List settings
         "newList" = [PSCustomObject]@{
             "senderAddress" = "info@apteco.de"
