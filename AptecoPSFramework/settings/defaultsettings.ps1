@@ -31,5 +31,8 @@
 
     # DuckDB
     "defaultDuckDBConnection" = "Data Source=:memory:;"     # Default DuckDB connection -> In-Memory connection, could also be a file
+    
+    # LogJob database (sqlite file via DuckDB will directly made, not connected to defaultDuckDBConnection)
+    "joblogDB" = "./logjob.sqlite"
 
 }

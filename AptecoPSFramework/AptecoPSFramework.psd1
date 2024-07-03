@@ -158,7 +158,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
-      Features: Adding an internal Function Add-HttpQueryPart to add new parts to a URI query
+      Feature: Adding a new local database with sqlite/DuckDB to log jobs into a database which will make it much easier to repeat jobs
+      Feature: Adding an internal Function Add-HttpQueryPart to add new parts to a URI query
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
       Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"

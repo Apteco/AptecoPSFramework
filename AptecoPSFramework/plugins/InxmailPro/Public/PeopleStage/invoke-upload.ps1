@@ -40,6 +40,19 @@ function Invoke-Upload{
         }
 
         # Log the job in the database
+        Set-JobLogDatabase
+        $jobId = Add-JobLog
+
+        $jobParams = [Hashtable]@{
+            "JobId" = $jobId
+            "Plugin" = $script:settings.plugin.guid
+            "Input" = ( ConvertTo-Json $InputHashtable -Depth 99 )
+            "Status" = "Starting"
+            "DebugMode" = $Script:debugMode
+            "Type" = $moduleName
+        }
+        Update-JobLog @jobParams
+
 
         #-----------------------------------------------
         # DEBUG MODE
@@ -104,6 +117,7 @@ function Invoke-Upload{
         If ( $Script:settings.upload.countRowsInputFile -eq $true ) {
             $rowsCount = Measure-Rows -Path $file.FullName -SkipFirstRow
             Write-Log -Message "Got a file with $( $rowsCount ) rows"
+            Update-JobLog -JobId $jobId -Inputrecords $rowsCount
         } else {
             Write-Log -Message "RowCount of input file not activated"
         }
@@ -522,6 +536,19 @@ function Invoke-Upload{
             $param = $_
             Write-Log -message "    $( $param ) = '$( $return[$param] )'" -writeToHostToo $false
         }
+
+        # log the return into database and close connection
+        $jobReturnParams = [Hashtable]@{
+            "JobId" = $jobId
+            "Status" = "Finished"
+            "Finished" = $true
+            "Successful" = $check.successCount
+            "Failed" = 0 # TODO needs correction
+            "Totalseconds" = $processDuration.TotalSeconds
+            "Output" = ( ConvertTo-Json $return -Depth 99)
+        }
+        Update-JobLog @jobReturnParams
+        Close-DuckDBConnection -Name "JobLog"
 
         # return the results
         $return
