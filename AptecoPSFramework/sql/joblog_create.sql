@@ -1,3 +1,4 @@
+-- sqlite
 CREATE TABLE IF NOT EXISTS joblog (
      id              INTEGER PRIMARY KEY
     ,created         TEXT DEFAULT (STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))

@@ -23,7 +23,6 @@ Function Set-JobLogDatabase {
         $joblogCreateStatement = Get-Content -Path $joblogCreateStatementPath -Encoding UTF8 -Raw
         Invoke-DuckDBQueryAsNonExecute -Query $joblogCreateStatement -ConnectionName "JobLog"
     
-
     }
 
 }

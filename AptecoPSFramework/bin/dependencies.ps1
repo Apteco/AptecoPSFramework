@@ -52,5 +52,5 @@ $psLocalPackages = [Array]@(
 )
 
 $psAssemblies = [Array]@(
-
+    "System.Web.Extensions"     # Needed for deserialisation of ConvertFrom-Json
 )
