@@ -4,27 +4,69 @@
 
 function Invoke-Upload{
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Object')]
     param (
-        [Parameter(Mandatory=$false)][Hashtable] $InputHashtable
+         [Parameter(Mandatory=$true, ParameterSetName = 'Object')][Hashtable]$InputHashtable        # This creates a new entry in joblog
+        ,[Parameter(Mandatory=$true, ParameterSetName = 'Job')][Int]$JobId                          # This uses an existing joblog entry
     )
 
     begin {
 
+        #-----------------------------------------------
+        # MODULE INIT
+        #-----------------------------------------------
+
+        $moduleName = "UPLOAD"
+        
 
         #-----------------------------------------------
         # START TIMER
         #-----------------------------------------------
 
         $processStart = [datetime]::now
-        #$inserts = 0
+
+
+        #-----------------------------------------------
+        # CHECK INPUT AND SET JOBLOG
+        #-----------------------------------------------
+
+        # Log the job in the database
+        Set-JobLogDatabase
+
+        Switch ( $PSCmdlet.ParameterSetName ) {
+
+            "Object" {
+
+                # Create a new job
+                $JobId = Add-JobLog
+                $jobParams = [Hashtable]@{
+                    "JobId" = $JobId
+                    "Plugin" = $script:settings.plugin.guid
+                    "Input" = ( ConvertTo-Json $InputHashtable -Depth 99 )
+                    "Status" = "Starting"
+                    "DebugMode" = $Script:debugMode
+                    "Type" = $moduleName
+                }
+                Update-JobLog @jobParams
+
+                break
+            }
+
+            "Job" {
+
+                # Get the jobs information
+                $job = Get-JobLog -JobId $JobId -ConvertInputAsHashtable
+                $InputHashtable = $job.input
+
+                break
+            }
+
+        }
 
 
         #-----------------------------------------------
         # LOG
         #-----------------------------------------------
-
-        $moduleName = "UPLOAD"
 
         # Start the log
         Write-Log -message $Script:logDivider
@@ -39,26 +81,24 @@ function Invoke-Upload{
             }
         }
 
-        # Log the job in the database
-        Set-JobLogDatabase
-        $jobId = Add-JobLog
-
-        $jobParams = [Hashtable]@{
-            "JobId" = $jobId
-            "Plugin" = $script:settings.plugin.guid
-            "Input" = ( ConvertTo-Json $InputHashtable -Depth 99 )
-            "Status" = "Starting"
-            "DebugMode" = $Script:debugMode
-            "Type" = $moduleName
-        }
-        Update-JobLog @jobParams
-
 
         #-----------------------------------------------
         # DEBUG MODE
         #-----------------------------------------------
 
         Write-Log "Debug Mode: $( $Script:debugMode )"
+
+
+        #-----------------------------------------------
+        # OPEN DEFAULT DUCKDB CONNECTION (NOT JOBLOG)
+        #-----------------------------------------------
+
+        Open-DuckDBConnection
+
+        # Create the attributes table
+        $attributesCreateStatementPath = Join-Path -Path $Script:moduleRoot -ChildPath "sql/attributes_create.sql"
+        $attributesCreateStatemen = Get-Content -Path $attributesCreateStatementPath -Encoding UTF8 -Raw
+        Invoke-DuckDBQueryAsNonExecute -Query $attributesCreateStatemen
 
 
         #-----------------------------------------------
@@ -117,7 +157,7 @@ function Invoke-Upload{
         If ( $Script:settings.upload.countRowsInputFile -eq $true ) {
             $rowsCount = Measure-Rows -Path $file.FullName -SkipFirstRow
             Write-Log -Message "Got a file with $( $rowsCount ) rows"
-            Update-JobLog -JobId $jobId -Inputrecords $rowsCount
+            Update-JobLog -JobId $JobId -Inputrecords $rowsCount
         } else {
             Write-Log -Message "RowCount of input file not activated"
         }
@@ -230,96 +270,61 @@ function Invoke-Upload{
 
             Write-Log "Getting stats for group $( $groupId )"
 
-            #$groupStats = Invoke-CR -Object "groups" -Path "/$( $groupId )/stats" -Method GET -Verbose
-            $groupStats = Get-GroupStats -GroupId $groupId
+            $groupStats = Get-List -Id $groupId
 
-            <#
-            {
-                "total_count": 4,
-                "inactive_count": 0,
-                "active_count": 4,
-                "bounce_count": 0,
-                "avg_points": 69.5,
-                "quality": 3,
-                "time": 1685545449,
-                "order_count": 0
+            # TODO do something with this?
+            # $groupStats.psobject.properties | ForEach-Object {
+            #     Write-Log "  $( $_.Name ): $( $_.Value )"
+            # }
+
+
+            #-----------------------------------------------
+            # LOAD CSV HEADERS/ATTRIBUTES
+            #-----------------------------------------------
+
+            # Sniffing of first 1000 rows
+            $sniff = Read-DuckDBQueryAsReader -Query "Select * from sniff_csv('$( $file.FullName )', sample_size=1000, delim='\t')" -ReturnAsPSCustom
+            
+            # Write the columns into the database
+            $sniff.Columns | ForEach-Object {
+                $col = $_
+                Invoke-DuckDBQueryAsNonExecute -Query "INSERT INTO attributes (name, type, source) VALUES ('$( $col.name )', '$( $col.type )', 'csv');"
             }
-            #>
 
-            $groupStats.psobject.properties | ForEach-Object {
-                Write-Log "  $( $_.Name ): $( $_.Value )"
+            # Flag other important columns
+            Invoke-DuckDBQueryAsNonExecute -Query "UPDATE attributes SET category = 'urn' WHERE name = '$( $InputHashtable.UrnFieldName )'"
+            Invoke-DuckDBQueryAsNonExecute -Query "UPDATE attributes SET category = 'email' WHERE name = '$( $InputHashtable.EmailFieldName )'"
+            Invoke-DuckDBQueryAsNonExecute -Query "UPDATE attributes SET category = 'mobile' WHERE name = '$( $InputHashtable.SmsFieldName )'"
+            Invoke-DuckDBQueryAsNonExecute -Query "UPDATE attributes SET category = 'commkey' WHERE name = '$( $InputHashtable.CommunicationKeyFieldName )'"
+
+
+            #-----------------------------------------------
+            # LOAD API ATTRIBUTES
+            #-----------------------------------------------
+
+            $attributes = Get-Attribute
+            $attributes | ForEach-Object {
+                $attr = $_
+                Invoke-DuckDBQueryAsNonExecute -Query "INSERT INTO attributes (extid, name, type, source, scope, length) VALUES ('$( $attr.id )', '$( $attr.name )', '$( $attr.type )', 'api', 'global', $( $attr.maxLength ));"
             }
 
 
             #-----------------------------------------------
-            # LOAD HEADER AND FIRST ROWS
+            # JOIN ATTRIBUTES
             #-----------------------------------------------
 
-            # Read first 100 rows
-            $deliveryFileHead = Get-Content -Path $file.FullName -TotalCount 201 -Encoding UTF8
-            $deliveryFileCsv =  ConvertFrom-Csv $deliveryFileHead -Delimiter "`t"
+            # TODO find out equivalent columns and check if new ones should be created
+            $q = "Select c.* from attributes c where source = 'csv' FULL OUTER JOIN attributes a on c.name = a.name WHERE a.source = 'api'"
+            $c = Read-DuckDBQueryAsReader -Query $q -ReturnAsPSCustom
 
-            $headers = [Array]@( $deliveryFileCsv[0].psobject.properties.name )
-            <#
-            $headers | ForEach {
 
-                $header = $_
-
-                $sqliteParameterObject = $sqliteDeliveryInsertCommand.CreateParameter()
-                $sqliteParameterObject.ParameterName = ":$( $header -replace '[^a-z0-9]', '' )"
-                [void]$sqliteDeliveryInsertCommand.Parameters.Add($sqliteParameterObject)
-
-                [void]$sqliteDeliveryCreateFields.Add( """$( $header )"" TEXT" )
-
-            }#>
-
-            $reservedFieldsCheck = Compare-Object -ReferenceObject $headers -DifferenceObject $Script:settings.upload.reservedFields -IncludeEqual
-            If ( ( $reservedFieldsCheck | Where-Object { $_.SideIndicator -eq "==" } ).count -gt 0 ) {
-
-                $msg = "You have used reserved fields:"
-                Write-Log -Message $msg -Severity ERROR
-
-                $reservedFieldsCheck | Where-Object { $_.SideIndicator -eq "==" } | ForEach-Object {
-                    Write-Log -Message "  $( $_.InputObject )"
-                }
-
-                throw [System.IO.InvalidDataException] $msg
-                exit 0
-
-            }
 
 
             #-----------------------------------------------
             # CHECK ATTRIBUTES
             #-----------------------------------------------
 
-            $requiredFields = @( $InputHashtable.EmailFieldName, $InputHashtable.UrnFieldName )
-            $reservedFields = @( $Script:settings.upload.reservedFields ) #@("tags")
-            Write-Log -message "Required fields: $( $requiredFields -join ", " )"
-            Write-Log -message "Reserved fields: $( $reservedFields -join ", " )"
-
-            $csvAttributesNames = $headers | Where-Object { $_.toLower() -notin $reservedFields }
-            #$csvAttributesNames = Get-Member -InputObject $dataCsv[0] -MemberType NoteProperty | where { $_.Name -notin $reservedFields }
-            Write-Log -message "Loaded csv attributes: $( $csvAttributesNames -join ", " )"
-
-            $attributeParam = [Hashtable]@{
-                "reservedFields" = $reservedFields  # TODO [ ] not used yet
-                "requiredFields" = $requiredFields
-                "csvAttributesNames" = $csvAttributesNames
-                "csvUrnFieldname" = $InputHashtable.UrnFieldName
-                "csvCommunicationKeyFieldName" = $InputHashtable.CommunicationKeyFieldName
-                "responseUrnFieldname" = $Script:settings.responses.urnFieldName
-                "groupId" = $groupId
-            }
-
-            # Logging attribute sync settings
-            Write-Log "Attribute sync settings:"
-            $attributeParam.Keys | ForEach-Object {
-                $param = $_
-                Write-Log -message "    $( $param ) = '$( $attributeParam[$param] )'" #-writeToHostToo $false
-            }
-
-            $attributes = Sync-Attribute @attributeParam
+            # TODO and create new ones, where needed
 
 
             #-----------------------------------------------
@@ -500,6 +505,13 @@ function Invoke-Upload{
                 Write-Log "Uploaded $( $j ) records, $( $l ) failed. Confirmed $( $tagcount ) receivers with tag '$( $tags )'" -severity INFO
             }
 
+
+            #-----------------------------------------------
+            # CLOSE DEFAULT DUCKDB CONNECTION
+            #-----------------------------------------------
+
+            Close-DuckDBConnection
+
         }
 
 
@@ -539,7 +551,7 @@ function Invoke-Upload{
 
         # log the return into database and close connection
         $jobReturnParams = [Hashtable]@{
-            "JobId" = $jobId
+            "JobId" = $JobId
             "Status" = "Finished"
             "Finished" = $true
             "Successful" = $check.successCount
