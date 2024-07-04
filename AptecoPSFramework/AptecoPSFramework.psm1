@@ -211,9 +211,13 @@ If ( $psLocalPackages.Count -gt 0 -and $loadlocalLibFolder -eq $true ) {
 # Load assemblies
 $psAssemblies | ForEach-Object {
     $ass = $_
-    Add-Type -AssemblyName $_
+    try {
+        Add-Type -AssemblyName $ass
+    }
+    catch {
+        throw "Unable to locate the assembly $( $ass )"
+    }
 }
-
 
 
 #-----------------------------------------------
