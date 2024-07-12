@@ -6,10 +6,10 @@ Function Get-JobLog {
          [Parameter(Mandatory=$true, ParameterSetName = 'Single')][Int]$JobId
 
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
-         [Switch]$ConvertInputAsHashtable = $false
+         [Switch]$ConvertInput = $false
 
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
-         [Switch]$ConvertOutputAsHashtable = $false
+         [Switch]$ConvertOutput = $false
 
         #,[Parameter(Mandatory=$true)][String]$ConnectionString
 
@@ -35,12 +35,31 @@ Function Get-JobLog {
                     throw "Multiple jobs found with id $( $JobId )"
                 } else {
 
-                    If ( $ConvertInputAsHashtable -eq $true) {
+                    If ( $ConvertInput -eq $true) {
                         $job.input = ConvertFrom-JsonAsHashtable $job.input
                     }
 
-                    If ( $ConvertOutputAsHashtable -eq $true) {
-                        $job.output = ConvertFrom-JsonAsHashtable $job.output
+                    If ( $ConvertOutput -eq $true) {
+                        Switch ( $job.returnformat ) {
+
+                            # "ARRAY" {
+                            #     ConvertFrom-Json $job.output
+                            #     break
+                            # }
+
+                            "HASHTABLE" {
+                                $job.output = ConvertFrom-JsonAsHashtable $job.output
+                                break
+
+                            }
+
+                            default {
+                                ConvertFrom-Json $job.output
+                                break
+                            }
+
+                        }
+                        
                     }
 
                 }
@@ -60,10 +79,37 @@ Function Get-JobLog {
                 #$job = Read-DuckDBQueryAsReader -Name "JobLog" -Query  -ReturnAsPSCustom
                 $job = Invoke-SqlQuery -Query $q -ConnectionName "JobLog" -Stream
 
-                $job | ForEach-Object {
-                    $j = $_
-                    $j.input = ConvertFrom-JsonAsHashtable $j.input
-                    $j.output = ConvertFrom-JsonAsHashtable $j.input
+                If ( $ConvertInput -eq $true -or $ConvertOutput -eq $true ) {
+
+                    $job | ForEach-Object {
+                        $j = $_
+                        If ( $ConvertInput -eq $true ) {
+                            $j.input = ConvertFrom-JsonAsHashtable $j.input
+                        }
+                        If ( $ConvertOutput -eq $true ) {
+                            Switch ( $j.returnformat ) {
+
+                                # "ARRAY" {
+                                #     ConvertFrom-Json $job.output
+                                #     break
+                                # }
+    
+                                "HASHTABLE" {
+                                    $j.output = ConvertFrom-JsonAsHashtable $j.output
+                                    break
+                                }
+    
+                                default {
+                                    $j.output = ConvertFrom-Json $j.output
+                                    break
+                                }
+    
+                            }
+                            
+                        }
+    
+                    }
+
                 }
 
                 break
@@ -72,7 +118,7 @@ Function Get-JobLog {
 
         $job
         
-
+        
     }
 
 }

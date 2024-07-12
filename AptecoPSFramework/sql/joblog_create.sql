@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS joblog (
     ,successful      INTEGER
     ,failed          INTEGER
     ,totalseconds    INTEGER
+    ,returnformat    TEXT
     ,output          TEXT
 );
 

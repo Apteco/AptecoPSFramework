@@ -55,7 +55,7 @@ function Invoke-Upload{
             "Job" {
 
                 # Get the jobs information
-                $job = Get-JobLog -JobId $JobId -ConvertInputAsHashtable
+                $job = Get-JobLog -JobId $JobId -ConvertInput
                 $InputHashtable = $job.input
 
                 # Update the job with more information
@@ -569,7 +569,7 @@ function Invoke-Upload{
             "OutputParam" = $return
         }
         Update-JobLog @jobReturnParams
-        Close-DuckDBConnection -Name "JobLog"
+        Close-JobLogDatabase -Name "JobLog"
 
         # return the results
         Switch ( $PSCmdlet.ParameterSetName ) {

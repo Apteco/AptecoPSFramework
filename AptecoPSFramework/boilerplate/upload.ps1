@@ -377,7 +377,7 @@ try {
 
     # return
     If ( $useJob -eq $true ) {
-        $jobReturn = Get-JobLog -JobId $jobId -ConvertOutputAsHashtable
+        $jobReturn = Get-JobLog -JobId $jobId -ConvertOutput
         $return = $jobReturn.output
     }
 

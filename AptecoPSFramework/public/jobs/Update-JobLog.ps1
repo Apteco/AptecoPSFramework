@@ -4,24 +4,58 @@ Function Update-JobLog {
     ...
 
     #>
-    [cmdletbinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Hashtable')]
     param(
 
-          [Parameter(Mandatory=$true)][Int]$JobId                # The Job ID that you have already got from the database
+          [Parameter(Mandatory=$true, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$true, ParameterSetName = 'Array')]
+          [Int]$JobId                # The Job ID that you have already got from the database
 
           # Values to change
-         ,[Parameter(Mandatory=$false)][Switch]$Finished = $false   # Finished like 0 or 1
-         ,[Parameter(Mandatory=$false)][String]$Status = ""     # Status like "Finished" and others
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Switch]$Finished = $false   # Finished like 0 or 1
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [String]$Status = ""     # Status like "Finished" and others
+         
          #,[Parameter(Mandatory=$false)][String]$Process = ""    # Process ID
-         ,[Parameter(Mandatory=$false)][String]$Plugin = ""     # Plugin guid
-         ,[Parameter(Mandatory=$false)][Int]$DebugMode = -1          # Debug mode like 0 or 1
-         ,[Parameter(Mandatory=$false)][String]$Type = ""       # Type like UPLOAD, MESSAGES, LISTS etc.
-         ,[Parameter(Mandatory=$false)][Hashtable]$InputParam = [Hashtable]@{}      # Input hashtable
-         ,[Parameter(Mandatory=$false)][Int]$Inputrecords = -1   # Number of records that have been put in
-         ,[Parameter(Mandatory=$false)][Int]$Successful = -1     # Successful records, only needed on uploads
-         ,[Parameter(Mandatory=$false)][Int]$Failed = -1         # Failed records, only needed on uploads
-         ,[Parameter(Mandatory=$false)][Int]$Totalseconds = -1   # Seconds in total, logged at the end
-         ,[Parameter(Mandatory=$false)][Hashtable]$OutputParam = [Hashtable]@{}     # Output hashtable (if it is suitable)
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [String]$Plugin = ""     # Plugin guid
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Int]$DebugMode = -1          # Debug mode like 0 or 1
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [String]$Type = ""       # Type like UPLOAD, MESSAGES, LISTS etc.
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Hashtable]$InputParam = [Hashtable]@{}      # Input hashtable
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Int]$Inputrecords = -1   # Number of records that have been put in
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Int]$Successful = -1     # Successful records, only needed on uploads
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Int]$Failed = -1         # Failed records, only needed on uploads
+         
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
+          [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
+          [Int]$Totalseconds = -1   # Seconds in total, logged at the end
+
+         # Only one Output should be allowed
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')][Hashtable]$OutputParam = [Hashtable]@{}     # Output hashtable (if it is suitable)
+         ,[Parameter(Mandatory=$false, ParameterSetName = 'Array')][System.Collections.ArrayList]$OutputArray = [System.Collections.ArrayList]@()     # Output array (if it is suitable)
     )
 
     Process {
@@ -80,8 +114,23 @@ Function Update-JobLog {
             [void]$upd.Add("totalseconds = $( $Totalseconds )")
         }
 
-        If ( $OutputParam.Keys.Count -gt 0 ) {
-            [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputParam -Depth 99 ) )'")
+        Switch ( $PSCmdlet.ParameterSetName ) {
+
+            "Array" {
+                If ( $OutputArray.Count -gt 0 ) {
+                    [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputArray -Depth 99 ) )'")
+                }
+                [void]$upd.Add("returnformat = 'ARRAY'")
+            }
+            
+            default {
+                If ( $OutputParam.Keys.Count -gt 0 ) {
+                    [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputParam -Depth 99 ) )'")
+                }
+                [void]$upd.Add("returnformat = 'HASHTABLE'")
+                break
+            }
+
         }
 
         $updateValues = $upd -join ", "
