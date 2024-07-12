@@ -15,6 +15,7 @@ $psModules = [Array]@(
     #"Microsoft.PowerShell.Utility"
     #"PSOAUth"  # is defined in the local plugins where it is needed
     "PackageManagement"
+    "SimplySql" # Added to use for job management instead of DuckDB which only support x64
 )
 
 

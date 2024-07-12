@@ -116,6 +116,12 @@ FunctionsToExport = @(
     "Add-DuckDBConnection"
     "Get-DebugMode"
     "Import-Lib"
+    "Add-JobLog"
+    "Get-JobLog"
+    "Update-JobLog"
+    "Set-JobLogDatabase"
+    "Close-JobLogDatabase"
+    #"Clean-JobLogDatabase"
 ) #'*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -158,6 +164,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Added SimplySql in the new version 2 to the dependencies
       Feature: Adding a new local database with sqlite/DuckDB to log jobs into a database which will make it much easier to repeat jobs
       Feature: Adding an internal Function Add-HttpQueryPart to add new parts to a URI query
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)

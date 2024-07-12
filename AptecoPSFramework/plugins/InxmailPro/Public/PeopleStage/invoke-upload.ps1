@@ -42,7 +42,7 @@ function Invoke-Upload{
                 $jobParams = [Hashtable]@{
                     "JobId" = $JobId
                     "Plugin" = $script:settings.plugin.guid
-                    "Input" = ( ConvertTo-Json $InputHashtable -Depth 99 )
+                    "InputParam" = $InputHashtable
                     "Status" = "Starting"
                     "DebugMode" = $Script:debugMode
                     "Type" = $moduleName
@@ -57,6 +57,15 @@ function Invoke-Upload{
                 # Get the jobs information
                 $job = Get-JobLog -JobId $JobId -ConvertInputAsHashtable
                 $InputHashtable = $job.input
+
+                # Update the job with more information
+                $jobParams = [Hashtable]@{
+                    "JobId" = $JobId
+                    "Plugin" = $script:settings.plugin.guid
+                    "Status" = "Starting"
+                    "Type" = $moduleName
+                }
+                Update-JobLog @jobParams
 
                 break
             }
@@ -557,14 +566,19 @@ function Invoke-Upload{
             "Successful" = $check.successCount
             "Failed" = 0 # TODO needs correction
             "Totalseconds" = $processDuration.TotalSeconds
-            "Output" = ( ConvertTo-Json $return -Depth 99)
+            "OutputParam" = $return
         }
         Update-JobLog @jobReturnParams
         Close-DuckDBConnection -Name "JobLog"
 
         # return the results
-        $return
-
+        Switch ( $PSCmdlet.ParameterSetName ) {
+            "Object" {
+                $return
+                break
+            }
+            # Otherwise the results are now in the database
+        }
 
     }
 
