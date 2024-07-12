@@ -72,7 +72,7 @@ get-list -type STANDARD | Out-GridView
 get-list -type STANDARD -All | Out-GridView
 
 # All approved mailings of type regular mailing
-Get-Mailing -Type REGULAR_MAILING -All -ApprovedOnly
+Get-Mailing -Type REGULAR_MAILING -All -IsApproved
 
 # Show all regular mailings created after first of May 2022
 Get-Mailing -Type REGULAR_MAILING -All -CreatedAfter "1.5.2022" | Out-GridView
