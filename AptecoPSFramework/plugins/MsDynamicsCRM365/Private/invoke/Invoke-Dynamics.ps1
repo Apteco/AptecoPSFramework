@@ -235,7 +235,7 @@ Function Invoke-Dynamics {
                 # $responseBody = $responseReader.ReadToEnd()
                 # Write-Log -Message $responseBody -Severity ERROR
 
-                throw $_.Exception
+                throw $_
 
             }
 

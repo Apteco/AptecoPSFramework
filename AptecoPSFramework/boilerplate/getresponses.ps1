@@ -169,7 +169,7 @@ try {
 
 } catch {
 
-    throw $_.Exception
+    throw $_
     Exit 1
 
 }

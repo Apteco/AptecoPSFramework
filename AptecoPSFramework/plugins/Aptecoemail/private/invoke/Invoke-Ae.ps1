@@ -192,7 +192,7 @@ function Invoke-Ae {
                 $errResponse = $e.Exception.Response
                 $errBody = Import-ErrorForResponseBody -Err $e
 
-                throw $_.Exception
+                throw $_
 
             }
 

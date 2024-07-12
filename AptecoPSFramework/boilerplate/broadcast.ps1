@@ -250,7 +250,7 @@ or
 
             Write-Log -Message "Failed to connect to SQLServer database" -Severity ERROR
             Write-Log -Message $_.Exception -Severity ERROR
-            throw $_.Exception
+            throw $_
 
 #>
 
@@ -275,7 +275,7 @@ try {
 
 } catch {
 
-    throw $_.Exception
+    throw $_
     Exit 1
 
 }

@@ -164,6 +164,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Improved the whole exception handling for all parts in the framework, so the messaging should be more clear, if problems occur
       Feature: Added SimplySql in the new version 2 to the dependencies
       Feature: Adding a new local database with sqlite/DuckDB to log jobs into a database which will make it much easier to repeat jobs
       Feature: Adding an internal Function Add-HttpQueryPart to add new parts to a URI query

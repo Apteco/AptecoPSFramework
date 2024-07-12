@@ -371,7 +371,7 @@ try {
 
     $e = ParseErrorForResponseBody($_)
     Write-Log -message ( $e | ConvertTo-Json -Depth 20 )
-    throw $_.exception
+    throw $_
 
 }
 
@@ -397,7 +397,7 @@ try {
 
     $e = ParseErrorForResponseBody($_)
     Write-Log -message ( $e | ConvertTo-Json -Depth 20 )
-    throw $_.exception
+    throw $_
 
 }
 

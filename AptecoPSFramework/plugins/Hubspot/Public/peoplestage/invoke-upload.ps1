@@ -341,7 +341,7 @@ function Invoke-Upload{
             $msg = "Error during uploading data in line $( $_.InvocationInfo.ScriptLineNumber ). Abort!"
             Write-Log -Message $msg -Severity ERROR -WriteToHostToo $false
             Write-Log -Message $_.Exception -Severity ERROR
-            throw $_.Exception
+            throw $_
 
 
         } finally {

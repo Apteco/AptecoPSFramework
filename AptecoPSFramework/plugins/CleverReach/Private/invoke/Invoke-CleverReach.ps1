@@ -279,7 +279,7 @@ function Invoke-CR {
 
                 }
 
-                throw $_.Exception
+                throw $_
 
             }
 
