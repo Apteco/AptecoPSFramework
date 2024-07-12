@@ -49,14 +49,15 @@ function Get-ContactData {
         $contactList = [System.Collections.ArrayList]@()
         $contactData.Data | ForEach-Object {
             $contact = $_
-            $contactObj = [PSCustomObject]@{
+            $contactObj = [Ordered]@{
                 "ContactID" = $contact.ContactID
             }
             $contact.Data | ForEach-Object {
                 $attribute = $_
-                $contactObj | Add-Member -MemberType NoteProperty -Name $attribute.Name -Value $attribute.Value
+                $contactObj[$attribute.Name] = $attribute.Value
+                #$contactObj | Add-Member -MemberType NoteProperty -Name $attribute.Name -Value $attribute.Value
             }
-            [void]$contactList.Add($contactObj)
+            [void]$contactList.Add([PSCustomObject]$contactObj)
         }
 
 		# return
