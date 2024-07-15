@@ -200,7 +200,7 @@ function Invoke-XPro {
             If ( $Paging -eq $true ) {
 
                 Write-Verbose "Jumping into next page"
-                $Script:pluginDebug = $wr
+                #$Script:pluginDebug = $wr
 
                 # If the result equals the pagesize, try it one more time with the next page
                 If ( $null -ne $wr."_links".next ) {
@@ -241,10 +241,10 @@ function Invoke-XPro {
             # SAVE CURRENT RATE
             #-----------------------------------------------
             
-            #$Script:pluginDebug = $req
-            $apiRateLimit = $req.OriginalResponse.Headers."X-RateLimit-Limit"
-            $apiRateRemaining = $req.OriginalResponse.Headers."X-RateLimit-Remaining"
-            $apiRateReset = ( Get-Unixtime ) + $req.OriginalResponse.Headers."X-RateLimit-Reset"
+            #$Script:pluginDebug = $req.OriginalResponse.Headers
+            $apiRateLimit = [UInt64]( $req.OriginalResponse.Headers."X-RateLimit-Limit".trim() )
+            $apiRateRemaining = [UInt64]( $req.OriginalResponse.Headers."X-RateLimit-Remaining".trim() )
+            $apiRateReset = ( Get-Unixtime ) + [UInt64]( $req.OriginalResponse.Headers."X-RateLimit-Reset".trim() )
             If ( $Script:variableCache.Keys -contains "api_rate_remaining" ) {
                 $Script:variableCache."api_rate_limit" = $apiRateLimit               # Request limit per minute
                 $Script:variableCache."api_rate_remaining" = $apiRateRemaining       # The number of requests left for the time window
