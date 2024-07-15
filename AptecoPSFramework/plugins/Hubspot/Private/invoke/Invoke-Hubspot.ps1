@@ -366,11 +366,11 @@ function Invoke-Hubspot {
         #-----------------------------------------------
 
         If ( $Script:variableCache.Keys -contains "api_rate_limit" ) {
-            $Script:variableCache.api_rate_limit = $wr.Headers."X-HubSpot-RateLimit-Daily"
-            $Script:variableCache.api_rate_remaining = $wr.Headers."X-HubSpot-RateLimit-Daily-Remaining"
+            $Script:variableCache.api_rate_limit = $wr.Headers."X-HubSpot-RateLimit-Daily".trim()
+            $Script:variableCache.api_rate_remaining = $wr.Headers."X-HubSpot-RateLimit-Daily-Remaining".trim()
         } else {
-            $Script:variableCache.Add("api_rate_limit",$wr.Headers."X-HubSpot-RateLimit-Daily")
-            $Script:variableCache.Add("api_rate_remaining", $wr.Headers."X-HubSpot-RateLimit-Daily-Remaining")
+            $Script:variableCache.Add("api_rate_limit",$wr.Headers."X-HubSpot-RateLimit-Daily".trim())
+            $Script:variableCache.Add("api_rate_remaining", $wr.Headers."X-HubSpot-RateLimit-Daily-Remaining".trim())
         }
 
 

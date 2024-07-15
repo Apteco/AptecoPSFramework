@@ -282,10 +282,10 @@ Function Invoke-Dynamics {
 
         If ( $Script:variableCache.Keys -contains "api_rate_remaining" ) {
             #$Script:variableCache.api_rate_limit = $wr.Headers."X-HubSpot-RateLimit-Daily"
-            $Script:variableCache.api_rate_remaining = $wr.Headers."x-ms-ratelimit-burst-remaining-xrm-requests"
+            $Script:variableCache.api_rate_remaining = $wr.Headers."x-ms-ratelimit-burst-remaining-xrm-requests".trim()
         } else {
             #$Script:variableCache.Add("api_rate_limit",$wr.Headers."X-HubSpot-RateLimit-Daily")
-            $Script:variableCache.Add("api_rate_remaining", $wr.Headers."x-ms-ratelimit-burst-remaining-xrm-requests")
+            $Script:variableCache.Add("api_rate_remaining", $wr.Headers."x-ms-ratelimit-burst-remaining-xrm-requests".trim() )
         }
 
 
