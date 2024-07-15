@@ -1,5 +1,5 @@
 
-Function Close-JobLogDatabaseDatebase {
+Function Close-JobLogDatabase {
     <#
 
     ...

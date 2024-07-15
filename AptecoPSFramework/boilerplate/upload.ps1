@@ -19,24 +19,16 @@ Param(
 
     ,[Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
     [String]$SettingsFile = ""
-
+    
+    ,[Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
+    [String]$ProcessId = ""
 
     ,[Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='HashtableInput')]
     [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
-    [Switch]$DebugMode = $false
+    [String]$DebugMode = "false"        # This is a string, because when sent trough multiple processes, only text can be transferred instead of native objects
 
 )
 
-<#
-# If this script is called by itself, re-transform the escaped json string input back into a hashtable
-If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
-    $params = [Hashtable]@{}
-    ( $jsonParams.replace("'",'"') | convertfrom-json ).psobject.properties | ForEach-Object {
-        Write-verbose "$( $_.Name ) - $( $_.Value )"
-        $params[$_.Name] = $_.Value
-    }
-}
-#>
 
 #-----------------------------------------------
 # DEBUG SWITCH
@@ -44,7 +36,7 @@ If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
 
 $debug = $false
 
-If ( $DebugMode -eq $true ) {
+If ( $DebugMode -eq "true" ) {
     $debug = $true
 }
 # TODO make an example lie
@@ -125,11 +117,26 @@ if ( $debug -eq $true ) {
 #
 ################################################
 
+#-----------------------------------------------
+# DEFAULT VALUES
+#-----------------------------------------------
+
+$useJob = $false
+$enforce64Bit  = $false
+$enforceCore = $false
+$enforcePython = $false
+
+
+#-----------------------------------------------
+# CHECK INPUT
+#-----------------------------------------------
+
 If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" ) {
     If ( $SettingsFile -eq "" ) {
         throw "Please define a settings file"
     } else {
         $settingsfileLocation = $SettingsFile
+        $useJob = $true
     }
 } else {
     $settingsfileLocation = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($params.settingsFile)
@@ -137,28 +144,21 @@ If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" ) {
 
 
 #-----------------------------------------------
-# CHECK IF 64 BIT AND MORE SHOULD BE ENFORCED
+# CHECK THE MODE THAT SHOULD BE USED
 #-----------------------------------------------
 
-$useJob = $false
-
 # Start this if 64 is needed to enforce when this process is 32 bit and system is able to handle it
-$enforce64Bit  = $false
 If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq $false -and [System.Environment]::Is64BitOperatingSystem -eq $true ) {
     $enforce64Bit = $true
     $useJob = $true
 }
 
 # When you want to use PSCore with 32bit, please change that path in the settings file
-$enforceCore = $false
 If ( $params.ForceCore -eq "true" ) {
-
     $enforceCore = $true
     $useJob = $true
-
 }
 
-$enforcePython = $false
 If ( $params.ForcePython -eq "true" ) {
     $enforcePython = $true
     $useJob = $true
@@ -203,7 +203,13 @@ Set-DebugMode -DebugMode $debug
 #-----------------------------------------------
 
 # Set the settings
-Import-Settings -Path $settingsfileLocation
+If ( $useJob -eq $true -and $ProcessId -ne "") {
+    Import-Settings -Path $settingsfileLocation -ProcessId $ProcessId
+} else {
+    Import-Settings -Path $settingsfileLocation
+}
+
+# Get all settings
 $s = Get-Settings
 
 
@@ -211,7 +217,7 @@ $s = Get-Settings
 # ADD JOB
 #-----------------------------------------------
 
-If ( $params.UseJob -eq "true" -or $useJob -eq $true ) {
+If ( $params.UseJob -eq "true" -or $useJob -eq $true -and $PsCmdlet.ParameterSetName -eq "HashtableInput") {
 
     # Create a new job
     $jobId = Add-JobLog
@@ -246,7 +252,6 @@ If ( $enforce64Bit -eq $true ) {
 #
 ################################################
 
-
 #-----------------------------------------------
 # CALL UPLOAD
 #-----------------------------------------------
@@ -275,8 +280,7 @@ try {
         "PSWin64" {
 
             # This inputs a string into powershell exe at a virtual place "sysnative"
-            # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-            $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -InformationAction "Continue"
+            $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -DebugMode:$debug.toString() -InformationAction "Continue" 
 
             # Check for warnings and errors
             $j | ForEach-Object {
@@ -319,7 +323,7 @@ try {
             
             # This inputs a string into powershell exe at a virtual place "sysnative"
             # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-            $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -InformationAction "Continue"
+            $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -DebugMode:$debug.toString() -InformationAction "Continue" 
 
             # Check for warnings and errors
             $j | ForEach-Object {

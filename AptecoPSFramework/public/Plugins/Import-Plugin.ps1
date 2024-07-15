@@ -1,7 +1,8 @@
 ﻿function Import-Plugin {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)][String] $Guid
+         [Parameter(Mandatory=$true)][String]$Guid
+        ,[Parameter(Mandatory=$false)][string]$ProcessId = ""               # The process id can also be set via this call
     )
 
     begin {
@@ -102,6 +103,11 @@
                 "processId" = $Script:processId
             }
         }
+        
+        # Override process id if delivered through parameters
+        If ( $ProcessId -ne "" ) {
+            $pluginParam.variables.processId = $ProcessId
+        }
 
         New-Module -Name "$( $plugin.Name )" -ArgumentList $pluginParam -ScriptBlock {
 
@@ -170,6 +176,7 @@
             #-----------------------------------------------
 
             Set-ProcessId -Id $InputPlugin.variables.processId
+
             Write-Log -message $logDivider
             Write-Log -Message "Using the process id $( $InputPlugin.variables.processId )"
 

@@ -24,6 +24,7 @@ function Get-Messages {
 
         $processStart = [datetime]::now
 
+        write-log "Parameterset: $( $PSCmdlet.ParameterSetName )"
 
         #-----------------------------------------------
         # CHECK INPUT AND SET JOBLOG
@@ -35,6 +36,7 @@ function Get-Messages {
         Switch ( $PSCmdlet.ParameterSetName ) {
 
             "Object" {
+                Write-log "adding a new job in function"
 
                 # Create a new job
                 $JobId = Add-JobLog
@@ -52,6 +54,7 @@ function Get-Messages {
             }
 
             "Job" {
+                Write-log "updating existing job"
 
                 # Get the jobs information
                 $job = Get-JobLog -JobId $JobId -ConvertInput
@@ -65,6 +68,9 @@ function Get-Messages {
                     "Type" = $moduleName
                 }
                 Update-JobLog @jobParams
+
+                # Set the current process id
+                Set-ProcessId -Id $job.process
 
                 break
             }
@@ -163,7 +169,7 @@ function Get-Messages {
         # CLOSE DEFAULT DUCKDB CONNECTION
         #-----------------------------------------------
 
-        Close-DuckDBConnection
+        #Close-DuckDBConnection
 
 
         #-----------------------------------------------
@@ -178,10 +184,10 @@ function Get-Messages {
             "Successful" = $messages.Count
             "Failed" = 0 # TODO needs correction
             "Totalseconds" = $processDuration.TotalSeconds
-            "OutputArray" = $return
+            "OutputArray" = $messages
         }
         Update-JobLog @jobReturnParams
-        Close-JobLogDatabase -Name "JobLog"
+        Close-JobLogDatabase
 
 
         # return the results

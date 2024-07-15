@@ -6,9 +6,11 @@ Function Get-JobLog {
          [Parameter(Mandatory=$true, ParameterSetName = 'Single')][Int]$JobId
 
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$ConvertInput = $false
 
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$ConvertOutput = $false
 
         #,[Parameter(Mandatory=$true)][String]$ConnectionString
@@ -20,7 +22,21 @@ Function Get-JobLog {
 
     Process {
 
-        # TODO check if connection is open?
+        #-----------------------------------------------
+        # CHECK CONNECTION
+        #-----------------------------------------------
+
+        $c = Get-SqlConnection -ConnectionName "JobLog"
+        If ( $c.State -eq "Open" ) {
+            # All good!
+        } else {
+            Set-JobLogDatabase
+        }
+
+
+        #-----------------------------------------------
+        # QUERY DATABASE
+        #-----------------------------------------------
 
         switch ($PSCmdlet.ParameterSetName) {
 
@@ -54,7 +70,7 @@ Function Get-JobLog {
                             }
 
                             default {
-                                ConvertFrom-Json $job.output
+                                $job.output = ConvertFrom-Json $job.output
                                 break
                             }
 

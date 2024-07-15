@@ -10,6 +10,7 @@ Function Import-Settings {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$false)][string]$Path = "./settings.yaml"
+        ,[Parameter(Mandatory=$false)][string]$ProcessId = ""               # The process id can also be set via this call
     )
 
     Process {
@@ -77,7 +78,11 @@ Function Import-Settings {
 
                     # TODO [x] load the plugins from the settings file, if present
                     try {
-                        Import-Plugin -guid $settings.plugin.guid
+                        If ( $ProcessId -ne "" ) {
+                            Import-Plugin -guid $settings.plugin.guid -ProcessId $ProcessId
+                        } else {
+                            Import-Plugin -guid $settings.plugin.guid
+                        }
                     } catch {
                         #Write-Error -Message "Plugin cannot be imported"
                         throw "Plugin cannot be imported"

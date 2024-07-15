@@ -61,6 +61,18 @@ Function Update-JobLog {
     Process {
 
         #-----------------------------------------------
+        # CHECK CONNECTION
+        #-----------------------------------------------
+
+        $c = Get-SqlConnection -ConnectionName "JobLog"
+        If ( $c.State -eq "Open" ) {
+            # All good!
+        } else {
+            Set-JobLogDatabase
+        }
+
+
+        #-----------------------------------------------
         # BUILD THE STATEMENT
         #-----------------------------------------------
 
@@ -95,7 +107,7 @@ Function Update-JobLog {
         }
 
         If ( $InputParam.Keys.Count -gt 0 ) {
-            [void]$upd.Add("input = '$( ( ConvertTo-Json $InputParam -Depth 99 ) )'")
+            [void]$upd.Add("input = '$( ( ConvertTo-Json $InputParam -Depth 99 -Compress ) )'")
         }
 
         If ( $Inputrecords -gt -1 ) {
@@ -118,14 +130,14 @@ Function Update-JobLog {
 
             "Array" {
                 If ( $OutputArray.Count -gt 0 ) {
-                    [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputArray -Depth 99 ) )'")
+                    [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputArray -Depth 99 -Compress ) )'")
                 }
                 [void]$upd.Add("returnformat = 'ARRAY'")
             }
             
             default {
                 If ( $OutputParam.Keys.Count -gt 0 ) {
-                    [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputParam -Depth 99 ) )'")
+                    [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputParam -Depth 99 -Compress ) )'")
                 }
                 [void]$upd.Add("returnformat = 'HASHTABLE'")
                 break
@@ -145,7 +157,7 @@ Function Update-JobLog {
 
         #$query = "update logjob set process = 'abc' where id = $( $JobId )"
         #Invoke-DuckDBQueryAsNonExecute -Query $sb.ToString() -ConnectionName "JobLog"
-        Invoke-SqlUpdate -Query $sb.ToString() -ConnectionName "JobLog"
+        $sqlUpdate = Invoke-SqlUpdate -Query $sb.ToString() -ConnectionName "JobLog"
 
     }
 
