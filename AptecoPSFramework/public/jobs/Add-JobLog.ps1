@@ -91,15 +91,7 @@ Function Add-JobLog {
 
     Process {
 
-        $c = Get-SqlConnection -ConnectionName "JobLog"
-        If ( $c.State -eq "Open" ) {
-            # All good!
-        } else {
-            Set-JobLogDatabase
-        }
-        
-
-        #Read-DuckDBQueryAsScalar -Name "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT last_insert_rowid()"
+        Set-JobLogDatabase
 
         Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT last_insert_rowid()"
 

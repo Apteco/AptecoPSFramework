@@ -11,7 +11,12 @@ Function Close-JobLogDatabase {
 
     Process {
 
-        Close-SqlConnection -ConnectionName "JobLog"
+        # just try it
+        try {
+            Close-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
+        } catch {
+            
+        }
 
     }
 

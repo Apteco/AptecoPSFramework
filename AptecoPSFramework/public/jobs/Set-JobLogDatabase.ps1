@@ -6,9 +6,6 @@ Function Set-JobLogDatabase {
 
     Process {
 
-        # Resolve path first
-        $absolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($script:settings.joblogDB)
-
         <#
         # Build Connection string
         $connString = "DataSource=$( $absolutePath )"
@@ -20,16 +17,32 @@ Function Set-JobLogDatabase {
         Open-DuckDBConnection -Name "JobLog"
         #>
 
-        # Open the connection
-        Open-SQLiteConnection -ConnectionName "JobLog" -DataSource $absolutePath
+        $connectDatabase = $true
+        try {
+            $c = Get-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
+            If ( $c.State -eq "Open" ) {
+                $connectDatabase = $false
+            }
+        } catch {
+            # Still connect here
+        }
 
-        # Create the database, if not exists
-        $joblogCreateStatementPath = Join-Path -Path $Script:moduleRoot -ChildPath "sql/joblog_create.sql"
-        $joblogCreateStatement = Get-Content -Path $joblogCreateStatementPath -Encoding UTF8 -Raw
-        #Invoke-DuckDBQueryAsNonExecute -Query $joblogCreateStatement -ConnectionName "JobLog"
-        
-        $u = Invoke-SqlUpdate -ConnectionName "JobLog" -Query $joblogCreateStatement      
+        If ( $connectDatabase -eq $true ) {
 
+            # Resolve path first
+            $absolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($script:settings.joblogDB)
+
+            # Open the connection
+            Open-SQLiteConnection -ConnectionName "JobLog" -DataSource $absolutePath
+
+            # Create the database, if not exists
+            $joblogCreateStatementPath = Join-Path -Path $Script:moduleRoot -ChildPath "sql/joblog_create.sql"
+            $joblogCreateStatement = Get-Content -Path $joblogCreateStatementPath -Encoding UTF8 -Raw
+            #Invoke-DuckDBQueryAsNonExecute -Query $joblogCreateStatement -ConnectionName "JobLog"
+            
+            $u = Invoke-SqlUpdate -ConnectionName "JobLog" -Query $joblogCreateStatement      
+
+        }
     
     }
 

@@ -64,12 +64,7 @@ Function Update-JobLog {
         # CHECK CONNECTION
         #-----------------------------------------------
 
-        $c = Get-SqlConnection -ConnectionName "JobLog"
-        If ( $c.State -eq "Open" ) {
-            # All good!
-        } else {
-            Set-JobLogDatabase
-        }
+        Set-JobLogDatabase
 
 
         #-----------------------------------------------
