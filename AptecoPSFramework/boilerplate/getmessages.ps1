@@ -1,5 +1,4 @@
 ﻿
-
 ################################################
 #
 # INPUT
@@ -81,14 +80,19 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 if ( $debug -eq $true ) {
 
     $params = [hashtable]@{
+
+        # Automatic parameters
         Password = 'ko'
         Username = 'ko'
-        #scriptPath = 'C:\faststats\Scripts\cleverreach'
-        settingsFile = '.\inx.yaml'
         #mode='taggingOnly'
-        Force64bit = "true"
+
+        # Integration parameters
+        #Force64bit = "true"
         #ForceCore = "true"
         #ForcePython = "true"
+        #UseJob = "true"
+        settingsFile = '.\inx.yaml'
+
     }
 
 }
@@ -108,6 +112,7 @@ $useJob = $false
 $enforce64Bit  = $false
 $enforceCore = $false
 $enforcePython = $false
+$isPsCoreInstalled = $false
 
 
 #-----------------------------------------------
@@ -215,6 +220,16 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true -and $PsCmdlet.ParameterSet
 
 }
 
+
+#-----------------------------------------------
+# FIND OUT ABOUT PS CORE
+#-----------------------------------------------
+
+$calc = . $s.psCoreExePath { 1+1 }
+if ( $calc -eq 2 ) {
+    $isPsCoreInstalled = $true
+}
+
 #-----------------------------------------------
 # FIND OUT THE MODE
 #-----------------------------------------------
@@ -265,26 +280,6 @@ try {
             # This inputs a string into powershell exe at a virtual place "sysnative"
             $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -DebugMode:$debug.toString() -InformationAction "Continue" 
 
-            # Check for warnings and errors
-            $j | ForEach-Object {
-                $jrow = $_
-                Switch -Wildcard ( $jrow ) {
-
-                    "INFO*" {
-                        Write-Information -MessageData $jrow -Tags @("Info") -InformationAction Continue
-                    }
-
-                    "WARNING*" {
-                        Write-Warning -Message $jrow
-                    }
-
-                    "WARNUNG*" {
-                        Write-Warning -Message $jrow
-                    }
-
-                }
-            }
-
             break
 
         }
@@ -293,40 +288,13 @@ try {
         "PSCore" {
 
             # Check if ps core is installed
-            try {
-                $calc = . $s.psCoreExePath { 1+1 }
-                if ( $calc -eq 2 ) {
-                    # Seems to be fine :-)
-                } else {
-                    throw "PowerShell Core does not seem to be installed or found"
-                }
-            } catch {
+            If ( $isPsCoreInstalled -eq $false ) {
                 throw "PowerShell Core does not seem to be installed or found"
             }
             
             # This inputs a string into powershell exe at a virtual place "sysnative"
             # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
             $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -DebugMode:$debug.toString() -InformationAction "Continue" 
-
-            # Check for warnings and errors
-            $j | ForEach-Object {
-                $jrow = $_
-                Switch -Wildcard ( $jrow ) {
-
-                    "INFO*" {
-                        Write-Information -MessageData $jrow -Tags @("Info") -InformationAction Continue
-                    }
-
-                    "WARNING*" {
-                        Write-Warning -Message $jrow
-                    }
-
-                    "WARNUNG*" {
-                        Write-Warning -Message $jrow
-                    }
-
-                }
-            }
 
             break
         }
@@ -363,12 +331,15 @@ try {
     }
 
     # return
-    If ( $useJob -eq $true ) {
-        $jobReturn = Get-JobLog -JobId $jobId -ConvertOutput
-        $return = $jobReturn.output
+    If ( $LASTEXITCODE -ne 0 ) {
+        $j
+    } else {
+        If ( $useJob -eq $true ) {
+            $jobReturn = Get-JobLog -JobId $jobId -ConvertOutput
+            $return = $jobReturn.output
+        }
+        $return
     }
-
-    $return
 
 
 } catch {
