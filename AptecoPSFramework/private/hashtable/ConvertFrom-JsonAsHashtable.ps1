@@ -18,18 +18,30 @@ Function ConvertFrom-JsonAsHashtable {
     }
 
     Begin {
-        $jsSerializer = [System.Web.Script.Serialization.JavaScriptSerializer]::new()
+        
+        If ( $Script:isCore -eq $false ) {
+            $jsSerializer = [System.Web.Script.Serialization.JavaScriptSerializer]::new()
+        }
+
     }
 
     Process {
 
-        Write-Verbose $InputObject
-        $jsSerializer.Deserialize($InputObject, 'Hashtable')
+        If ( $Script:isCore -eq $false ) {
+            #Write-Verbose $InputObject
+            $jsSerializer.Deserialize($InputObject, 'Hashtable')
+        } else {
+            ConvertFrom-Json $InputObject -AsHashtable
+        }
 
     }
 
     end {
-        $jsSerializer = $null
+
+        If ( $Script:isCore -eq $false ) {
+            $jsSerializer = $null
+        }
+        
     }
 
 }

@@ -127,12 +127,32 @@ New-Variable -Name plugins -Value $null -Scope Script -Force        # Plugins co
 New-Variable -Name pluginPath -Value $null -Scope Script -Force     # The path of the chosen plugin
 New-Variable -Name plugin -value $null -Scope Script -Force         # The plugin pscustomobject
 New-Variable -Name duckDb -Value $null -Scope Script -Force         # New Variable for saving the DuckDB connection
+New-Variable -Name isCore -Value $null -Scope Script -Force
+New-Variable -Name os -Value $null -Scope Script -Force
 
 # Set the variables now
 $Script:timestamp = [datetime]::Now
 $Script:debugMode = $false
 $Script:logDivider = "----------------------------------------------------" # String used to show a new part of the log
 $Script:moduleRoot = $PSScriptRoot.ToString()
+$Script:isCore = ($PSVersionTable.Keys -contains "PSEdition") -and ($PSVersionTable.PSEdition -ne 'Desktop')
+
+# Check the operating system, if Core
+if ($Script:isCore -eq $true) {
+    If ( $IsWindows -eq $true ) {
+        $Script:os = "Windows"
+    } elseif ( $IsLinux -eq $true ) {
+        $Script:os = "Linux"
+    } elseif ( $IsMacOS -eq $true ) {
+        $Script:os = "MacOS"
+    } else {
+        throw "Unknown operating system"
+    }
+} else {
+    # [System.Environment]::OSVersion.VersionString()
+    # [System.Environment]::Is64BitOperatingSystem
+    $Script:os = "Windows"
+}
 
 # instantiate plugin with dummy values
 # TODO remove this dummy values
