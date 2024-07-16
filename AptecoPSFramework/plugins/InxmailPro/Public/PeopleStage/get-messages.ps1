@@ -26,6 +26,7 @@ function Get-Messages {
 
         write-log "Parameterset: $( $PSCmdlet.ParameterSetName )"
 
+
         #-----------------------------------------------
         # CHECK INPUT AND SET JOBLOG
         #-----------------------------------------------
@@ -151,7 +152,7 @@ function Get-Messages {
 
             $msg = "No messages loaded -> please check!"
             Write-Log -Message $msg -Severity ERROR
-            throw [System.IO.InvalidDataException] $msg
+            throw $msg
 
         }
 
