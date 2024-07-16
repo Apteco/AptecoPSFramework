@@ -245,6 +245,7 @@
                         Write-Log "Loading lib folder from: '$( $localLibFolder )'"
                         $dependencyParams.Add("LoadWholePackageFolder", $true)
                         $dependencyParams.Add("LocalPackageFolder", $localLibFolder)
+                        $dependencyParams.Add("SuppressWarnings", $true)
 
                          #$localLibFolderItem.fullname
 
