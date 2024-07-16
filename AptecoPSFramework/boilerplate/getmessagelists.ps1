@@ -77,7 +77,7 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 # INPUT PARAMETERS, IF DEBUG IS TRUE
 #-----------------------------------------------
 
-if ( $debug -eq $true -and $jsonParams -eq "" ) {
+if ( $debug -eq $true ) {
 
     $params = [hashtable]@{
         Password = 'ko'
@@ -169,9 +169,9 @@ Set-Location $settingsFileItem.DirectoryName
 #-----------------------------------------------
 
 If ($debug -eq $true) {
-    Import-Module "C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFramework" -Verbose
+    Import-Module "AptecoPSFramework" -Verbose
 } else {
-    Import-Module "C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFramework"
+    Import-Module "AptecoPSFramework"
 }
 
 
@@ -220,11 +220,15 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true -and $PsCmdlet.ParameterSet
 #-----------------------------------------------
 # FIND OUT ABOUT PS CORE
 #-----------------------------------------------
-
-$calc = . $s.psCoreExePath { 1+1 }
+try {
+    $calc = . $s.psCoreExePath { 1+1 }
+} catch {
+    # just a test, nothing to do
+}
 if ( $calc -eq 2 ) {
     $isPsCoreInstalled = $true
 }
+
 
 #-----------------------------------------------
 # FIND OUT THE MODE
@@ -327,7 +331,7 @@ try {
     }
 
     # return
-    If ( $LASTEXITCODE -ne 0 ) {
+    If ( $LASTEXITCODE -gt 0 ) {
         $j
     } else {
         If ( $useJob -eq $true ) {
