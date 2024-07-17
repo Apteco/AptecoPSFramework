@@ -36,7 +36,7 @@ Function Import-Settings {
                         Switch ( $pathExtension ) {
 
                             { $PSItem -in @( ".yml", ".yaml" ) } {
-                                $settings = Get-Content -Path $absolutePath -Encoding utf8 -Raw | ConvertFrom-Yaml | ConvertTo-Yaml -JsonCompatible | ConvertFrom-Json
+                                $settings = [PSCustomObject]( Get-Content -Path $absolutePath -Encoding utf8 -Raw | ConvertFrom-Yaml -Ordered )
                             }
 
                             default {
