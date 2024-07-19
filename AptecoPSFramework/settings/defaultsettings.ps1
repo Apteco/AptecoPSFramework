@@ -42,9 +42,10 @@
 
     # DuckDB
     "defaultDuckDBConnection" = "Data Source=:memory:;"     # Default DuckDB connection -> In-Memory connection, could also be a file
-    "upload" = [PSCustomObject]@{
-        "QueriesBeforeUploadWithDuckDB" = [Array]@()
-    }
+    "queriesBeforeUploadWithDuckDB" = [Array]@()
+    #"upload" = [PSCustomObject]@{
+    #    "queriesBeforeUploadWithDuckDB" = [Array]@()
+    #}
     
     # LogJob database (sqlite file via DuckDB will directly made, not connected to defaultDuckDBConnection)
     "joblogDB" = "./logjob.sqlite"
