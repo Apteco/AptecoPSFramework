@@ -383,7 +383,7 @@ if ($params.ListName -eq "" -or $null -eq $params.ListName -or $params.MessageNa
 #-----------------------------------------------
 
 # A certain method to correctly invoke
-$multipart = Prepare-MultipartUpload -string $csvString
+$multipart = ConvertTo-MultipartUpload -string $csvString
 
 # Dem server gibt man Informationen mit über das Format, was es für den server leichter macht
 $object = "imports/recipients"

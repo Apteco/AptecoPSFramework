@@ -90,6 +90,7 @@ RequiredModules = @(
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
+
     "Add-PluginFolder"
     "Export-Settings"
     "Get-Debug"
@@ -107,6 +108,7 @@ FunctionsToExport = @(
     #"Set-ProcessIdentifier"
     "Set-Settings"
     "Install-Plugin"
+
     "Open-DuckDBConnection"
     "Get-DuckDBConnection"
     "Close-DuckDBConnection"
@@ -116,12 +118,14 @@ FunctionsToExport = @(
     "Add-DuckDBConnection"
     "Get-DebugMode"
     "Import-Lib"
+
     "Add-JobLog"
     "Get-JobLog"
     "Update-JobLog"
     "Set-JobLogDatabase"
     "Close-JobLogDatabase"
     #"Clean-JobLogDatabase"
+    
 ) #'*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -164,7 +168,6 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
-        
       Feature: Improved the whole exception handling for all parts in the framework, so the messaging should be more clear, if problems occur
       Feature: Changed the way Apteco email builds up arrays, so the performance in loading contactlists should be a little bit better
       Feature: Added SimplySql in the new version 2 to the dependencies
@@ -173,6 +176,8 @@ PrivateData = @{
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
       Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
       Fix: API Ratelimiting could cause problems when also containing whitespace, this has been fixed
+      Fix: Renaming Prepare-MultipartUpload to ConvertTo-MultipartUpload to only use allowed verbs
+      Fix: Renaming Prompt-Choice to Request-Choice to only use allowed verbs
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Fix: Improved the error handling and messaging for loading settings files
