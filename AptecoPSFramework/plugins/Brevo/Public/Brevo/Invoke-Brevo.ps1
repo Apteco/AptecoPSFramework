@@ -132,7 +132,7 @@ function Invoke-Brevo {
 
         # Prepare Body
         If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
-            $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99
+            $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99 -Compress
             $updatedParameters.Body = $bodyJson
         }
 
