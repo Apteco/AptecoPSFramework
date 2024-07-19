@@ -83,5 +83,26 @@ Get-Contact -Expand
 # Get all contacts from a specific list
 Get-Contact -ListId il055arn
 
+# Add a list without splatting
+Add-List -Name "Testlist" -HasOpenTracking -HasClickTracking
+
+# Add a list with splatting
+$addList = [Hashtable]@{
+    "Name": "My new List"
+    "UsesEconda" = $false
+    "UsesGoogleAnalytics" = $true
+    "HasOpenTracking" = $true
+    "HasClickTracking" = $true
+    "HasConversionTracking" = $false
+    "Imprint" = "http://example.org/imprint"
+    "HeaderFromEmail" = "from@example.org"
+    "HeaderFromName" = "From Name"
+    "HeaderReplyEmail" = "reply@example.org"
+    "HeaderReplyName" = "Reply Name"
+    "TrackingUrl" = ""
+    "Landingpage" = "http://example.org/unsubscribe-landingpage"
+    "UseEcgList" = $false
+}
+Add-List @addList
 
 ```
