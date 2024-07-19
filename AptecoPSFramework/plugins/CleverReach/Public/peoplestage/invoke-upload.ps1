@@ -297,7 +297,7 @@ function Invoke-Upload{
             $additionalTagging = $false
             If ( $headers.toLower() -contains "tags") {
                 $additionalTagging = $true
-                $tagsIndex = $headers.toLower().IndexOf("tags")
+                $tagsIndex = $headers.Trim().toLower().IndexOf("tags")
             }
 
 
@@ -310,7 +310,7 @@ function Invoke-Upload{
             Write-Log -message "Required fields: $( $requiredFields -join ", " )"
             Write-Log -message "Reserved fields: $( $reservedFields -join ", " )"
 
-            $csvAttributesNames = $headers | Where-Object { $_.toLower() -notin $reservedFields }
+            $csvAttributesNames = $headers | Where-Object { $_.Trim().toLower() -notin $reservedFields }
             #$csvAttributesNames = Get-Member -InputObject $dataCsv[0] -MemberType NoteProperty | where { $_.Name -notin $reservedFields }
             Write-Log -message "Loaded csv attributes: $( $csvAttributesNames -join ", " )"
 
@@ -338,7 +338,7 @@ function Invoke-Upload{
             # CHECK ATTRIBUTES FOR PREHEADER FIELD
             #-----------------------------------------------
 
-            If ( $csvAttributesNames.toLower() -contains $Script:settings.broadcast.preheaderFieldname.toLower() ) {
+            If ( $csvAttributesNames.Trim().toLower() -contains $Script:settings.broadcast.preheaderFieldname.Trim().toLower() ) {
                 $preheaderIsSet = $true
             } else {
                 $preheaderIsSet = $false
@@ -363,7 +363,7 @@ function Invoke-Upload{
                 #$script:debug = $globalDeactivated
                 Write-Log -Message "Adding $( $globalDeactivated.count ) global inactive receivers to exclusion list"
                 If ( $globalDeactivated.Count -gt 0 ) {
-                    $exclusionList.AddRange( @( $globalDeactivated.email.toLower() ) )
+                    $exclusionList.AddRange( @( $globalDeactivated.email.Trim().toLower() ) )
                 }
 
             }
@@ -374,7 +374,7 @@ function Invoke-Upload{
                 $localDeactivated = @( (Get-LocalDeactivated -GroupId $groupId) )
                 Write-Log -Message "Adding $( $localDeactivated.count ) local inactive receivers to exclusion list"
                 If ( $localDeactivated.count -gt 0 ) {
-                    $exclusionList.AddRange( @( $localDeactivated.email.toLower() ) )
+                    $exclusionList.AddRange( @( $localDeactivated.email.Trim().toLower() ) )
                 }
 
             }
@@ -397,7 +397,7 @@ function Invoke-Upload{
             If ( $Script:settings.upload.excludeBounces -eq $true ) {
                 Write-Log -Message "Adding $( $bounced.count ) bounced receivers to exclusion list"
                 If ( $bounced.count -gt 0 ) {
-                    [void]$exclusionList.AddRange( @( $bounced.email.toLower() ) )
+                    [void]$exclusionList.AddRange( @( $bounced.email.Trim().toLower() ) )
                 }
             }
 
@@ -455,7 +455,7 @@ function Invoke-Upload{
             #$Script:debug = $reader
 
             $globalAtts = @( $attributes.global | Where-Object { $_.name -in $headers } )
-            $headersLower = @( $headers.tolower() )
+            $headersLower = @( $headers.Trim().tolower() )
 
             #$localAtts = $localAttributes | where { $_.name -in $headers }
 
@@ -484,7 +484,7 @@ function Invoke-Upload{
 
                 # put in email address
                 $emailIndex = $headers.IndexOf($InputHashtable.EmailFieldName)
-                $uploadEntry.email = ($values[$emailIndex]).ToLower()
+                $uploadEntry.email = ($values[$emailIndex]).Trim().ToLower()
 
                 # go through every header and fill it into the object
                 <#
@@ -518,8 +518,8 @@ function Invoke-Upload{
                 # Global attributes
                 $globalAtts | ForEach-Object {
 
-                    $attrName = $_.name.toLower() # using description now rather than name, because the comparison is made on descriptions
-                    $attrDescription = $_.description.toLower()
+                    $attrName = $_.name.Trim().toLower() # using description now rather than name, because the comparison is made on descriptions
+                    $attrDescription = $_.description.Trim().toLower()
                     $value = $null
 
                     $nameIndex = $headersLower.IndexOf($attrName)
@@ -540,8 +540,8 @@ function Invoke-Upload{
                 # New local attributes
                 $attributes.new | ForEach-Object {
 
-                    $attrName = $_.name.toLower() # using description now rather than name, because the comparison is made on descriptions
-                    $attrDescription = $_.description.toLower()
+                    $attrName = $_.name.Trim().toLower() # using description now rather than name, because the comparison is made on descriptions
+                    $attrDescription = $_.description.Trim().toLower()
                     $value = $null
 
                     $nameIndex = $headersLower.IndexOf($attrName)
@@ -567,7 +567,7 @@ function Invoke-Upload{
                     #     $attrName = $_.name # using description now rather than name, because the comparison is made on descriptions
                     # }
                     $attrName = $_.name.toLower() # using description now rather than name, because the comparison is made on descriptions
-                    $attrDescription = $_.description.toLower()
+                    $attrDescription = $_.description.Trim().toLower()
                     $value = $null
 
                     $nameIndex = $headersLower.IndexOf($attrName)
@@ -588,7 +588,7 @@ function Invoke-Upload{
                 # Communication Key if not present yet through local or new attributes
                 $uploadProperties = [Array]@()
                 $uploadProperties = [Array]@( $uploadEntry.attributes.psobject.properties.name )
-                $normalisedCommkeyName = $InputHashtable.CommunicationKeyFieldName.toLower().replace(" ","_")
+                $normalisedCommkeyName = $InputHashtable.CommunicationKeyFieldName.Trim().toLower().replace(" ","_")
                 If ( $uploadProperties -notcontains $InputHashtable.CommunicationKeyFieldName -or $uploadProperties -notcontains $normalisedCommkeyName) {
                     If ( $attributes.local.description -contains $normalisedCommkeyName) {
                         $attrName = $normalisedCommkeyName
@@ -619,11 +619,11 @@ function Invoke-Upload{
                 If ( $preheaderIsSet -eq $true ) {
 
                     # Find out if the preheader is global or local and change the value to ""
-                    If ( @( $uploadEntry.attributes.psobject.properties.name.toLower() ) -contains $Script:settings.broadcast.preheaderFieldname.toLower() ) {
+                    If ( @( $uploadEntry.attributes.psobject.properties.name.Trim().toLower() ) -contains $Script:settings.broadcast.preheaderFieldname.Trim().toLower() ) {
                         If ( $Script:settings.upload.nullAttributeWhenValue -contains $uploadEntry.attributes.( $Script:settings.broadcast.preheaderFieldname ) ) {
                             $uploadEntry.attributes.( $Script:settings.broadcast.preheaderFieldname ) = ""
                         }
-                    } ElseIf ( @( $uploadEntry.global_attributes.psobject.properties.name.toLower() ) -contains $Script:settings.broadcast.preheaderFieldname.toLower() ) {
+                    } ElseIf ( @( $uploadEntry.global_attributes.psobject.properties.name.Trim().toLower() ) -contains $Script:settings.broadcast.preheaderFieldname.Trim().toLower() ) {
                         If ( $Script:settings.upload.nullAttributeWhenValue -contains $uploadEntry.global_attributes.( $Script:settings.broadcast.preheaderFieldname ) ) {
                             $uploadEntry.global_attributes.( $Script:settings.broadcast.preheaderFieldname ) = ""
                         }
@@ -649,7 +649,7 @@ function Invoke-Upload{
                         Write-Log "  $( $checkObject.count ) rows"
 
                         $validateObj = [PSCustomObject]@{
-                            "emails" = [Array]@( $checkObject.email ).toLower()
+                            "emails" = [Array]@( $checkObject.email ).Trim().toLower()
                             "group_id" = $groupId
                             "invert" = $false
                         }
