@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS attributes (
     ,extid          VARCHAR
     ,name           VARCHAR
     ,description    VARCHAR
-    ,scope          VARCHAR
+    ,scope          VARCHAR -- global, local, transactional
     ,source         VARCHAR
     ,type           VARCHAR
     ,length         INTEGER
