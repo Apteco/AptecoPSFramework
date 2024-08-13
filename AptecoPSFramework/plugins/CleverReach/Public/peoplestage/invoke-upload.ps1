@@ -696,10 +696,9 @@ function Invoke-Upload{
 
                     Do {
 
-                        $currentUploadCounter = ( $uploadObject[0..$uploadSize] ).count
-                        Write-Log "  $( $currentUploadCounter ) objects/rows will be uploaded"
-
                         $uploadBody = $uploadObject[0..( $uploadSize - 1 )]
+                        $currentUploadCounter = $uploadBody.count
+                        Write-Log "  $( $currentUploadCounter ) objects/rows will be uploaded"
 
                         If ( $uploadBody.count -gt 0 ) {
 
@@ -739,7 +738,7 @@ function Invoke-Upload{
 
                         # Do an extra round for remaining records AND if it is the last row
                         If ( $uploadObject.count -gt 0 -and $reader.EndOfStream -eq $true) {
-                            $uploadFinished = $true
+                            $uploadFinished = $false
                         } else {
                             $uploadFinished = $true # Otherwise always do only one upload
                         }
