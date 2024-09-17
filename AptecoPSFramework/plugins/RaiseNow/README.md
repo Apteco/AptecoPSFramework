@@ -1,43 +1,82 @@
 
+# Start
+
+You need to setup your raisenow account with one payment provider. After that you can also create test donations. Within the setup process you will obtain a token with your client id and client secret
+
 Documentation: https://docs.raisenow.com/api/
 
-Obtain a token with your client id and client secret
+
+
+# Quickstart
+
+Please make sure to change your paths and to replace `<clientid>` and `<clientsecret>`
 
 ```PowerShell
-$clientId = ""
-$clientSecret = ""
-$body = [PScustomobject]@{"grant_type"="client_credentials";"client_id"=$clientId;"client_secret"=$clientSecret}
-$t = irm -uri "https://api.raisenow.io/oauth2/token" -Method Post -Body ( $body | ConvertTo-Json ) -ContentType "application/json" -Headers @{"Accept-Encoding"="gzip"}
 
-$t.access_token
+Start-Process powershell.exe -WorkingDirectory ".\Downloads\raisenow\"
+
+# Import the module
+Import-Module aptecopsframework -Verbose
+Import-Module "C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFramework"
+
+# Choose a plugin
+$plugin = get-plugins | Select guid, name, version, update, path | where-object { $_.name -like "RaiseNow" } | Select -first 1
+
+# Install the plugin before loading it (installing dependencies)
+#Install-Plugin -Guid $plugin.guid
+
+# Import the plugin into this session
+import-plugin -Guid $plugin.guid
+
+# Get merged settings for this plugin and change some
+$settings = Get-settings
+$settings.logfile = ".\file.log"
+$settings.login.clientId = "<clientid>"
+$settings.login.clientSecret = Convert-PlaintextToSecure "<clientsecret>"
+$settings.token.tokenSettingsFile = ".\rntoken.json"
+
+# Set the settings
+Set-Settings -PSCustom $settings
+
+# Save the settings into a file
+$settingsFile = ".\settings.yaml"
+Export-Settings -Path $settingsFile
 
 ```
+
+# Functions
+
+
+```PowerShell
+
+# Import the module
+Import-Module aptecopsframework -Verbose
+Import-Module "C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFramework"
+
+Import-Settings -Path ".\settings.yaml"
+
+# List all commands of this plugin
+get-command -module "*RaiseNow*"
+
+# Get your organisations
+Get-Organisation
+
+# Get your accounts
+Get-Account
+
+# Get your subscription plans
+Get-SubscriptionPlan
+
+```
+
+
+
+
+
+# Notes
+
 
 Token is valid for 3600 seconds
-
-List organisations just as a test
-
-```PowerShell
-irm -uri "https://api.raisenow.io/organisations" -Method Get -ContentType "application/json" -Headers @{"Accept-Encoding"="gzip"; "Authorization" = "Bearer $( $t.access_token )"}
-```
-
-List accounts
-
-```PowerShell
-irm -uri "https://api.raisenow.io/accounts" -Method Get -ContentType "application/json" -Headers @{"Accept-Encoding"="gzip"; "Authorization" = "Bearer $( $t.access_token )"}
-```
-
-List subscription plans
-
-```PowerShell
-irm -uri "https://api.raisenow.io/subscription-plans" -Method Get -ContentType "application/json" -Headers @{"Accept-Encoding"="gzip"; "Authorization" = "Bearer $( $t.access_token )"}
-```
-
-List your supporters
-
-```PowerShell
-irm -uri "https://api.raisenow.io/supporters" -Method Get -ContentType "application/json" -Headers @{"Accept-Encoding"="gzip"; "Authorization" = "Bearer $( $t.access_token )"}
-```
 
 
 
