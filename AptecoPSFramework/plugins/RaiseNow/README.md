@@ -67,6 +67,16 @@ Get-Account
 # Get your subscription plans
 Get-SubscriptionPlan
 
+# List first payments
+Get-Payment
+
+# List payments since a specific unix timestamp
+Get-Payment -FromUnixtime 1726049866
+
+# List a specific payment
+get-payment -Uuid "2a014f5d-098c-45b4-84b5-d431da18f98a"
+
+
 ```
 
 
