@@ -79,9 +79,59 @@ get-payment -Uuid "2a014f5d-098c-45b4-84b5-d431da18f98a"
 
 ```
 
+# Use case with database
 
+To put the data straight away in a database, you could do something like
 
+```PowerShell
+import-module SqlPipeline, simplysql
+Open-SQLiteConnection -DataSource ".\rn.sqlite"
+get-payment | select uuid, created, amount, @{ name="payload";expression={ ConvertTo-Json $_ -Depth 99 -Compress } } | Add-RowsToSql -TableName "payments" -UseTransaction -verbose
+Close-SqlConnection
+```
 
+Now you can use sqlite to query your data. Either use sqlite directly https://sqlite.org/json1.html or use the json extension of duckdb https://duckdb.org/docs/extensions/json.html
+
+When you do not want to install DuckDB you can even do it in the browser with https://shell.duckdb.org/ and then `.add file`, choose your sqlite file and then `.open rn.sqlite` and you are ready to create your queries.
+
+E.g. to extract the metadata with a uuid in pure sqlite query language
+
+```SQL
+SELECT p.uuid
+	,json_extract(m.value, '$.created') mcreated
+	,json_extract(m.value, '$.group') mgroup
+	,json_extract(m.value, '$.name') mname
+	,json_extract(m.value, '$.type') mtype
+	,json_extract(m.value, '$.value') mvalue
+FROM payments p
+	,json_each(p.payload - > '$.metadata') m
+
+```
+or the equivalent via DuckDB query language would be
+
+```SQL
+INSTALL sqlite;
+LOAD sqlite;
+INSTALL json;
+LOAD json;
+ATTACH 'C:\Users\Florian\Downloads\raisenow\rn.sqlite' AS rn(TYPE sqlite);
+USE rn;
+WITH data
+AS (
+	SELECT uuid
+		,payload::JSON -> '$.metadata' AS raw
+	FROM rn.payments
+	)
+	,metadata
+AS (
+	SELECT uuid
+		,unnest(from_json(raw, '[{"created":"VARCHAR","group":"VARCHAR","name":"VARCHAR", "type":"VARCHAR", "value":"VARCHAR"}]')) not_raw
+	FROM data
+	)
+SELECT uuid
+	,not_raw.*
+FROM metadata;
+```
 
 # Notes
 
