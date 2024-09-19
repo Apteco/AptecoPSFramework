@@ -110,24 +110,23 @@ FROM payments p
 or the equivalent via DuckDB query language would be
 
 ```SQL
-INSTALL sqlite;
-LOAD sqlite;
-INSTALL json;
-LOAD json;
+INSTALL sqlite; LOAD sqlite;
+INSTALL json; LOAD json;
 ATTACH 'C:\Users\Florian\Downloads\raisenow\rn.sqlite' AS rn(TYPE sqlite);
 USE rn;
-WITH data
-AS (
+
+WITH
+data AS (
 	SELECT uuid
 		,payload::JSON -> '$.metadata' AS raw
 	FROM rn.payments
-	)
-	,metadata
-AS (
+	),
+metadata AS (
 	SELECT uuid
 		,unnest(from_json(raw, '[{"created":"VARCHAR","group":"VARCHAR","name":"VARCHAR", "type":"VARCHAR", "value":"VARCHAR"}]')) not_raw
 	FROM data
 	)
+
 SELECT uuid
 	,not_raw.*
 FROM metadata;
