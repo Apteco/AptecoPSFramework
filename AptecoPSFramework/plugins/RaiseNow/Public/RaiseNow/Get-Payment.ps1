@@ -16,6 +16,15 @@ function Get-Payment {
         #,[Parameter(Mandatory=$false)][String]$FromDate = ""                        # string like 2024-06-16
         
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][Switch]$All = $false
+
+         ,[Parameter(Mandatory=$false)]
+         #[ValidateSet("adhoc", "recurring", "newsletter", "onevent", "testmail", "multilanguage", "broadcast", IgnoreCase = $false)]
+         [Array]$Include = [Array]@()             # adhoc|recurring|newsletter|onevent|testmail|multilanguage|broadcast - multiple values are allowed
+
+         ,[Parameter(Mandatory=$false)]
+         #[ValidateSet("adhoc", "recurring", "newsletter", "onevent", "testmail", "multilanguage", "broadcast", IgnoreCase = $false)]
+         [Array]$Exclude = [Array]@("charged_by")             # adhoc|recurring|newsletter|onevent|testmail|multilanguage|broadcast - multiple values are allowed
+
         
     )
 
@@ -73,8 +82,8 @@ function Get-Payment {
                     )
                     "size" = 100        # max 10k records and 10MB
                     "from" = 0 # TODO needed to add paging
-                    "includes" = [Array]@()
-                    "excludes" = [Array]@("charged_by")
+                    "includes" = $Include #[Array]@()
+                    "excludes" = $Exclude #[Array]@("charged_by")
                 }
 
                 # Create params
