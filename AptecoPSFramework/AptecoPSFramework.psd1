@@ -158,6 +158,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Add RaiseNow API integration to fetch data
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
       Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
       Fix CleverReach: When having spaces around a column name, it will be trimmed now automatically
