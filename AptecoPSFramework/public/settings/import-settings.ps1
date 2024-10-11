@@ -45,8 +45,8 @@ Function Import-Settings {
                         }
 
                     } catch {
-                        #Write-Error "There is a problem loading the settings file"
-                        throw "There is a problem loading the settings file"
+                        Write-Error "There is a problem loading the settings file"
+                        throw $_
                     }
 
                     # Register all plugins
@@ -55,32 +55,32 @@ Function Import-Settings {
                             Add-PluginFolder $_
                         }
                     } catch {
-                        #Write-Error "There is a problem registering plugins"
-                        throw "There is a problem with registering the plugins"
+                        Write-Error "There is a problem registering plugins"
+                        throw $_
                     }
 
                     # Joining the settings together
                     try {
                         $joinedSettings = Join-PSCustomObject -Left $Script:defaultSettings -Right $settings -AddPropertiesFromRight -MergePSCustomObjects -MergeHashtables #-MergeArrays
                     } catch {
-                        #Write-Error -Message "Settings cannot be joined"
-                        throw "Settings cannot be joined"
+                        Write-Error -Message "Settings cannot be joined"
+                        throw $_
                     }
 
                     # Set the settings into the module (modules defaultsettings + imported settings)
                     try {
                         Set-Settings -PSCustom $joinedSettings
                     } catch {
-                        #Write-Error -Message "Settings cannot be loaded - Round 1"
-                        throw "Settings cannot be loaded"
+                        Write-Error -Message "Settings cannot be loaded"
+                        throw $_
                     }
 
                     # TODO [x] load the plugins from the settings file, if present
                     try {
                         Import-Plugin -guid $settings.plugin.guid
                     } catch {
-                        #Write-Error -Message "Plugin cannot be imported"
-                        throw "Plugin cannot be imported"
+                        Write-Error -Message "Plugin cannot be imported"
+                        throw $_
                     }
 
                 } else {
