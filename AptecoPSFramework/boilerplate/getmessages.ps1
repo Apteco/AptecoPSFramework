@@ -31,6 +31,9 @@ If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
 #-----------------------------------------------
 
 $debug = $false
+If ( $PSBoundParameters["Debug"].IsPresent -eq $true ) {
+    $debug = $true
+}
 
 
 #-----------------------------------------------

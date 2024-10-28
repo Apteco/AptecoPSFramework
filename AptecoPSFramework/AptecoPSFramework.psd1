@@ -158,6 +158,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Improved boilerplate files to be runnable with -Debug flag instead of setting that in the script file.
+               In that case it uses the params object inside that file
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
       Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
       Fix CleverReach: When having spaces around a column name, it will be trimmed now automatically
