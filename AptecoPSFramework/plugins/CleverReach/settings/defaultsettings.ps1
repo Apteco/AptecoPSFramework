@@ -30,6 +30,9 @@
         # Generic errors like 404 that are not on the specific list
         "MaximumRetriesGeneric" = 1
 
+        # Sometimes connections are getting closed, so adding the option to disable keepalive
+        "DisableKeepAlive" = $true
+
     }
 
     # Token refreshment

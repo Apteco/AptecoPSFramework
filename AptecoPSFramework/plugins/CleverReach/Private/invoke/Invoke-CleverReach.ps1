@@ -229,6 +229,11 @@ function Invoke-CR {
                 $updatedParameters.Body = $bodyJson
             }
 
+            # Add DisableKeepalive
+            If ( $settings.errorhandling.DisableKeepAlive -eq $true ) {
+                $updatedParameters.add("DisableKeepAlive",$true)
+            }
+
             # Execute the request
             try {
 
