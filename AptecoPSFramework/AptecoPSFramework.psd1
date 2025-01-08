@@ -158,6 +158,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature CleverReach: New function to download all receivers of a list
       Feature: Improved boilerplate files to be runnable with -Debug flag instead of setting that in the script file.
                In that case it uses the params object inside that file
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
