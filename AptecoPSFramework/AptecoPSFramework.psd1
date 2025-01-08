@@ -167,6 +167,7 @@ PrivateData = @{
       Fix: Improved the error output, when settings are imported
       Fix CleverReach: Adding an option to disable keepalives when the connection causes problems
       Fix CleverReach: Added a hint, if a http 403 Forbidden happens, that this could be caused because of too many uploaded contacts regarding the licence
+      Fix CleverReach: When requesting contacts per tag, it is now limited to 5000 per page and now sorted by count rather than tag name
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Fix: Improved the error handling and messaging for loading settings files
