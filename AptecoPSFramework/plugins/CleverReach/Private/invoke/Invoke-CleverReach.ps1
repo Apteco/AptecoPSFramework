@@ -282,6 +282,12 @@ function Invoke-CR {
                         Continue
                     }
 
+                } elseif ( $errResponse.StatusCode.value__ -eq 403 ) {
+
+                    # Give extra hints with 403
+                    Write-Log -Severity WARNING -Message "403 Forbidden"
+                    Write-Log -Severity WARNING -Message "Just a possible hint: Please check if you have enough contacts in your licence available"
+
                 }
 
                 throw $_.Exception

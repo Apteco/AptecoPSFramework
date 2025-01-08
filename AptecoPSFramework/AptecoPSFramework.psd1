@@ -166,6 +166,7 @@ PrivateData = @{
       Fix CleverReach: When there are more people in the last upload batch than the uploadsize, then only the first (last) batch was done
       Fix: Improved the error output, when settings are imported
       Fix CleverReach: Adding an option to disable keepalives when the connection causes problems
+      Fix CleverReach: Added a hint, if a http 403 Forbidden happens, that this could be caused because of too many uploaded contacts regarding the licence
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Fix: Improved the error handling and messaging for loading settings files
