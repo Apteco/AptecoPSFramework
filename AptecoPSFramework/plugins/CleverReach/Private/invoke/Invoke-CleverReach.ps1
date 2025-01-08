@@ -159,6 +159,15 @@ function Invoke-CR {
             $updatedParameters.add("ContentType",$Script:settings.contentType)
         }
 
+        # Add DisableKeepalive
+        If ( $settings.errorhandling.DisableKeepAlive -eq $true ) {
+            If ( $updatedParameters.ContainsKey("DisableKeepAlive") -eq $true ) {
+                $updatedParameters."DisableKeepAlive" = $true
+            } else {
+                $updatedParameters.add("DisableKeepAlive",$true)
+            }   
+        }
+
         # normalize the path, remove leading and trailing slashes
         If ( $Path -ne "") {
             If ( $Path.StartsWith("/") -eq $true ) {
@@ -227,11 +236,6 @@ function Invoke-CR {
             If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
                 $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99
                 $updatedParameters.Body = $bodyJson
-            }
-
-            # Add DisableKeepalive
-            If ( $settings.errorhandling.DisableKeepAlive -eq $true ) {
-                $updatedParameters.add("DisableKeepAlive",$true)
             }
 
             # Execute the request
