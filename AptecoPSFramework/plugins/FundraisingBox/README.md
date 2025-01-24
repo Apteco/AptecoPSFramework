@@ -358,3 +358,118 @@ try {
 }
 
 ```
+
+# Queries for Apteco FastStats Designer
+
+In this example we are using the DuckDB.NET driver to query the partly nested data.
+
+## Person
+
+```SQL
+INSTALL sqlite;
+LOAD sqlite;
+ATTACH 'C:\faststats\Scripts\frb\frb.sqlite' AS frb (READ_ONLY);
+USE frb;
+
+WITH extracted
+AS (
+	SELECT *
+		,json_transform(OBJECT, '{
+"smart_contact_id": "VARCHAR"
+,"company_id": "INTEGER"
+,"company_name": "VARCHAR"
+,"info": "VARCHAR"
+,"wants_mailing": "BOOLEAN"
+,"wants_no_email": "BOOLEAN"
+,"wants_no_post": "BOOLEAN"
+,"wants_no_call": "BOOLEAN"
+,"greeting": "VARCHAR"
+,"external_person_id": "VARCHAR"
+,"donation_count": "INTEGER"
+,"created_at": "TIMESTAMP"
+,"updated_at": "TIMESTAMP"
+,"updated_by": "TIMESTAMP"
+,"updated_by_user_id": "VARCHAR"
+
+}') AS extracted_list
+	FROM Items
+	WHERE type = 'person'
+	)
+SELECT id
+	,unnest(extracted_list)
+FROM extracted;
+```
+
+## Main address
+
+This can be used as a lookup connected to `Person`
+
+```SQL
+INSTALL sqlite;
+LOAD sqlite;
+ATTACH 'C:\faststats\Scripts\frb\frb.sqlite' AS frb (READ_ONLY);
+USE frb;
+
+WITH extracted
+AS (
+	SELECT *
+		,json_transform(json_extract(OBJECT, '$.fb_person_addresses'), '[{
+
+"id": "VARCHAR"
+,"address": "VARCHAR"
+,"post_code": "VARCHAR"
+,"city": "VARCHAR"
+,"state": "VARCHAR"
+,"country": "VARCHAR"
+,"type": "VARCHAR"
+,"is_main": "BOOLEAN"
+
+}]
+') AS extracted_list
+	FROM Items
+	WHERE type = 'person'
+
+	)
+
+Select * from (
+SELECT id AS personId
+	,unnest(extracted_list, recursive := true)
+FROM extracted)
+WHERE is_main = true
+;
+```
+
+## addresses
+
+This has a 1:n relationship with `Person`
+
+```SQL
+INSTALL sqlite;
+LOAD sqlite;
+ATTACH 'C:\faststats\Scripts\frb\frb.sqlite' AS frb (READ_ONLY);
+USE frb;
+
+WITH extracted
+AS (
+	SELECT *
+		,json_transform(json_extract(OBJECT, '$.fb_person_addresses'), '[{
+
+"id": "VARCHAR"
+,"address": "VARCHAR"
+,"post_code": "VARCHAR"
+,"city": "VARCHAR"
+,"state": "VARCHAR"
+,"country": "VARCHAR"
+,"type": "VARCHAR"
+,"is_main": "BOOLEAN"
+
+}]
+') AS extracted_list
+	FROM Items
+	WHERE type = 'person'
+	)
+
+SELECT id AS personId
+	,unnest(extracted_list, recursive := true)
+FROM extracted;
+```
