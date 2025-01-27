@@ -9,7 +9,7 @@ function Get-Donation {
 
         ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')]
          [Parameter(Mandatory=$false, ParameterSetName = 'AllPages')]
-         [DateTime]$DateFrom = $null
+         [DateTime]$DateFrom = [datetime]::MinValue
 
         #,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')][Int] $SkipToken = 0
         ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')]
@@ -48,7 +48,7 @@ function Get-Donation {
                     "Paging" = $True
                 }
 
-                If ( $DateFrom -ne $null ) {
+                If ( $DateFrom -ne [datetime]::MinValue ) {
                     $params.Add( "Query", [PSCustomObject]@{"date_min"=$DateFrom.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
 
@@ -65,7 +65,7 @@ function Get-Donation {
                     "Pagesize" = $First
                 }
 
-                If ( $DateFrom -ne $null ) {
+                If ( $DateFrom -ne [datetime]::MinValue ) {
                     $params.Add( "Query", [PSCustomObject]@{"date_min"=$DateFrom.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
                 

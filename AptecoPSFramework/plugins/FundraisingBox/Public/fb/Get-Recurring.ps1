@@ -7,6 +7,14 @@ function Get-Recurring {
         # [Parameter(Mandatory=$true, ParameterSetName = 'AllPages')]
          [Int] $Id
 
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'AllPages')]
+         [DateTime]$StartMin = [datetime]::MinValue
+
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'AllPages')]
+         [DateTime]$NextMin = [datetime]::MinValue
+
         #,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')][Int] $SkipToken = 0
         ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')][Int] $First = 10
 
@@ -42,6 +50,14 @@ function Get-Recurring {
                     "Paging" = $True    
                 }
 
+                If ( $NextMin -ne [datetime]::MinValue ) {
+                    $params.Add( "Query", [PSCustomObject]@{"next_min"=$NextMin.toString("yyyy-MM-dd HH:mm:ss")} )
+                }
+
+                If ( $StartMin -ne [datetime]::MinValue ) {
+                    $params.Add( "Query", [PSCustomObject]@{"next_min"=$StartMin.toString("yyyy-MM-dd HH:mm:ss")} )
+                }
+
                 break
             }
 
@@ -53,6 +69,14 @@ function Get-Recurring {
                     "Method" = "GET"
                     "Paging" = $False
                     "Pagesize" = $First
+                }
+
+                If ( $NextMin -ne [datetime]::MinValue ) {
+                    $params.Add( "Query", [PSCustomObject]@{"next_min"=$NextMin.toString("yyyy-MM-dd HH:mm:ss")} )
+                }
+
+                If ( $StartMin -ne [datetime]::MinValue ) {
+                    $params.Add( "Query", [PSCustomObject]@{"next_min"=$StartMin.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
                 
             }

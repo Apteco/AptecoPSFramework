@@ -7,6 +7,10 @@ function Get-Mandate {
         # [Parameter(Mandatory=$true, ParameterSetName = 'AllPages')]
          [Int] $Id
 
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'AllPages')]
+         [DateTime]$DateFrom = [datetime]::MinValue
+
         #,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')][Int] $SkipToken = 0
         ,[Parameter(Mandatory=$false, ParameterSetName = 'OnePage')][Int] $First = 10
 
@@ -42,6 +46,10 @@ function Get-Mandate {
                     "Paging" = $True    
                 }
 
+                If ( $DateFrom -ne [datetime]::MinValue ) {
+                    $params.Add( "Query", [PSCustomObject]@{"date_min"=$DateFrom.toString("yyyy-MM-dd HH:mm:ss")} )
+                }
+
                 break
             }
 
@@ -53,6 +61,10 @@ function Get-Mandate {
                     "Method" = "GET"
                     "Paging" = $False
                     "Pagesize" = $First
+                }
+
+                If ( $DateFrom -ne [datetime]::MinValue ) {
+                    $params.Add( "Query", [PSCustomObject]@{"date_min"=$DateFrom.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
                 
             }
