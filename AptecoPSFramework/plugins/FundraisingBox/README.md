@@ -441,6 +441,11 @@ try {
 
 In this example we are using the DuckDB.NET driver to query the partly nested data.
 
+Here is rough image of the data model, the column names are not translated into German yet:
+
+![grafik](https://github.com/user-attachments/assets/38ec9ce0-bbf3-4856-9a74-9f3ca95c7a8e)
+
+
 ## Person
 
 ```SQL
