@@ -76,4 +76,11 @@ Get-ContactData -KeyValues "10596","10764","13919" -KeyId "id" -Fields "email" -
 $c = Get-ListContact -ListId 1801153297 -all | Get-ContactData -KeyId "id" -Fields "email", "first_name" -ResolveFields -IgnoreErrors
 $c | Select -First 1000 | Out-Gridview
 
+# Select lists of the last 60 days and delete them
+$regex = "_(\d{8}-\d{6})$"
+get-list | Where-Object { $_.name -match $regex -and [datetime]::ParseExact($_.created, "yyyy-MM-dd HH:mm:ss", $null) -lt [datetime]::today.AddDays(-60) } | ForEach-Object {
+    $listId = $_.id
+    Remove-List $listId
+}
+
 ```
