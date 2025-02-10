@@ -171,8 +171,8 @@ Predefined values can be found here: https://developer.fundraisingbox.com/refere
 # TODO
 
 - [ ] Mark all functions with needed packages to license
-- [ ] Paging
-- [ ] return the data, if paging is supported
+- [x] Paging
+- [x] return the data, if paging is supported
 
 # Example script for extracting data
 
