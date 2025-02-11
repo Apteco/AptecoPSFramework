@@ -37,14 +37,14 @@
 
         #"tokenfile" =  "C:\Test\cr.token"
         #"createTokenFile" = $true
-        "tokenSettingsFile" = "" # Path for the settings file that contains important information about the token creation and refreshing
+        "tokenSettingsFile" = "" # Path for the settings json file like c:\temp\sf_token_settings.json that contains important information about the token creation and refreshing
 
         # Not implemented yet, but settings for the token file
         "exportTokenToFile" = $true                         # only used, if the token usage is on 'generate'
         "tokenUsage" = "consume"                            # consume|generate -> please have only one setting where you generate the token
         "encryptTokenFile" = $false                         # only used, if the token usage is on 'generate', when 'consume' then the tokenfile will be decrypted
                                                             # be careful, that the encryption is user dependent so cannot be shared between multiple users
-        "tokenFilePath" = ""                                # path for the file containing the token that should be consumed or generated
+        "tokenFilePath" = ""                                # path for the file like C:\temp\sf.token containing the token that should be consumed or generated
 
 
     }

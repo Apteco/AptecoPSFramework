@@ -74,6 +74,7 @@ function Register-NewTokenViaOauth {
         # REFRESH THE TOKEN
         #-----------------------------------------------
 
+        # TODO change this url to custom domains
         $refreshUrl = [uri]"https://login.salesforce.com/services/oauth2/token"
         $newToken = Invoke-RestMethod -Uri $refreshUrl -ContentType "application/x-www-form-urlencoded" -Method POST -Body $body
 
