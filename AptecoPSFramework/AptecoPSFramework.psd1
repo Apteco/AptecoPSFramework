@@ -160,6 +160,7 @@ PrivateData = @{
         ReleaseNotes = '
       Feature: Improved Performance for DuckDB reader (e.g. 5 seconds for 150k rows instead of 70 seconds)
       Feature: Improved handling for sniffing csv files with DuckDB (example is in help)
+      Feature: Adding FundraisingBox as a new plugin for the Apteco PS Framework allowing to load data through the API
       Fix CleverReach: When having spaces around a column name, it will be trimmed now automatically
       Fix CleverReach: When there are more people in the last upload batch than the uploadsize, then only the first (last) batch was done
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
