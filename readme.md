@@ -16,6 +16,7 @@ CRM|Microsoft Dynamics 365 CRM|DataVerse oData WebAPI|REST|Download all CRM obje
 Email|emarsys (An SAP Company)|Emarsys Core API|REST|Adding Lists and Contacts, get lists, campaigns, fields, contact data
 Email|ActiveCampaign||REST|Still under development
 Email|Apteco email||REST|Get lists and contacts on that list
+CRM|Fundraising Box||REST|Get contacts, donations, projects and much more to build a system
 
 # Installation / Update / Uninstall
 
