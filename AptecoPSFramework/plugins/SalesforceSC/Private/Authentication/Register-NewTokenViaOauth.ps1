@@ -70,12 +70,28 @@ function Register-NewTokenViaOauth {
             #"resource"
         }
 
+
+        #-----------------------------------------------
+        # BUILD THE URL
+        #-----------------------------------------------
+
+        # check url, if it ends with a slash
+        If ( $Script:settings.base.endswith("/") -eq $true ) {
+            $base = $Script:settings.base
+        } else {
+            $base = "$( $Script:settings.base )/"
+        }
+
+        # Build custom salesforce domain
+        $refreshUrl = [uri]"https://$( $Script:settings.login.mydomain ).$( $base )services/oauth2/token"
+
+
         #-----------------------------------------------
         # REFRESH THE TOKEN
         #-----------------------------------------------
 
-        # TODO change this url to custom domains
-        $refreshUrl = [uri]"https://login.salesforce.com/services/oauth2/token"
+
+        # Get new token
         $newToken = Invoke-RestMethod -Uri $refreshUrl -ContentType "application/x-www-form-urlencoded" -Method POST -Body $body
 
 
