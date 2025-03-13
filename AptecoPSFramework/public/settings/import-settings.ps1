@@ -52,7 +52,8 @@ Function Import-Settings {
                     # Register all plugins
                     try {
                         $settings.pluginFolders | ForEach-Object {
-                            Add-PluginFolder $_
+                            $f = $_
+                            Add-PluginFolder "$( $f )"
                         }
                     } catch {
                         Write-Error "There is a problem registering plugins"
