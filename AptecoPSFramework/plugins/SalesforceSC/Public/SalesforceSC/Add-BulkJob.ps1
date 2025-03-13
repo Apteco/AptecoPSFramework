@@ -102,7 +102,7 @@ function Add-BulkJob {
         $return = Add-BulkJob @bulkParams
 
     .INPUTS
-        int
+        None. You cannot pipe objects to this function.
 
     .OUTPUTS
         Array of jobs
