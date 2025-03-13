@@ -162,6 +162,9 @@ function Invoke-SFSC {
         }
         #>
 
+        # Add a collection instead of a single object for the return
+        $res = [System.Collections.ArrayList]@()
+
     }
 
     Process {
@@ -214,7 +217,6 @@ function Invoke-SFSC {
 
                 $e = $_
 
-                Write-Log -Message $e.Exception.Message -Severity ERROR
 
                 # parse the response code and body
                 $errResponse = $e.Exception.Response
@@ -237,72 +239,114 @@ function Invoke-SFSC {
                         Continue
                     }
 
-                }
+                } else {
 
                 # $responseStream = $_.Exception.Response.GetResponseStream()
                 # $responseReader = [System.IO.StreamReader]::new($responseStream)
                 # $responseBody = $responseReader.ReadToEnd()
                 # Write-Log -Message $responseBody -Severity ERROR
 
-                throw $_.Exception
+                    Write-Log -Message $e.Exception.Message -Severity ERROR
+                    throw $_.Exception
+
+                }
 
             }
 
             # Increase page and add results to the collection
-            <#
-            If ( $Paging -eq $true ) {
-
-                # If the result equals the pagesize, try it one more time with the next page
-                If ( $wr.count -eq $currentPagesize ) {
-
-                    Switch ( $updatedParameters.Method ) {
-
-                        "GET"{
-                            $Query.page += 1
-                        }
-
-                        "POST" {
-                            $Body.page += 1
-                        }
-                    }
-
+            If ( $wr.headers.Keys -contains "Sforce-Locator" ) {
+                If ( $wr.headers."Sforce-Locator" -ne "null" ) {
+                   If ( $Query.PsObject.properties.name -contains "locator" ) {
+                        $Query."locator" = $wr.headers."Sforce-Locator"
+                   } else {
+                        $Query | Add-Member -MemberType NoteProperty -Name "locator" -Value $wr.headers."Sforce-Locator"
+                   }
                 } else {
-
-                    # If this is less than the page size -> done!
                     $finished = $true
+                }
+            } else {
+                $finished = $true
+            }
 
+            # Add result to return collection
+            Switch -Wildcard ( $wr.headers.'Content-Type' ) {
+                "text/csv*" {
+                    [void]$res.AddRange(@( ConvertFrom-Csv -Delimiter "`t" -InputObject $wr.Content ))
+                    break
                 }
 
-                # Add result to return collection
-                [void]$res.AddRange($wr)
+                "application/json*" {
+                    [void]$res.AddRange(@( ConvertFrom-Json -InputObject $wr.content ))
+                    break
+                }
 
+                default {
+                    #$wr.Content
+                }
+            }
+            <#
+            If ( $wr.headers.'Content-Type' -like "text/csv*" ) {
+                [void]$res.AddRange(@( $wr.Content | ConvertFrom-Csv -Delimiter "`t"))
+                #$Script:plugindebug = $wr
             } else {
+                [void]$res.Add($wr.Content) # TODO maybe not needed
+            }
                 #>
 
-                # If this is only one request without paging -> done!
-                $finished = $true
-
-            #}
 
             If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
                 Write-log $wr.Headers."Sforce-Limit-Info" -severity verbose #api-usage=2/15000
             }
 
+            #-----------------------------------------------
+            # SAVE CURRENT RATE AFTER LAST CALL
+            #-----------------------------------------------
+
+            If ( $Script:variableCache.Keys -contains "api_rate_limit" ) {
+                $Script:variableCache.api_rate_limit = $wr.Headers."Sforce-Limit-Info".trim()
+            } else {
+                $Script:variableCache.Add("api_rate_limit",$wr.Headers."Sforce-Limit-Info".trim())
+            }
+
+
         } Until ( $finished -eq $true )
 
+        <#
+        If ( $res.Count -eq 0 -or $res.Count -eq 1 ) {
 
-        If ( $wr.Content -eq $null ) {
-            $ret = [Array]@()
+            If ( $null -eq $wr.Content ) {
+                $ret = [Array]@()
+            } else {
+                # TODO check with utf8 in returned header
+                If ( $wr.headers.'Content-Type' -like "application/json*" ) {
+                    $ret = convertfrom-json -InputObject $wr.content #-Depth 99
+                } else {
+                    $ret = $res #$wr.content
+                }
+            }
+
+            $ret
+    
+        } else {
+
+            $res
+
+        }
+        #>
+
+        # If it was not added to the return collection and is not null, just return it blank
+        If ( $res.Count -eq 0 -and $null -ne $wr.Content ) {
+            $wr.Content
+            
+        # Otherwise return an empty array
+        } elseif ( $res.Count -eq 0 -or $null -eq $wr.Content ) {
+            [Array]@()
+        
+        # Or return the parsed response
         } else {
             # TODO check with utf8 in returned header
-            If ( $wr.headers.'Content-Type' -like "application/json*" ) {
-                $ret = convertfrom-json -InputObject $wr.content #-Depth 99
-            } else {
-                $ret = $wr.content
-            }
+            $res
         }
-
-        $ret
 
     }
 
