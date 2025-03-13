@@ -47,7 +47,8 @@ function Get-Messages {
             #default {
 
                 # Load mailings data from SalesForce
-                $campaigns = @( Get-SFSCObjectData -Object "Campaign" -Fields @("Id", "Name") -Limit 200 )
+                $campaigns = @( Get-SFSCObjectData -Object "Campaign" -Fields "id", "name" -Where $Script:settings.upload.campaignFilter -limit 200 )
+                #$campaigns = @( Get-SFSCObjectData -Object "Campaign" -Fields @("Id", "Name") -Limit 200 )
                 #$campaigns = Invoke-SFSCQuery -query "select id, name from campaign" -IncludeAttributes
                 # $queryObj = [PSCustomObject]@{
                 #     "q" = "select id, name from campaign limit 100"
@@ -68,7 +69,7 @@ function Get-Messages {
                     }
                     [void]$mailingsList.add(
                         [Mailing]@{
-                            "mailingId" = $mailing.Id.substring(11)
+                            "mailingId" = $mailing.Id.substring(7,11)
                             "mailingName" = $mailing.Name #.substring(0,$l)
                         }
                     )
