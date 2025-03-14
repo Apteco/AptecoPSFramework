@@ -141,6 +141,15 @@ function Invoke-Upload{
             }
         }
 
+
+        #-----------------------------------------------
+        # VARIABLES
+        #-----------------------------------------------
+
+        $successful = 0
+        $failed = 0
+        $processed = 0
+
     }
 
     process {
@@ -615,9 +624,6 @@ function Invoke-Upload{
             #-----------------------------------------------
 
             # Count all numbers together and log them
-            $successful = 0
-            $failed = 0
-            $processed = 0
             $cmJobs | ForEach-Object {
 
                 $j = $_
@@ -698,15 +704,6 @@ function Invoke-Upload{
             Write-Log "Current API Limit: $( $Script:variableCache.api_rate_limit )"
 
 
-
-            # Close the file reader, if open
-            # If the variable is not already declared, that shouldn't be a problem
-            # try {
-            #     $reader.Close()
-            # } catch {
-
-            # }
-
             #-----------------------------------------------
             # STOP TIMER
             #-----------------------------------------------
@@ -741,21 +738,10 @@ function Invoke-Upload{
             "CustomProvider"= $Script:settings.providername
             "ProcessId" = $Script:processId
 
-            # More values for broadcast
-            #"Tag" = ( $tags -join ", " )
-            #"GroupId" = $groupId
-            #"PreheaderIsSet" = $preheaderIsSet
-
-            # Some more information for the broadcasts script
-            #"EmailFieldName"= $params.EmailFieldName
-            #"Path"= $params.Path
-            #"UrnFieldName"= $params.UrnFieldName
-            #"TargetGroupId" = $targetGroup.targetGroupId
-
             # More information about the different status of the import
-            #"RecipientsIgnored" = $status.report.total_ignored
-            #"RecipientsQueued" = $recipients
-            #"RecipientsSent" = $status.report.total_added + $status.report.total_updated
+            "RecipientsProcessed" = $processed
+            "RecipientsFailed" = $failed
+            "RecipientsSuccessful" = $successful
 
         }
 
