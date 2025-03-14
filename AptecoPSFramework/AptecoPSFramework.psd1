@@ -168,6 +168,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Massive improvements for the Salesforce integration. Have a look at the documentation for more information
       Feature: Added MergeHashtable and MergePSCustomObject as Dependencies for future use in settings
       Feature CleverReach: New function to download all receivers of a list
       Feature: Improved boilerplate files to be runnable with -Debug flag instead of setting that in the script file.
