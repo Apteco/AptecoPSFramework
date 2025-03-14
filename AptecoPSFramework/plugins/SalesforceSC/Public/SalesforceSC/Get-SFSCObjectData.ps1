@@ -27,7 +27,7 @@ function Get-SFSCObjectData {
         Switch to include attributes in the result.
 
     .PARAMETER Bulk
-        Switch to use bulk query instead of a direct query. (TODO: Implement this feature)
+        Switch to use bulk query instead of a direct query
 
     .EXAMPLE
         Get-SFSCObjectData -Object 'Account' -Fields 'Id', 'Name' -Where "Name LIKE 'A%'" -Limit 10
