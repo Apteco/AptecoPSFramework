@@ -6,8 +6,8 @@
 
         # general information about this plugin
         "name" = "Salesforce SalesCloud CampaignMembers"
-        "version" = "0.0.3"
-        "lastUpdate" = "2023-10-16"
+        "version" = "0.1.0"
+        "lastUpdate" = "2025-03-13"
         "category" = "channel"
         "type" = "crm"
         "stage" = "dev"

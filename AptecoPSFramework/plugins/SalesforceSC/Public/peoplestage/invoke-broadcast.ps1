@@ -17,7 +17,6 @@ function Invoke-Broadcast{
         #-----------------------------------------------
 
         $processStart = [datetime]::now
-        #$inserts = 0
 
 
         #-----------------------------------------------
@@ -25,8 +24,6 @@ function Invoke-Broadcast{
         #-----------------------------------------------
 
         Set-ProcessId -Id $InputHashtable.ProcessId
-        #$tag = ( $InputHashtable.Tag -split ", " )
-        #$groupId = $InputHashtable.GroupId
 
 
         #-----------------------------------------------
@@ -48,35 +45,6 @@ function Invoke-Broadcast{
             }
         }
 
-
-        #-----------------------------------------------
-        # PARSE MESSAGE
-        #-----------------------------------------------
-
-        # $mailing = [Mailing]::new($InputHashtable.MessageName)
-        # Write-Log "Got chosen message entry with id '$( $mailing.mailingId )' and name '$( $mailing.mailingName )'"
-
-        # $templateId = $mailing.mailingId
-
-
-        #-----------------------------------------------
-        # CHECK CLEVERREACH CONNECTION
-        #-----------------------------------------------
-
-        # try {
-
-        #     Test-CleverReachConnection
-
-        # } catch {
-
-        #     Write-Log -Message $_.Exception -Severity ERROR
-        #     throw [System.IO.InvalidDataException] $msg
-        #     exit 0
-
-        #     # TODO is exit needed here?
-
-        # }
-
     }
 
     process {
@@ -88,11 +56,6 @@ function Invoke-Broadcast{
 
 
         } catch {
-
-            #$msg = "Error during writing data. Abort!"
-            #Write-Log -Message $msg -Severity ERROR
-            #Write-Log -Message $_.Exception -Severity ERROR
-            #throw [System.IO.InvalidDataException] $msg
 
             $msg = "Error during broadcasting data. Abort!"
             Write-Log -Message $msg -Severity ERROR -WriteToHostToo $false
@@ -120,7 +83,7 @@ function Invoke-Broadcast{
         #-----------------------------------------------
 
         # count the number of successful upload rows
-        $recipients = $tagCount
+        $recipients = $InputHashtable.RecipientsSuccessful
 
         # put in the source id as the listname
         $transactionId = $copiedMailing.id
@@ -135,17 +98,6 @@ function Invoke-Broadcast{
             # General return value to identify this custom channel in the broadcasts detail tables
             "CustomProvider"=  $Script:settings.providername
             "ProcessId" = $Script:processId
-
-            # Some more information for the broadcasts script
-            #"EmailFieldName"= $params.EmailFieldName
-            #"Path"= $params.Path
-            #"UrnFieldName"= $params.UrnFieldName
-            #"TargetGroupId" = $targetGroup.targetGroupId
-
-            # More information about the different status of the import
-            #"RecipientsIgnored" = $status.report.total_ignored
-            #"RecipientsQueued" = $recipients
-            #"RecipientsSent" = $status.report.total_added + $status.report.total_updated
 
         }
 

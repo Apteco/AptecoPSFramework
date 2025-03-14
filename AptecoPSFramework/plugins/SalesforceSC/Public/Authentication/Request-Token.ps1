@@ -106,14 +106,30 @@
 
 
         #-----------------------------------------------
+        # BUILD THE URL
+        #-----------------------------------------------
+
+        # check url, if it ends with a slash
+        If ( $Script:settings.base.endswith("/") -eq $true ) {
+            $base = $Script:settings.base
+        } else {
+            $base = "$( $Script:settings.base )/"
+        }
+
+        # Build custom salesforce domain
+        $baseUrl = [uri]"https://$( $Script:settings.login.mydomain ).$( $base )"
+
+
+
+        #-----------------------------------------------
         # SET THE PARAMETERS
         #-----------------------------------------------
 
         $oauthParam = [Hashtable]@{
             "ClientId" = $ClientId
             "ClientSecret" = $clientCred.GetNetworkCredential().password     # this will be asked for in the next step
-            "AuthUrl" = "https://login.salesforce.com/services/oauth2/authorize"
-            "TokenUrl" = "https://login.salesforce.com/services/oauth2/token"
+            "AuthUrl" = "$( $baseUrl )services/oauth2/authorize"
+            "TokenUrl" = "$( $baseUrl )services/oauth2/token"
             "SaveSeparateTokenFile" = $true
             "RedirectUrl" = $RedirectUrl
             "SettingsFile" = $SettingsFile
