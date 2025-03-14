@@ -1,41 +1,3 @@
-﻿
-################################################
-#
-# INPUT
-#
-################################################
-
-[CmdletBinding()]
-Param(
-
-    [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true)]
-    [String]$SettingsFile = ""
-
-)
-
-
-#-----------------------------------------------
-# DEBUG SWITCH
-#-----------------------------------------------
-
-$debug = $false
-If ( $PSBoundParameters["Debug"].IsPresent -eq $true ) {
-    $debug = $true
-}
-
-
-################################################
-#
-# NOTES
-#
-################################################
-
-<#
-
-bla bla
-
-#>
-
 
 ################################################
 #
@@ -81,26 +43,18 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 ################################################
 
 #-----------------------------------------------
-# CHECK INPUT
+# DEFAULT VALUES
 #-----------------------------------------------
 
-If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" ) {
-    If ( $SettingsFile -eq "" ) {
-        throw "Please define a settings file"
-    } else {
-        $settingsfileLocation = $SettingsFile
-    }
-} else {
-    $settingsfileLocation = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($params.settingsFile)
+$useJob = $false
+$enforce64Bit  = $false
+$enforceCore = $false
+$enforcePython = $false
+$isPsCoreInstalled = $false
+
+If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" -and $settingsfileLocation -ne "" ) {
+    $useJob = $true
 }
-
-#-----------------------------------------------
-# CHANGE PATH
-#-----------------------------------------------
-
-# Set current location to the settings files directory
-$settingsFileItem = Get-Item $settingsfileLocation
-Set-Location $settingsFileItem.DirectoryName
 
 
 ################################################
@@ -109,14 +63,37 @@ Set-Location $settingsFileItem.DirectoryName
 #
 ################################################
 
+
+#-----------------------------------------------
+# CHECK THE MODE THAT SHOULD BE USED
+#-----------------------------------------------
+
+# Start this if 64 is needed to enforce when this process is 32 bit and system is able to handle it
+If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq $false -and [System.Environment]::Is64BitOperatingSystem -eq $true ) {
+    $enforce64Bit = $true
+    $useJob = $true
+}
+
+# When you want to use PSCore with 32bit, please change that path in the settings file
+If ( $params.ForceCore -eq "true" ) {
+    $enforceCore = $true
+    $useJob = $true
+}
+
+If ( $params.ForcePython -eq "true" ) {
+    $enforcePython = $true
+    $useJob = $true
+}
+
+
 #-----------------------------------------------
 # IMPORT MODULE
 #-----------------------------------------------
 
 If ($debug -eq $true) {
-    Import-Module "AptecoPSFramework" -Verbose
+    Import-Module "C:\FastStats\Scripts\github\AptecoPSFramework" -Verbose
 } else {
-    Import-Module "AptecoPSFramework"
+    Import-Module "C:\FastStats\Scripts\github\AptecoPSFramework"
 }
 
 
@@ -142,33 +119,61 @@ $s = Get-Settings
 Set-DebugMode -DebugMode $debug
 
 
-################################################
-#
-# PROGRAM
-#
-################################################
-
-
 #-----------------------------------------------
-# GET MESSAGES
+# ADD JOB
 #-----------------------------------------------
 
-# Added try/catch again because of extras.xml wrapper
-try {
+If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
 
-    # Do the upload
-    $return = Get-Response
+    If ( $PsCmdlet.ParameterSetName -eq "HashtableInput" ) {
 
-    # Return the values, if succeeded
-    $return
+        # Create a new job
+        $jobId = Add-JobLog
+        $jobParams = [Hashtable]@{
+            "JobId" = $JobId
+            #"Plugin" = $script:settings.plugin.guid
+            "InputParam" = $params
+            #"Status" = "Starting"
+            "DebugMode" = $debug
+        }
+        Update-JobLog @jobParams
 
-} catch {
+    } else {
 
-    throw $_
-    Exit 1
+        $job = Get-JobLog -JobId $JobId -ConvertInput
+
+        If ( $job.debug -eq "1" ) {
+            $debug = $True
+            Set-DebugMode -DebugMode $debug
+        }
+
+    }
 
 }
 
 
+#-----------------------------------------------
+# FIND OUT ABOUT PS CORE
+#-----------------------------------------------
+try {
+    $calc = . $s.psCoreExePath { 1+1 }
+} catch {
+    # just a test, nothing to do
+}
+if ( $calc -eq 2 ) {
+    $isPsCoreInstalled = $true
+}
 
 
+#-----------------------------------------------
+# FIND OUT THE MODE
+#-----------------------------------------------
+
+$mode = "function"
+If ( $enforce64Bit -eq $true ) {
+    $mode = "PSWin64"
+} elseif ( $enforceCore -eq $true ) {
+    $mode = "PSCore"
+} elseif ( $enforcePython -eq $true ) {
+    $mode = "Python"
+}

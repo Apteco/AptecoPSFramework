@@ -32,6 +32,12 @@ Import-Module AptecoPSFramework
 Install-AptecoPSFramework
 ```
 
+If you have downloaded this repository as zip file directly from github, you maybe need to unblock all files first. This is something you can do like this, when you go to the directory where you extracted the files to:
+
+```PowerShell
+Get-ChildItem -Path "." -Recurse -Include "*.ps1","*.psm1","*.psd1" | % { Unblock-File $_.FullName }
+```
+
 # Getting started with the Framework
 
 After the installation you are reade to use this module and create a settings json file and connect that with your Apteco system. So please import your module like 

@@ -49,10 +49,7 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 #
 ################################################
 
-Import-Module "AptecoPSFramework" -Verbose # TODO change later to plain module name
-Import-Module "EncryptCredential" # Add this so you can encrypt your credentials, but start this window with your PeopleStage executing server user
-# TODO Is this step still needed?
-#Set-ExecutionDirectory -Path "."
+Import-Module "AptecoPSFramework", "EncryptCredential"
 
 
 ################################################
@@ -66,7 +63,7 @@ Import-Module "EncryptCredential" # Add this so you can encrypt your credentials
 #-----------------------------------------------
 
 #Add-PluginFolder "D:\Scripts\CleverReach\Plugins"
-#Register-Plugins   # Not needed later on since 0.0.3
+
 
 #-----------------------------------------------
 # CHOOSE A PLUGIN
@@ -95,7 +92,6 @@ Import-Plugin -guid $plugin.guid
 #-----------------------------------------------
 
 $settings = Get-settings
-#$settings.pluginGuid = $plugin.guid
 
 
 ################################################
@@ -142,4 +138,4 @@ $settings.logfile = ".\file.log"
 ################################################
 
 Set-Settings -PSCustom $settings
-Export-Settings -Path ".\settings.json"
+Export-Settings -Path ".\settings.yaml"

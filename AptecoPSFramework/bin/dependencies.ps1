@@ -17,6 +17,8 @@ $psModules = [Array]@(
     "PackageManagement"
     "ConvertStrings"
     "SimplySql" # Added to use for job management instead of DuckDB which only support x64
+    "MergeHashtable"
+    "MergePSCustomObject"
 )
 
 

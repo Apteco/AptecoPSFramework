@@ -168,6 +168,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Added MergeHashtable and MergePSCustomObject as Dependencies for future use in settings
       Feature CleverReach: New function to download all receivers of a list
       Feature: Improved boilerplate files to be runnable with -Debug flag instead of setting that in the script file.
                In that case it uses the params object inside that file
@@ -191,6 +192,8 @@ PrivateData = @{
       Fix: API Ratelimiting could cause problems when also containing whitespace, this has been fixed
       Fix: Renaming Prepare-MultipartUpload to ConvertTo-MultipartUpload to only use allowed verbs
       Fix: Renaming Prompt-Choice to Request-Choice to only use allowed verbs
+      Fix: Settings merging was not working properly when a sub property is an [Ordered] instead of [Hashtable] or [PSCustomObject].
+           Also the count of properties was not correct when merging settings. That is all fixed now.
 0.3.3 Fix: Setting a default logfile at the start of the module load named "logfile.log"
       Fix: Reflected a new flag for installing dependencies so that DuckDB is not installing all dependent packages of DuckDB.NET
       Fix: Improved the error handling and messaging for loading settings files
