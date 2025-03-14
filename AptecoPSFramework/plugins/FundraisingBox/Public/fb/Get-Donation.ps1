@@ -1,4 +1,4 @@
-
+﻿
 function Get-Donation {
     [CmdletBinding(DefaultParameterSetName = 'OnePage')]
     param (
@@ -33,7 +33,7 @@ function Get-Donation {
                 $params = [Hashtable]@{
                     "Object" = "donations/$( $Id )"
                     "Method" = "GET"
-                    "Paging" = $False    
+                    "Paging" = $False
                 }
 
                 break
@@ -68,7 +68,7 @@ function Get-Donation {
                 If ( $DateFrom -ne [datetime]::MinValue ) {
                     $params.Add( "Query", [PSCustomObject]@{"date_min"=$DateFrom.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
-                
+
             }
 
         }

@@ -310,7 +310,7 @@ function Invoke-Hubspot {
             }
 
             # Parse the content directly
-            If ( $wr.Content -eq $null ) {
+            If ( $null -eq $wr.Content ) {
                 $content = [Array]@()
             } else {
                 If ( $wr.headers.'Content-Type' -like "application/json*" ) {

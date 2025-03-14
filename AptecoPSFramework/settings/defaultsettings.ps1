@@ -1,4 +1,4 @@
-# TODO please be aware, that the join-object function does not support $null yet
+﻿# TODO please be aware, that the join-object function does not support $null yet
 
 [PSCustomObject]@{
 
@@ -46,7 +46,7 @@
     #"upload" = [PSCustomObject]@{
     #    "queriesBeforeUploadWithDuckDB" = [Array]@()
     #}
-    
+
     # LogJob database (sqlite file via DuckDB will directly made, not connected to defaultDuckDBConnection)
     "joblogDB" = "./logjob.sqlite"
 

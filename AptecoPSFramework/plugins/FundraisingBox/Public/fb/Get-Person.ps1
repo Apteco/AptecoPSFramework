@@ -1,4 +1,4 @@
-
+﻿
 function Get-Person {
     [CmdletBinding(DefaultParameterSetName = 'OnePage')]
     param (
@@ -28,7 +28,7 @@ function Get-Person {
                 $params = [Hashtable]@{
                     "Object" = "persons/$( $Id )"
                     "Method" = "GET"
-                    "Paging" = $False    
+                    "Paging" = $False
                 }
 
                 break
@@ -40,7 +40,7 @@ function Get-Person {
                 $params = [Hashtable]@{
                     "Object" = "persons"
                     "Method" = "GET"
-                    "Paging" = $True    
+                    "Paging" = $True
                 }
 
                 break
@@ -55,7 +55,7 @@ function Get-Person {
                     "Paging" = $False
                     "Pagesize" = $First
                 }
-                
+
             }
 
         }

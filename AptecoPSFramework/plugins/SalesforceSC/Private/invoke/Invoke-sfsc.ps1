@@ -326,7 +326,7 @@ function Invoke-SFSC {
             }
 
             $ret
-    
+
         } else {
 
             $res
@@ -337,11 +337,11 @@ function Invoke-SFSC {
         # If it was not added to the return collection and is not null, just return it blank
         If ( $res.Count -eq 0 -and $null -ne $wr.Content ) {
             $wr.Content
-            
+
         # Otherwise return an empty array
         } elseif ( $res.Count -eq 0 -or $null -eq $wr.Content ) {
             [Array]@()
-        
+
         # Or return the parsed response
         } else {
             # TODO check with utf8 in returned header

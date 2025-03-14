@@ -1,4 +1,4 @@
-
+﻿
 Function Set-JobLogDatabase {
     [cmdletbinding()]
     param(
@@ -39,11 +39,11 @@ Function Set-JobLogDatabase {
             $joblogCreateStatementPath = Join-Path -Path $Script:moduleRoot -ChildPath "sql/joblog_create.sql"
             $joblogCreateStatement = Get-Content -Path $joblogCreateStatementPath -Encoding UTF8 -Raw
             #Invoke-DuckDBQueryAsNonExecute -Query $joblogCreateStatement -ConnectionName "JobLog"
-            
-            $u = Invoke-SqlUpdate -ConnectionName "JobLog" -Query $joblogCreateStatement      
+
+            $u = Invoke-SqlUpdate -ConnectionName "JobLog" -Query $joblogCreateStatement
 
         }
-    
+
     }
 
 }

@@ -1,4 +1,4 @@
-
+﻿
 
 function Get-ApiUsage {
 
@@ -22,17 +22,17 @@ function Get-ApiUsage {
         # Do a simple API call to refresh the counts
 
         #https://api.hubapi.com/crm/v3/objects/contacts?limit=1&archived=false
-        
+
         # Get current timestamp
         $unixtime = Get-Unixtime
         $resetAt = $unixtime - $Script:variableCache."api_rate_reset"
-        
+
         If ( $unixtime -eq $resetAt -or $resetAt -ge 0 -or $ForceRefresh -eq $true) {
             # This means it needs a current status and needs to be refreshed
             Invoke-XPro -Object "serverinfo" | Out-Null # TODO check if maybe another call should be better for this
         }
 
-        # All good, just relead the value and remove the minus   
+        # All good, just relead the value and remove the minus
         $resetAt = [Math]::Abs( $unixtime - $Script:variableCache."api_rate_reset" )
 
         # Put a message on the console

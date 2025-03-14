@@ -1,4 +1,4 @@
-
+﻿
 
 function Get-Messages {
 
@@ -165,7 +165,7 @@ function Get-Messages {
         $processDuration = New-TimeSpan -Start $processStart -End $processEnd
         Write-Log -Message "Needed $( [int]$processDuration.TotalSeconds ) seconds in total"
 
-        
+
         #-----------------------------------------------
         # CLOSE DEFAULT DUCKDB CONNECTION
         #-----------------------------------------------

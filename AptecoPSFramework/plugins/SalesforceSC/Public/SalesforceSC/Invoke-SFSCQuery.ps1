@@ -28,8 +28,8 @@ function Invoke-SFSCQuery {
         If ( $Bulk -eq $true ) {
             # TODO [x] implement
             $bulkParams = [Hashtable]@{
-                "Query" = $Query                
-                "Path" = ".\newData.csv" 
+                "Query" = $Query
+                "Path" = ".\newData.csv"
             }
             If ( $QueryAll -eq $True ) {
                 $bulkParams.Add("QueryOperation", "queryAll")
@@ -56,7 +56,7 @@ function Invoke-SFSCQuery {
                 )
             }
             #>
-        
+
 
             #$objects = Invoke-RestMethod -URI "$( $base )/services/data/v$( $version )/sobjects/" -Method Get -verbose -ContentType $contentType -Headers $headers
 

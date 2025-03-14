@@ -17,7 +17,7 @@ function Invoke-Upload{
         #-----------------------------------------------
 
         $moduleName = "UPLOAD"
-        
+
 
         #-----------------------------------------------
         # START TIMER
@@ -293,7 +293,7 @@ function Invoke-Upload{
 
             # Sniffing of first 1000 rows
             $sniff = Read-DuckDBQueryAsReader -Query "Select * from sniff_csv('$( $file.FullName )', sample_size=1000, delim='\t')" -ReturnAsPSCustom
-            
+
             # Write the columns into the database
             $sniff.Columns | ForEach-Object {
                 $col = $_
@@ -341,7 +341,7 @@ function Invoke-Upload{
             #-----------------------------------------------
 
             <#
-            
+
             NOTE
 
             Transform csv into compatible inxmail csv file (meaning that email field is in first place)
@@ -359,7 +359,7 @@ function Invoke-Upload{
 
             # Redefine the properties now
             $props = $dataCsv | Get-Member -MemberType NoteProperty
-            
+
             #>
 
             $query = "select $( $params.EmailFieldName ) as email"
@@ -412,9 +412,9 @@ function Invoke-Upload{
                 Start-Sleep -Seconds $sleepTime
                 $totalSleepTime += $sleepTime
                 Write-Host $totalSleepTime
-                
+
             } while ( @("SUCCESS","FAILED","CANCELED") -notcontains $check.state)
-                    
+
             Write-Log -message "Got back status '$( $check.state )' after $( $totalSleepTime ) seconds"
             Write-Log -message "$( $check.successCount ) records uploaded successfully"
             Write-Log -message "$( $check.failCount ) records uploaded failed"

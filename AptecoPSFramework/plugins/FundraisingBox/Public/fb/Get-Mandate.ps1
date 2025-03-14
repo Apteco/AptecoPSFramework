@@ -1,4 +1,4 @@
-
+﻿
 function Get-Mandate {
     [CmdletBinding(DefaultParameterSetName = 'OnePage')]
     param (
@@ -31,7 +31,7 @@ function Get-Mandate {
                 $params = [Hashtable]@{
                     "Object" = "mandates/$( $Id )"
                     "Method" = "GET"
-                    "Paging" = $False    
+                    "Paging" = $False
                 }
 
                 break
@@ -43,7 +43,7 @@ function Get-Mandate {
                 $params = [Hashtable]@{
                     "Object" = "mandates"
                     "Method" = "GET"
-                    "Paging" = $True    
+                    "Paging" = $True
                 }
 
                 If ( $DateFrom -ne [datetime]::MinValue ) {
@@ -66,7 +66,7 @@ function Get-Mandate {
                 If ( $DateFrom -ne [datetime]::MinValue ) {
                     $params.Add( "Query", [PSCustomObject]@{"date_min"=$DateFrom.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
-                
+
             }
 
         }

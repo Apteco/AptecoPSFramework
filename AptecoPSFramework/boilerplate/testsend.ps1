@@ -136,7 +136,7 @@ try {
 
         "PSWin64" {
 
-            $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -InformationAction "Continue" 
+            $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -InformationAction "Continue"
 
             break
 
@@ -149,10 +149,10 @@ try {
             If ( $isPsCoreInstalled -eq $false ) {
                 throw "PowerShell Core does not seem to be installed or found"
             }
-            
+
             # This inputs a string into powershell exe at a virtual place "sysnative"
             # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-            $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -InformationAction "Continue" 
+            $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -InformationAction "Continue"
 
             break
         }

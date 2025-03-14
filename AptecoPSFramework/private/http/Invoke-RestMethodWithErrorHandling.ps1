@@ -107,7 +107,7 @@ function Invoke-RestMethodWithErrorHandling {
         $Error.Clear()
 
         # Return: Make sure it is not really null to imitate Invoke-RestMethod
-        If ( $response -eq $null ) {
+        If ( $null -eq $response ) {
             [Array]@()
         } else {
             $response

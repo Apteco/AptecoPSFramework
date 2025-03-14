@@ -9,7 +9,7 @@ function Resolve-ContactData {
     begin {
 
         # fill fields into variable cache or just get it
-        If ( $Script:variableCache.fields -eq $null ) {
+        If ( $null -eq $Script:variableCache.fields ) {
 
             # Create a lookup hashtable for field names
             $fieldHashtable = [hashtable]@{}

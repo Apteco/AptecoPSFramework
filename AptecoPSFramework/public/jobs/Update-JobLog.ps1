@@ -1,4 +1,4 @@
-Function Update-JobLog {
+﻿Function Update-JobLog {
     <#
 
     ...
@@ -15,40 +15,40 @@ Function Update-JobLog {
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Switch]$Finished = $false   # Finished like 0 or 1
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [String]$Status = ""     # Status like "Finished" and others
-         
+
          #,[Parameter(Mandatory=$false)][String]$Process = ""    # Process ID
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [String]$Plugin = ""     # Plugin guid
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Int]$DebugMode = -1          # Debug mode like 0 or 1
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [String]$Type = ""       # Type like UPLOAD, MESSAGES, LISTS etc.
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Hashtable]$InputParam = [Hashtable]@{}      # Input hashtable
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Int]$Inputrecords = -1   # Number of records that have been put in
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Int]$Successful = -1     # Successful records, only needed on uploads
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Int]$Failed = -1         # Failed records, only needed on uploads
-         
+
          ,[Parameter(Mandatory=$false, ParameterSetName = 'Hashtable')]
           [Parameter(Mandatory=$false, ParameterSetName = 'Array')]
           [Int]$Totalseconds = -1   # Seconds in total, logged at the end
@@ -108,7 +108,7 @@ Function Update-JobLog {
         If ( $Inputrecords -gt -1 ) {
             [void]$upd.Add("inputrecords = $( $Inputrecords )")
         }
-        
+
         If ( $Successful -gt -1 ) {
             [void]$upd.Add("successful = $( $Successful )")
         }
@@ -129,7 +129,7 @@ Function Update-JobLog {
                 }
                 [void]$upd.Add("returnformat = 'ARRAY'")
             }
-            
+
             default {
                 If ( $OutputParam.Keys.Count -gt 0 ) {
                     [void]$upd.Add("output = '$( ( ConvertTo-Json $OutputParam -Depth 99 -Compress ) )'")

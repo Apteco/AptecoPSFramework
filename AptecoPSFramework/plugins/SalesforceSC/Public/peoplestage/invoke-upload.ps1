@@ -235,7 +235,7 @@ function Invoke-Upload{
                 # Another way to stream through files
 
                 $arr = [System.Collections.ArrayList]@()
-                $elapsed = [System.Diagnostics.Stopwatch]::StartNew() 
+                $elapsed = [System.Diagnostics.Stopwatch]::StartNew()
 
                 # Open the text file from disk
                 $reader = New-Object System.IO.StreamReader("c:\faststats\Publish\DB01\system\Deliveries\PowerShell_Sent ~ Sent_2a165893-f884-4e6b-b5d8-d031f628eaf2.txt")
@@ -252,10 +252,10 @@ function Invoke-Upload{
                         $c += 1
                     }
                     [void]$arr.Add([PSCustomObject]$o)
-                    $i++; if (($i % 10000) -eq 0) { 
+                    $i++; if (($i % 10000) -eq 0) {
                         Write-Host "$i rows have been inserted in $($elapsed.Elapsed.ToString())."
-                    } 
-                } 
+                    }
+                }
 
                 # Clean Up
                 $reader.Close(); $reader.Dispose()
@@ -313,7 +313,7 @@ function Invoke-Upload{
                             "ContactId" = $row.$urnFieldName
                             "LeadId" = ""
                         }
-                        
+
                         #$row.psobject.properties | Where-Object { $_.name -notin $excludeColumns } | ForEach-Object {
                         ForEach ( $prop in $props ) {
                             #$prop = $_
@@ -323,14 +323,14 @@ function Invoke-Upload{
                             #}
                         }
                         [void]$newCsv.add([PSCustomObject]$line)
-    
+
                     } else {
-    
+
                         $skippedLines += 1
-    
+
                     }
 
-                    
+
                 } else {
 
                     # THIS MEANS IT IS A LEAD, SO PREPARE THAT
@@ -360,7 +360,7 @@ function Invoke-Upload{
 
                         # Create the line for the leads object
                         $leadLine = [Ordered]@{
-                            $externalLeadId = $row.$urnFieldName # TODO put this into the settings 
+                            $externalLeadId = $row.$urnFieldName # TODO put this into the settings
                         }
                         # ForEach ( $prop in $lRowColumns ) {
                         #     If ( $prop -notlike "Apteco_Test_Varchar*" ) { # TODO remove this
@@ -403,12 +403,12 @@ function Invoke-Upload{
                         #Write-Log "Added a row to leads"
 
                     } else {
-    
+
                         $skippedLines += 1
-    
+
                     }
 
-                    
+
                 }
 
                 $c += 1
@@ -436,7 +436,7 @@ function Invoke-Upload{
             #-----------------------------------------------
             # CHECK LEADS
             #-----------------------------------------------
-            
+
             If ( $leadCsv.Count -gt 0 ) {
 
                 $leadCount = 0
@@ -446,7 +446,7 @@ function Invoke-Upload{
                 # TODO [x] Not the best way when you have quotes in values
                 # TODO [x] Implement better streaming for upload
                 #$newCsvContent | set-content -Path $nf -Encoding UTF8
-                
+
                 # Create all files to upload
                 Write-Log "Writing lead files"
                 $leadFilesToUpload = [System.Collections.ArrayList]@()
@@ -490,7 +490,7 @@ function Invoke-Upload{
                         "SuccessfulFilename" = $successfulFilename
                         "ExternalIdFieldName" = $externalLeadId
                         "DownloadFailures" = $Script:settings.upload.downloadFailedResults
-                        "FailureFilename" = ".\failedleads_$( $Script:processId )_$( [datetime]::now.toString("yyyyMMdd_HHmmss") )_$( $i ).csv"    
+                        "FailureFilename" = ".\failedleads_$( $Script:processId )_$( [datetime]::now.toString("yyyyMMdd_HHmmss") )_$( $i ).csv"
                     }
                     $lJob = Add-BulkJob @lJobParams
 
@@ -532,7 +532,7 @@ function Invoke-Upload{
                         $skippedLines += 1
 
                     }
-                                        
+
                 }
 
                 Write-Log "Stats after upserting leads file"
@@ -544,11 +544,11 @@ function Invoke-Upload{
                     $c = $_
                     Write-Log -Severity VERBOSE -Message "  $( $c.Name ): $( $c.Count ) leads"
                 }
-               
+
 
             }
 
-            
+
             #-----------------------------------------------
             # WRITE THE DATA FILE
             #-----------------------------------------------
@@ -593,29 +593,29 @@ function Invoke-Upload{
                     "FailureFilename" = ".\failed_$( $Script:processId )_$( [datetime]::now.toString("yyyyMMdd_HHmmss") )_$( $j ).csv"
                     #"ExternalIdFieldName" = "ContactId"    # This does not work ;-)
                 }
-    
+
                 If ( $InputHashtable.operation -ne "" ) {
-    
+
                     Switch ( $InputHashtable.operation ) {
-    
+
                         # TODO implement more operations
-    
+
                         "delete" {
                             $cmJobParams.Add( "Operation", "delete" )
                         }
-    
+
                         default {
                             $cmJobParams.Add( "Operation", "insert" )
                         }
-    
+
                     }
-    
+
                 }
-    
+
                 [void]$cmJobs.Add((Add-BulkJob @cmJobParams))
                 #$cmJob = Add-BulkJob @cmJobParams
                 #$cmJob | ConvertTo-Json | sc ".\jobresult.json" -encoding UTF8
-    
+
             }
 
 
@@ -663,7 +663,7 @@ function Invoke-Upload{
                     throw "There has been a problem with $( $errorRate )% error rate. There are more than $( $Script:settings.upload.errorThreshold )% errors."
                 }
             }
-            
+
 
         } catch {
 
@@ -693,7 +693,7 @@ function Invoke-Upload{
                 #$lf
             }
             If ( Test-Path $successfulFilename ) {
-                #$successfulFilename 
+                #$successfulFilename
             }
             #>
 

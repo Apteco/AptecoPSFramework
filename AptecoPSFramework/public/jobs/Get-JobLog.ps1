@@ -1,4 +1,4 @@
-
+﻿
 Function Get-JobLog {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     Param(
@@ -70,7 +70,7 @@ Function Get-JobLog {
                             }
 
                         }
-                        
+
                     }
 
                 }
@@ -104,21 +104,21 @@ Function Get-JobLog {
                                 #     ConvertFrom-Json $job.output
                                 #     break
                                 # }
-    
+
                                 "HASHTABLE" {
                                     $j.output = ConvertFrom-JsonAsHashtable $j.output
                                     break
                                 }
-    
+
                                 default {
                                     $j.output = ConvertFrom-Json $j.output
                                     break
                                 }
-    
+
                             }
-                            
+
                         }
-    
+
                     }
 
                 }
@@ -128,7 +128,7 @@ Function Get-JobLog {
         }
 
         $job
-        
+
     }
 
 }

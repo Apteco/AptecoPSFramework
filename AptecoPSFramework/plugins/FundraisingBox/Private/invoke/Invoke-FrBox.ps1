@@ -1,4 +1,4 @@
-
+﻿
 
 function Invoke-FrBox {
 
@@ -212,7 +212,7 @@ function Invoke-FrBox {
                 }
                 $req = @( Invoke-WebRequestWithErrorHandling @wrInput )
                 #$Script:pluginDebug = $req
-                
+
                 $wr =  convertfrom-json -InputObject $req.content
                 #$wr = $req
 
@@ -268,7 +268,7 @@ function Invoke-FrBox {
                         $finished = $true
 
                     }
-                    
+
 
                 } else {
 

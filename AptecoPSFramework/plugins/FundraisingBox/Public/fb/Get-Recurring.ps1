@@ -1,4 +1,4 @@
-
+﻿
 function Get-Recurring {
     [CmdletBinding(DefaultParameterSetName = 'OnePage')]
     param (
@@ -35,7 +35,7 @@ function Get-Recurring {
                 $params = [Hashtable]@{
                     "Object" = "recurrings/$( $Id )"
                     "Method" = "GET"
-                    "Paging" = $False    
+                    "Paging" = $False
                 }
 
                 break
@@ -47,7 +47,7 @@ function Get-Recurring {
                 $params = [Hashtable]@{
                     "Object" = "recurrings"
                     "Method" = "GET"
-                    "Paging" = $True    
+                    "Paging" = $True
                 }
 
                 If ( $NextMin -ne [datetime]::MinValue ) {
@@ -78,7 +78,7 @@ function Get-Recurring {
                 If ( $StartMin -ne [datetime]::MinValue ) {
                     $params.Add( "Query", [PSCustomObject]@{"next_min"=$StartMin.toString("yyyy-MM-dd HH:mm:ss")} )
                 }
-                
+
             }
 
         }
@@ -94,7 +94,7 @@ function Get-Recurring {
 
         # Request fields
         $recurrings = Invoke-FrBox @params
-        
+
         # return
         $recurrings
 

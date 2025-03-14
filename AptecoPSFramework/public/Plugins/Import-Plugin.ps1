@@ -103,7 +103,7 @@
                 "processId" = $Script:processId
             }
         }
-        
+
         # Override process id if delivered through parameters
         If ( $ProcessId -ne "" ) {
             $pluginParam.variables.processId = $ProcessId

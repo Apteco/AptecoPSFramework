@@ -179,7 +179,7 @@ function Invoke-XPro {
                     "ForceUTF8Return" = $true
                 }
                 $req = @( Invoke-WebRequestWithErrorHandling @wrInput )
-                
+
                 $wr =  convertfrom-json -InputObject $req.content
 
             } catch {
@@ -240,7 +240,7 @@ function Invoke-XPro {
             #-----------------------------------------------
             # SAVE CURRENT RATE
             #-----------------------------------------------
-            
+
             #$Script:pluginDebug = $req.OriginalResponse.Headers
             $apiRateLimit = [UInt64]( $req.OriginalResponse.Headers."X-RateLimit-Limit".trim() )
             $apiRateRemaining = [UInt64]( $req.OriginalResponse.Headers."X-RateLimit-Remaining".trim() )

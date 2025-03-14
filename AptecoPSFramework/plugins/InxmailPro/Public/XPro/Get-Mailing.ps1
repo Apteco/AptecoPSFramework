@@ -1,4 +1,4 @@
-
+﻿
 function Get-Mailing {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
@@ -21,10 +21,10 @@ function Get-Mailing {
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][String]$ModifiedAfter = ""       # string like 2024-06-16
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][String]$ModifiedBefore = ""      # string like 2024-06-16
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][String]$SentAfter = ""           # string like 2024-06-16
-        
+
         # Generic
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][Switch]$All = $false             # Return all mailings through paging
-        
+
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
          [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$IncludeLinks = $false  # Should the links also be included?
@@ -34,7 +34,7 @@ function Get-Mailing {
     begin {
 
         switch ($PSCmdlet.ParameterSetName) {
-            
+
             'Single' {
 
                 # Create params
@@ -171,7 +171,7 @@ function Get-Mailing {
                 If ( $All -eq $true ) {
                     $params.Add("Paging", $true)
                 }
-                
+
                 break
             }
         }
@@ -215,14 +215,14 @@ function Get-Mailing {
             'Collection' {
 
                 $mailingsToFilter = $mailings."_embedded"."inx:mailings"
-        
+
                 # return
                 If ( $IncludeLinks -eq $true ) {
                     $mailingsToFilter
                 } else {
                     $mailingsToFilter | Select-Object * -ExcludeProperty "_links"
                 }
-                
+
                 break
             }
         }

@@ -1,10 +1,10 @@
-
+﻿
 <#
 If ( $isDuckDBLoaded -eq $true )
 
     # Resolve path first
     $absolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($script:settings.joblogDB)
-    
+
     # Build Connection string
     $connString = "DataSource=$( $absolutePath )"
 

@@ -165,7 +165,7 @@ function Invoke-CR {
                 $updatedParameters."DisableKeepAlive" = $true
             } else {
                 $updatedParameters.add("DisableKeepAlive",$true)
-            }   
+            }
         }
 
         # normalize the path, remove leading and trailing slashes

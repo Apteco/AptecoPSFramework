@@ -1,4 +1,4 @@
-
+﻿
 Function Close-JobLogDatabase {
     <#
 
@@ -15,7 +15,7 @@ Function Close-JobLogDatabase {
         try {
             Close-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
         } catch {
-            
+
         }
 
     }

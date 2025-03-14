@@ -1,4 +1,4 @@
-
+﻿
 
 function Save-NewToken {
 
@@ -21,19 +21,19 @@ function Save-NewToken {
             If ( $newToken -ne "" ) {
 
                 Write-Log -message "Got new token valid for $( $newToken.expires_in ) seconds and scope '$( $newToken.scope )'" #-Verbose
-    
+
                 # Save the token and metadata around it
                 [void]( Request-TokenRefresh -SettingsFile $Script:settings.token.tokenSettingsFile -NewAccessToken $newToken.access_token -NewRefreshToken $newToken.refresh_token )
-    
+
                 # Return
                 $newToken.access_token
-    
+
             }
 
         } catch {
 
             Write-Log -message "There was a problem with generating the token" -Severity ERROR
-            
+
         }
 
 

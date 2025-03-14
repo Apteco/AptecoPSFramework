@@ -1,4 +1,4 @@
-
+﻿
 function Get-List {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
@@ -8,9 +8,9 @@ function Get-List {
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [ValidateSet("STANDARD", "ADMIN", "SYSTEM", IgnoreCase = $false)]
          [Array]$Type = [Array]@()             # STANDARD|ADMIN|SYSTEM - multiple values are allowed
-        
+
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][Switch]$All = $false  # Should the links also be included?
-        
+
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
          [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$IncludeLinks = $false  # Should the links also be included?
@@ -48,7 +48,7 @@ function Get-List {
                 If ( $All -eq $true ) {
                     $params.Add("Paging", $true)
                 }
-                
+
                 break
             }
         }
@@ -90,7 +90,7 @@ function Get-List {
                 } else {
                     $listsToFilter | Select-Object * -ExcludeProperty "_links"
                 }
-                
+
                 break
             }
         }

@@ -1,4 +1,4 @@
-
+﻿
 function Get-Attribute {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
@@ -42,7 +42,7 @@ function Get-Attribute {
                 # If ( $All -eq $true ) {
                 #     $params.Add("Paging", $true)
                 # }
-                
+
                 break
             }
         }
@@ -64,7 +64,7 @@ function Get-Attribute {
 
         # Return
         switch ($PSCmdlet.ParameterSetName) {
-            
+
             'Single' {
 
                 # return
@@ -85,7 +85,7 @@ function Get-Attribute {
                 } else {
                     $attributes."_embedded"."inx:attributes" | Select-Object * -ExcludeProperty "_links"
                 }
-                
+
                 break
             }
         }

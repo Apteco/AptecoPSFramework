@@ -98,7 +98,7 @@ function Get-SFSCObjectData {
         If ( $Where -ne "" ) {
             [void]$queryBuilder.AppendLine(" WHERE $( $Where )")
         }
-        
+
         If ($Limit -ne -1) {
             [void]$queryBuilder.AppendLine(" LIMIT $( $limit )")
         }
@@ -108,7 +108,7 @@ function Get-SFSCObjectData {
             "IncludeAttributes" = $IncludeAttributes
             "Bulk" = $Bulk
         }
-        
+
         #return
         @( Invoke-SFSCQuery @resultParams )
 

@@ -1,4 +1,4 @@
-Function ConvertFrom-JsonAsHashtable {
+﻿Function ConvertFrom-JsonAsHashtable {
 
     # To solve these problems, load the content with Invoke-WebRequest rather than Invoke-RestMethod, and convert the content with the function above
 
@@ -18,7 +18,7 @@ Function ConvertFrom-JsonAsHashtable {
     }
 
     Begin {
-        
+
         If ( $Script:isCore -eq $false ) {
             $jsSerializer = [System.Web.Script.Serialization.JavaScriptSerializer]::new()
         }
@@ -41,7 +41,7 @@ Function ConvertFrom-JsonAsHashtable {
         If ( $Script:isCore -eq $false ) {
             $jsSerializer = $null
         }
-        
+
     }
 
 }

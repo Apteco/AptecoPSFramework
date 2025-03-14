@@ -188,7 +188,7 @@ Function Invoke-Dynamics {
                 $wr = @( Invoke-WebRequestWithErrorHandling @wrInput )
 
                 # Parse the result
-                If ( $wr.Content -eq $null ) {
+                If ( $null -eq $wr.Content ) {
                     $wrContent = [Array]@()
                 } else {
                     # TODO check with utf8 in returned header
