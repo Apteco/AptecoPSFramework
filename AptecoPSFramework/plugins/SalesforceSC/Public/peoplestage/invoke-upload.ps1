@@ -266,6 +266,7 @@ function Invoke-Upload{
                 If ( $newCsv.Count -eq 0 ) {
 
                     $rowColumns = ( $row.psobject.properties | Where-Object { $_.name -notin $excludeColumns } ).name
+                    Write-Log "Got the row columns: '$( $rowColumns -join "', '" )'"
 
                     $props = [System.Collections.ArrayList]@()
                     ForEach ( $prop in $rowColumns ) {
@@ -333,11 +334,12 @@ function Invoke-Upload{
                             # Get Lead columns
                             $sfLeadFields = Get-SFSCObjectField -Object "Lead" | where-object { $_.createable -eq $True }
                             $sfLeadFieldsNames = $sfLeadFields.name
-                            $lRowColumns = ( $row.psobject.properties | Where-Object { $_.name -notin $excludeColumns } ).name
+                            #$lRowColumns = ( $row.psobject.properties | Where-Object { $_.name -notin $excludeColumns } ).name
+                            #Write-Log "Got the lead row columns: '$( $lRowColumns -join "', '" )'"
                             $externalLeadId = $Script:settings.upload.leadExternalId
 
                             $leadProps = [System.Collections.ArrayList]@()
-                            ForEach ( $prop in $lRowColumns ) {
+                            ForEach ( $prop in $rowColumns ) {
                                 #$prop = $_
                                 If ( $sfLeadFieldsNames -contains $prop ) {
                                     [void]$leadProps.Add($prop)
@@ -360,7 +362,9 @@ function Invoke-Upload{
                         #     }
                         # }
                         ForEach ( $prop in $leadProps ) {
-                            $line.Add( $prop, $row.$prop )
+                            If ( $prop -notlike "Apteco_Test_Varchar*" ) { # TODO remove this
+                                $leadLine.Add( $prop, $row.$prop )
+                            }
                         }
                         [void]$leadCsv.add([PSCustomObject]$leadLine)
 
