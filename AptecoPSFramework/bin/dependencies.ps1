@@ -16,6 +16,7 @@ $psModules = [Array]@(
     #"PSOAUth"  # is defined in the local plugins where it is needed
     "PackageManagement"
     "ConvertStrings"
+    "SimplySql" # Added to use for job management instead of DuckDB which only support x64
 )
 
 
@@ -53,5 +54,5 @@ $psLocalPackages = [Array]@(
 )
 
 $psAssemblies = [Array]@(
-
+    "System.Web.Extensions"     # Needed for deserialisation of ConvertFrom-Json
 )

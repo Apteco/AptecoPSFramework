@@ -12,7 +12,7 @@ $choiceMatchedWithArray = $stringArray[$choice -1]
 
 #>
 
-Function Prompt-Choice {
+Function Request-Choice {
 
     param(
          [Parameter(Mandatory=$true)][string]$title

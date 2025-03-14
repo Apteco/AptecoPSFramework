@@ -1,6 +1,6 @@
 ﻿
 
-Function Prepare-MultipartUpload {
+Function ConvertTo-MultipartUpload {
     param(
         [Parameter(Mandatory=$true)][String]$path,
         [Parameter(Mandatory=$false)]$part = $false

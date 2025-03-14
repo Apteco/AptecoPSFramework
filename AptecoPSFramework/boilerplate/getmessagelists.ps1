@@ -9,21 +9,26 @@
 Param(
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName='HashtableInput')]
-    [hashtable]$params = [Hashtable]@{},
+    [hashtable]$params = [Hashtable]@{}
 
-    [Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName='JsonInput')]
-    [String]$jsonParams = ""
+    #,[Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName='JsonInput')]
+    #[String]$JsonParams = ""
+
+    ,[Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
+    [String]$JobId = ""
+
+    ,[Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
+    [String]$SettingsFile = ""
+
+    ,[Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
+    [String]$ProcessId = ""
+
+    ,[Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='HashtableInput')]
+    [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName=$true, ParameterSetName='JobIdInput')]
+    [String]$DebugMode = "false"        # This is a string, because when sent trough multiple processes, only text can be transferred instead of native objects
 
 )
 
-# If this script is called by itself, re-transform the escaped json string input back into a hashtable
-If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
-    $params = [Hashtable]@{}
-    ( $jsonParams.replace("'",'"') | convertfrom-json ).psobject.properties | ForEach-Object {
-        Write-verbose "$( $_.Name ) - $( $_.Value )"
-        $params[$_.Name] = $_.Value
-    }
-}
 
 #-----------------------------------------------
 # DEBUG SWITCH
@@ -33,6 +38,12 @@ $debug = $false
 If ( $PSBoundParameters["Debug"].IsPresent -eq $true ) {
     $debug = $true
 }
+
+If ( $DebugMode -eq "true" ) {
+    $debug = $true
+}
+# TODO make an example lie
+# . ./upload.ps -JobId 123 -DebugMode
 
 
 #-----------------------------------------------
@@ -69,14 +80,18 @@ $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 # INPUT PARAMETERS, IF DEBUG IS TRUE
 #-----------------------------------------------
 
-if ( $debug -eq $true -and $jsonParams -eq "" ) {
+if ( $debug -eq $true ) {
 
     $params = [hashtable]@{
         Password = 'ko'
         Username = 'ko'
-        #scriptPath = 'C:\faststats\Scripts\cleverreach'
-        settingsFile = '.\settings.json'
+        
+        # Integration parameters
         #Force64bit = "true"
+        #ForceCore = "true"
+        #ForcePython = "true"
+        #UseJob = "true"
+        settingsFile = '.\inx.yaml'
     }
 
 }
@@ -84,66 +99,56 @@ if ( $debug -eq $true -and $jsonParams -eq "" ) {
 
 ################################################
 #
-# NOTES
+# CHECKS
 #
 ################################################
 
-<#
+#-----------------------------------------------
+# DEFAULT VALUES
+#-----------------------------------------------
 
-bla bla
-
-#>
-
-
-################################################
-#
-# SCRIPT ROOT
-#
-################################################
-
-# Set current location to the settings files directory
-$settingsFile = Get-Item $params.settingsFile
-Set-Location $settingsFile.DirectoryName
-
-
-################################################
-#
-# 64 BIT CHECK
-#
-################################################
-
-$thisScript = ".\getmessagelists.ps1"
+$useJob = $false
+$enforce64Bit  = $false
+$enforceCore = $false
+$enforcePython = $false
+$isPsCoreInstalled = $false
 
 
 #-----------------------------------------------
-# CHECK IF 64 BIT SHOULD BE ENFORCED
+# CHECK INPUT
+#-----------------------------------------------
+
+If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" ) {
+    If ( $SettingsFile -eq "" ) {
+        throw "Please define a settings file"
+    } else {
+        $settingsfileLocation = $SettingsFile
+        $useJob = $true
+    }
+} else {
+    $settingsfileLocation = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($params.settingsFile)
+}
+
+
+#-----------------------------------------------
+# CHECK THE MODE THAT SHOULD BE USED
 #-----------------------------------------------
 
 # Start this if 64 is needed to enforce when this process is 32 bit and system is able to handle it
 If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq $false -and [System.Environment]::Is64BitOperatingSystem -eq $true ) {
+    $enforce64Bit = $true
+    $useJob = $true
+}
 
-    $markerGuid = [guid]::NewGuid().toString()
+# When you want to use PSCore with 32bit, please change that path in the settings file
+If ( $params.ForceCore -eq "true" ) {
+    $enforceCore = $true
+    $useJob = $true
+}
 
-    try {
-
-        # Input parameter must be a string and for json the double quotes need to be escaped
-        $params.Add("markerGuid", $markerGuid)
-        $paramInput = ( ConvertTo-Json $params -Compress -Depth 99 ).replace('"',"'")
-
-        # This inputs a string into powershell exe at a virtual place "sysnative"
-        # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-        $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text  -File $thisScript -JsonParams $paramInput -InformationAction "Continue"
-
-    } catch {
-        Exit 1
-    }
-
-    # Convert the PSCustomObject back to a hashtable
-    $markerRow = $j.IndexOf($markerGuid)
-    ( convertfrom-json $j[$markerRow+1].replace("'",'"') ) #.trim()
-
-    Exit 0
-
+If ( $params.ForcePython -eq "true" ) {
+    $enforcePython = $true
+    $useJob = $true
 }
 
 
@@ -152,6 +157,15 @@ If ( $params.Force64bit -eq "true" -and [System.Environment]::Is64BitProcess -eq
 # SETTINGS
 #
 ################################################
+
+#-----------------------------------------------
+# CHANGE PATH
+#-----------------------------------------------
+
+# Set current location to the settings files directory
+$settingsFileItem = Get-Item $settingsfileLocation
+Set-Location $settingsFileItem.DirectoryName
+
 
 #-----------------------------------------------
 # IMPORT MODULE
@@ -172,16 +186,65 @@ Set-DebugMode -DebugMode $debug
 
 
 #-----------------------------------------------
-# SETTINGS
+# SET SETTINGS
 #-----------------------------------------------
 
 # Set the settings
-<#
-$settings = Get-settings
-$settings.logfile = ".\file.log"
-Set-Settings -PSCustom $settings
-#>
-Import-Settings -Path $params.settingsFile
+If ( $useJob -eq $true -and $ProcessId -ne "") {
+    Import-Settings -Path $settingsfileLocation -ProcessId $ProcessId
+} else {
+    Import-Settings -Path $settingsfileLocation
+}
+
+# Get all settings
+$s = Get-Settings
+
+
+#-----------------------------------------------
+# ADD JOB
+#-----------------------------------------------
+
+If ( $params.UseJob -eq "true" -or $useJob -eq $true -and $PsCmdlet.ParameterSetName -eq "HashtableInput") {
+
+    # Create a new job
+    $jobId = Add-JobLog
+    $jobParams = [Hashtable]@{
+        "JobId" = $JobId
+        #"Plugin" = $script:settings.plugin.guid
+        "InputParam" = $params
+        #"Status" = "Starting"
+        "DebugMode" = $debug
+    }
+    Update-JobLog @jobParams
+
+}
+
+
+#-----------------------------------------------
+# FIND OUT ABOUT PS CORE
+#-----------------------------------------------
+try {
+    $calc = . $s.psCoreExePath { 1+1 }
+} catch {
+    # just a test, nothing to do
+}
+if ( $calc -eq 2 ) {
+    $isPsCoreInstalled = $true
+}
+
+
+#-----------------------------------------------
+# FIND OUT THE MODE
+#-----------------------------------------------
+
+$mode = "function"
+If ( $enforce64Bit -eq $true ) {
+    $mode = "PSWin64"
+} elseif ( $enforceCore -eq $true ) {
+    $mode = "PSCore"
+} elseif ( $enforcePython -eq $true ) {
+    $mode = "Python"
+}
 
 
 ################################################
@@ -191,26 +254,107 @@ Import-Settings -Path $params.settingsFile
 ################################################
 
 #-----------------------------------------------
-# GET MESSAGELISTS
+# CALL MESSAGELISTS
 #-----------------------------------------------
+
+$thisScript = ".\getmessagelists.ps1"
+
 
 # Added try/catch again because of extras.xml wrapper
 try {
 
     # Do the upload
-    $return = Get-Groups -InputHashtable $params
+    Switch ( $mode ) {
 
-    # Return the values, if succeeded
-    If ( $PsCmdlet.ParameterSetName -eq "JsonInput" ) {
-        $params.markerGuid  # Output a guid to find out the separator
-        ( ConvertTo-Json $return -Depth 99 -Compress ).replace('"',"'") # output the result as json
+        "function" {
+
+            If ( $useJob -eq $true ) {
+                Get-Groups -JobId $jobId
+            } else {
+                $return = Get-Groups -InputHashtable $params
+            }
+
+            break
+        }
+
+
+        "PSWin64" {
+
+            # This inputs a string into powershell exe at a virtual place "sysnative"
+            $j = . $Env:SystemRoot\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -DebugMode:$debug.toString() -InformationAction "Continue" 
+
+            break
+
+        }
+
+
+        "PSCore" {
+
+            # Check if ps core is installed
+            If ( $isPsCoreInstalled -eq $false ) {
+                throw "PowerShell Core does not seem to be installed or found"
+            }
+            
+            # This inputs a string into powershell exe at a virtual place "sysnative"
+            # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
+            $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -DebugMode:$debug.toString() -InformationAction "Continue" 
+
+            break
+        }
+
+
+        "Python" {
+
+            <#
+
+            assuming you have a python file like add.py and this content
+
+            ```Python
+            import sys
+
+            # This program adds two numbers
+            num1 = float(sys.argv[1])
+            num2 = 6.3
+
+            # Add two numbers
+            sum = num1 + num2
+
+            # Display the sum
+            print('The sum of {0} and {1} is {2}'.format(num1, num2, sum))
+            ```
+
+            #>
+
+            # Then it can be called like this
+            . $s.pythonPath add.py "5.5"
+
+            break
+        }
+
+    }
+
+    # return
+    If ( $LASTEXITCODE -gt 0 ) {
+        $j
     } else {
+        If ( $useJob -eq $true ) {
+            $jobReturn = Get-JobLog -JobId $jobId -ConvertOutput
+            $return = $jobReturn.output
+        }
         $return
     }
 
+
 } catch {
 
-    throw $_.Exception
+    throw $_
     Exit 1
+
+} finally {
+
+    # Close the connection to joblog
+    If ( $useJob -eq $true ) {
+        Close-JobLogDatabase
+    }
 
 }

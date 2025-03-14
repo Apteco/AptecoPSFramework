@@ -22,8 +22,19 @@
     "allowedProtocols" = @(,"Tls12")                        # Protocols that should be used like Tls12, Tls13, SSL3
     "keyfile" = ""                                          # Define a path in here, if you use another keyfile for https://www.powershellgallery.com/packages/EncryptCredential/0.0.2
 
-    # PowerShell
-    "powershellExePath" =  "powershell.exe"                 # Could be changed to something like pwsh.exe for the scheduled task of refreshing token and response gathering
+    # PowerShell/Python
+    "powershellExePath" =  "$( $Env:SystemRoot )\sysnative\WindowsPowerShell\v1.0\powershell.exe"
+                                                            # Default powershell to use. Could be changed to something like pwsh.exe for the scheduled task of refreshing token and response gathering
+                                                            # To make sure to use the 64 bit version, change this to an absolute path like
+                                                            # This inputs a string into powershell exe at a virtual place "sysnative"
+
+    "psCoreExePath" = "$( $Env:ProgramFiles )\PowerShell\7\pwsh.exe"
+                                                            # The absolute path of PSCore, if you want to use PSCore x86 (32 bit), then change the path to something like
+                                                            # "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\PowerShell\7\pwsh.exe"
+                                                            # or
+                                                            # C:\Program Files (x86)\PowerShell\7\pwsh.exe
+
+    "pythonPath" = "$( $Env:ProgramFiles )\Python\python.exe"
 
     # Local lib folder
     "loadlocalLibFolder" = $true
@@ -31,5 +42,12 @@
 
     # DuckDB
     "defaultDuckDBConnection" = "Data Source=:memory:;"     # Default DuckDB connection -> In-Memory connection, could also be a file
+    "queriesBeforeUploadWithDuckDB" = [Array]@()
+    #"upload" = [PSCustomObject]@{
+    #    "queriesBeforeUploadWithDuckDB" = [Array]@()
+    #}
+    
+    # LogJob database (sqlite file via DuckDB will directly made, not connected to defaultDuckDBConnection)
+    "joblogDB" = "./logjob.sqlite"
 
 }

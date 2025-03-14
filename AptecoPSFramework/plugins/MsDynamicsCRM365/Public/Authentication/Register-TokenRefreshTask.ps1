@@ -140,7 +140,7 @@ function Register-TokenRefreshTask {
                 $newTask = Register-ScheduledTask @taskParams #T1 -InputObject $task
             } catch {
                 Write-Log -message "Creation of task failed or is not completed, please check your scheduled tasks and try again"
-                throw $_.Exception
+                throw $_
             }
 
             # Check the scheduled task

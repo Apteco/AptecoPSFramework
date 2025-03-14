@@ -362,6 +362,9 @@ $c = Read-DuckDBQueryAsScalar -Query "Select count(*) from read_csv('.\test.txt'
 # This query then trys to find out more about the csv file like the delimiter, headers, date formats, column data types and much more
 # The delimiter does not need to be defined explicitely, it expects UTF-8
 $c = Read-DuckDBQueryAsReader -Query "Select * from sniff_csv('.\test.txt', sample_size=1000, delim='\t') limit 10" -ReturnAsPSCustom
+
+# Read a csv file as an array of pscustom objects
+$c = Read-DuckDBQueryAsReader -Query "Select * from sniff_csv('.\test.txt', delim='\t')" -ReturnAsPSCustom -AsStream
 ```
 
 # Errors

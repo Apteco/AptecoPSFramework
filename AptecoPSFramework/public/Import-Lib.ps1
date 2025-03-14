@@ -31,7 +31,7 @@ Function Import-Lib {
                 #Set-Location $localLibFolderItem.Parent.FullName
 
                 # Import the dependencies
-                Import-Dependencies -LoadWholePackageFolder -LocalPackageFolder $localLibFolder #$localLibFolderItem.name
+                Import-Dependencies -LoadWholePackageFolder -LocalPackageFolder $localLibFolder -SuppressWarnings #$localLibFolderItem.name
 
                 # Go back, if needed
                 #Set-Location -Path $currentLocation.Path
