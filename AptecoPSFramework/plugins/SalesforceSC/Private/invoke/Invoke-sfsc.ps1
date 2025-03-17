@@ -77,7 +77,7 @@ function Invoke-SFSC {
             $token = Convert-SecureToPlaintext -String $Script:settings.login.accesstoken
         } else {
             throw "No token available!"
-            exit 0 # TODO check, if this token is needed or should be another exit code
+            exit 0
         }
 
         # Build up header
@@ -284,19 +284,11 @@ function Invoke-SFSC {
                     #$wr.Content
                 }
             }
-            <#
-            If ( $wr.headers.'Content-Type' -like "text/csv*" ) {
-                [void]$res.AddRange(@( $wr.Content | ConvertFrom-Csv -Delimiter "`t"))
-                #$Script:plugindebug = $wr
-            } else {
-                [void]$res.Add($wr.Content) # TODO maybe not needed
-            }
-                #>
-
 
             If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
                 Write-log $wr.Headers."Sforce-Limit-Info" -severity verbose #api-usage=2/15000
             }
+
 
             #-----------------------------------------------
             # SAVE CURRENT RATE AFTER LAST CALL
@@ -311,29 +303,6 @@ function Invoke-SFSC {
 
         } Until ( $finished -eq $true )
 
-        <#
-        If ( $res.Count -eq 0 -or $res.Count -eq 1 ) {
-
-            If ( $null -eq $wr.Content ) {
-                $ret = [Array]@()
-            } else {
-                # TODO check with utf8 in returned header
-                If ( $wr.headers.'Content-Type' -like "application/json*" ) {
-                    $ret = convertfrom-json -InputObject $wr.content #-Depth 99
-                } else {
-                    $ret = $res #$wr.content
-                }
-            }
-
-            $ret
-
-        } else {
-
-            $res
-
-        }
-        #>
-
         # If it was not added to the return collection and is not null, just return it blank
         If ( $res.Count -eq 0 -and $null -ne $wr.Content ) {
             $wr.Content
@@ -344,7 +313,6 @@ function Invoke-SFSC {
 
         # Or return the parsed response
         } else {
-            # TODO check with utf8 in returned header
             $res
         }
 

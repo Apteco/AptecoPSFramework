@@ -1,4 +1,4 @@
-﻿
+
 
 function Add-BulkJob {
 
@@ -73,9 +73,9 @@ function Add-BulkJob {
 
 
     .EXAMPLE
-        Building up job parameters and then execute the job.
+        Building up job parameters and then execute the job. 
 
-        $successfulFilename =
+        $successfulFilename = 
         $lJobParams = [Hashtable]@{
             "Object" = "Lead"
             "Path" = "C:\temp\leads.csv"
@@ -95,8 +95,8 @@ function Add-BulkJob {
         Query data via bulk job
 
         $bulkParams = [Hashtable]@{
-            "Query" = "Select id, name from Contact"
-            "Path" = ".\newData.csv"
+            "Query" = "Select id, name from Contact"    
+            "Path" = ".\newData.csv" 
             "QueryOperation" = "query"
         }
         $return = Add-BulkJob @bulkParams
@@ -118,7 +118,7 @@ function Add-BulkJob {
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
          [Parameter(Mandatory=$True, ParameterSetName = 'Ingest')]
          [String]$Object
-
+        
         ,[Parameter(Mandatory=$True, ParameterSetName = 'Query')]
          [String]$Query
 
@@ -141,7 +141,7 @@ function Add-BulkJob {
          [String]$ColumnDelimiter = "TAB"             # BACKQUOTE|CARET|COMMA|PIPE|SEMICOLON|TAB
 
         ,[Parameter(Mandatory=$False, ParameterSetName = 'Ingest')]
-         [String]$ExternalIdFieldName = ""
+         [String]$ExternalIdFieldName = "" 
 
         # TODO implement splitting of multiple files and return an array of jobs rather than one job -> currently done in the calling script
         ,[Parameter(Mandatory=$True, ParameterSetName = 'Ingest')]
@@ -167,7 +167,7 @@ function Add-BulkJob {
 
         ,[Parameter(Mandatory=$False, ParameterSetName = 'Ingest')]
          [String]$SuccessfulFilename = ""
-
+        
          ,[Parameter(Mandatory=$False, ParameterSetName = 'Ingest')]
          [Switch]$DownloadUnprocessed = $false
 
@@ -201,14 +201,14 @@ function Add-BulkJob {
                 If ( ( Test-Path -Path $absolutePath ) -eq $True ) {
                     # path is valid
                 } else {
-                    throw "Path '$( $absolutePath )' is not existing"
+                    throw "Path '$( $absolutePath )' is not existing"    
                 }
 
             } else {
                 throw "Path '$( $absolutePath )' is not valid"
             }
         }
-
+        
 
         #-----------------------------------------------
         # CHECK THE OUTPUT FILE
@@ -324,9 +324,8 @@ function Add-BulkJob {
         # CHECK INPUT FILES AND SPLIT THEM IF TOO BIG
         #-----------------------------------------------
 
-        # TODO Split-File is already added to helpers, but implement it here and loop through everything
         <#
-
+        
         To fulfill the maximum filesize of 150MB after base64 (enlarges around 33%), the file shouldn't be
         larger than 112 MB.
 
@@ -448,9 +447,10 @@ function Add-BulkJob {
         # curl https://MyDomainName.my.salesforce.com/services/data/v58.0/jobs/ingest/7505fEXAMPLE4C2AAM/batches/ -H 'Authorization: Bearer 00DE0X0A0M0PeLE!AQcAQH0dMHEXAMPLEzmpkb58urFRkgeBGsxL_QJWwYMfAbUeeG7c1EXAMPLEDUkWe6H34r1AAwOR8B8fLEz6nEXAMPLE' -H "Content-Type: text/csv" -H "Accept: application/json" -H "X-PrettyPrint:1" --data-binary @bulkinsert.csv -X PUT
 
         #$upload = Invoke-RestMethod -URI "$( $base )/services/data/v$( $version )/jobs/ingest/$( $job.id )/batches/" -Method PUT -verbose -ContentType "text/csv" -Headers $headers -body $accountsCsv
-
+        
         # TODO Switch to multipart upload for better performance
-
+        # When using pwsh, this is supported by the -form parameter: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-restmethod?view=powershell-7.5#parameters
+        
         If ($PSCmdlet.ParameterSetName -eq "Ingest") {
 
             $upload = Invoke-SFSC -Service "data" -Object "jobs" -Path "/ingest/$( $job.id )/batches/" -Method "PUT" -ContentType "text/csv" -InFile $Path #$file.FullName
@@ -469,9 +469,9 @@ function Add-BulkJob {
         #     "state" = "UploadComplete"
         # }
         # $patchedJob = Invoke-RestMethod -URI "$( $base )/services/data/v$( $version )/jobs/ingest/$( $job.id )/" -Method PATCH -verbose -ContentType $contentType -Headers $headers -body $patchDetails
-
+        
         If ($PSCmdlet.ParameterSetName -eq "Ingest") {
-
+        
             $uploadCompleteBody = [PSCustomObject]@{
                 "state" = "UploadComplete"
             }
@@ -496,7 +496,7 @@ function Add-BulkJob {
 
         #>
 
-
+        
         #-----------------------------------------------
         # CHECK JOB STATUS ASYNC
         #-----------------------------------------------
@@ -518,17 +518,14 @@ function Add-BulkJob {
                 "Query" {
                     $jobStatus = Invoke-SFSC -Service "data" -Object "jobs" -Path "/query/$( $job.id )/" -Method "GET"
                 }
-
+            
             }
-            Write-Log "  Job status: $( $jobStatus.state ) - $( $jobStatus.numberRecordsProcessed ) records done - $( $jobStatus.numberRecordsFailed ) records failed" # TODO maybe remove this log
-            #$jobStatus.state
-
+            Write-Log "  Job status: $( $jobStatus.state ) - $( $jobStatus.numberRecordsProcessed ) records done - $( $jobStatus.numberRecordsFailed ) records failed"
+            
             $jobTs = New-TimeSpan -Start $jobStartTs -End ( [datetime]::now )
 
         } Until ( @("Failed", "JobComplete", "Aborted") -contains $jobStatus.state -or $jobTs.TotalSeconds -gt $MaxSecondsWait )
-
-        #$jobStatus | ConvertTo-Json | sc ".\jobstatus.json" -encoding UTF8
-
+        
         If ( $jobStatus.state -ne "JobComplete" ) {
             Write-Log -Severity ERROR -Message "Job $( $job.id ) with status '$( $jobStatus.state )': '$( $jobStatus.errorMessage )'"
             throw "$( $jobStatus.errorMessage )"
@@ -539,7 +536,7 @@ function Add-BulkJob {
         }
 
         <#
-
+        
         {
             "id":  "750FS00000FLBJDYA5",
             "operation":  "delete",
@@ -563,12 +560,12 @@ function Add-BulkJob {
             "errorMessage":  "InvalidBatch : The \u0027delete\u0027 batch must contain only ids"
         }
 
-
+        
         #>
 
-
+        
         #-----------------------------------------------
-        # GET RESULTS AND BUILD RETURN OBJECT
+        # GET RESULTS
         #-----------------------------------------------
 
         #$jobResults = Invoke-SFSC -Service "data" -Object "jobs" -Path "/ingest/$( $job.id )/" -method get
@@ -603,7 +600,7 @@ function Add-BulkJob {
 
         # Write the unprocessed restults into a file (only when canceled or aborted)
         If ( $DownloadUnprocessed -eq $True ) {
-            $unp = Invoke-SFSC -Service "data" -Object "jobs" -Path "/ingest/$( $job.id )/unprocessedRecords" -method get #-outfile $unpAbsolutePath #| Set-Content -Path $unpAbsolutePath
+            $unp = Invoke-SFSC -Service "data" -Object "jobs" -Path "/ingest/$( $job.id )/unprocessedRecords" -method get #-outfile $unpAbsolutePath #| Set-Content -Path $unpAbsolutePath 
             $unp | Export-Csv $unpAbsolutePath -Encoding UTF8 -NoTypeInformation -Delimiter "`t"
             Write-Log "Written unprocessed to '$( $unpAbsolutePath )'" -severity VERBOSE
             $returnHashtable.add("unprocessedFile", $unpAbsolutePath)
@@ -613,9 +610,7 @@ function Add-BulkJob {
 
         # Download file via paging
         If ( $PSCmdlet.ParameterSetName -eq "Query") {
-            # TODO [x] implement paging
-            # TODO add maxRecords to Parameter or settings
-            $data = Invoke-SFSC -Service "data" -Object "jobs" -Path "/query/$( $job.id )/results" -Query ( [PSCustomObject]@{ "maxRecords" = "50000" } ) -method get -headers ( [Hashtable]@{ "Accept-Encoding" = "gzip" } )
+            $data = Invoke-SFSC -Service "data" -Object "jobs" -Path "/query/$( $job.id )/results" -Query ( [PSCustomObject]@{ "maxRecords" = $Script:settings.upload.maxRecordsPerPageBulkDownload } ) -method get -headers ( [Hashtable]@{ "Accept-Encoding" = "gzip" } )
         }
 
 

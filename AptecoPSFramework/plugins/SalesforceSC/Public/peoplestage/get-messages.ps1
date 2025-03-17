@@ -3,12 +3,16 @@
 function Get-Messages {
     [CmdletBinding(DefaultParameterSetName = 'Object')]
     param (
-        [Parameter(Mandatory=$true, ParameterSetName = 'Object')][Hashtable]$InputHashtable        # This creates a new entry in joblog
-        ,[Parameter(Mandatory=$true, ParameterSetName = 'Job')][Int]$JobId                          # This uses an existing joblog entry
+
+         [Parameter(Mandatory=$true, ParameterSetName = 'Object')]
+         [Hashtable]$InputHashtable             # This creates a new entry in joblog
+        
+        ,[Parameter(Mandatory=$true, ParameterSetName = 'Job')]
+         [Int]$JobId                            # This uses an existing joblog entry
+
     )
 
     begin {
-
 
         #-----------------------------------------------
         # LOG
@@ -87,50 +91,32 @@ function Get-Messages {
 
         }
 
-        #-----------------------------------------------
-        # DEPENDENCIES
-        #-----------------------------------------------
-
-        #Import-Module MeasureRows
-        #Import-Lib -IgnorePackageStructure
-
     }
 
     process {
 
-        #Switch ( $InputHashtable.mode ) {
+        # Load mailings data from SalesForce
+        $campaigns = @( Get-SFSCObjectData -Object "Campaign" -Fields "id", "name" -Where $Script:settings.upload.campaignFilter -limit 200 )
+        Write-Log "Loaded $( $campaigns.Count ) campaigns from Salesforce" -severity INFO #-WriteToHostToo $false
 
-            #default {
-
-                # Load mailings data from SalesForce
-                $campaigns = @( Get-SFSCObjectData -Object "Campaign" -Fields "id", "name" -Where $Script:settings.upload.campaignFilter -limit 200 )
-                Write-Log "Loaded $( $campaigns.Count ) campaigns from Salesforce" -severity INFO #-WriteToHostToo $false
-
-                # Load and filter list into array of mailings objects
-                $mailingsList = [System.Collections.ArrayList]@()
-                $campaigns | ForEach-Object {
-                    $mailing = $_
-                    $maxLength = $mailing.Name.length
-                    If ($maxLength -lt 20) {
-                        $l = $maxLength
-                    } else {
-                        $l = 20
-                    }
-                    [void]$mailingsList.add(
-                        [Mailing]@{
-                            "mailingId" = $mailing.Id.substring(7,11)
-                            "mailingName" = $mailing.Name #.substring(0,$l)
-                        }
-                    )
+        # Load and filter list into array of mailings objects
+        $mailingsList = [System.Collections.ArrayList]@()
+        $campaigns | ForEach-Object {
+            $mailing = $_
+            $maxLength = $mailing.Name.length
+            If ($maxLength -lt 20) {
+                $l = $maxLength
+            } else {
+                $l = 20
+            }
+            [void]$mailingsList.add(
+                [Mailing]@{
+                    "mailingId" = $mailing.Id.substring(7,11)
+                    "mailingName" = $mailing.Name #.substring(0,$l)
                 }
+            )
+        }
 
-            #}
-
-        #}
-
-
-        # fields, id, name, status, type, StartDate, EndDate, ...
-        # Get-SFSCObjectField -object "Campaign" | Out-GridView
 
         # Transform the mailings array into the needed output format
         $columns = @(
@@ -159,8 +145,6 @@ function Get-Messages {
 
         }
 
-        # Return
-        #$messages
 
         #-----------------------------------------------
         # RETURN VALUES TO PEOPLESTAGE

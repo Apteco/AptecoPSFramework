@@ -135,7 +135,7 @@
             "SettingsFile" = $SettingsFile
             "PayloadToSave" = [PSCustomObject]@{
                 "clientid" = $ClientId
-                "secret" = $encryptedSecret #$clientCred.GetNetworkCredential().password  # TODO maybe encrypt this?
+                "secret" = $encryptedSecret
             }
             "TokenFile" = $TokenFile
             "SaveExchangedPayload" = $true

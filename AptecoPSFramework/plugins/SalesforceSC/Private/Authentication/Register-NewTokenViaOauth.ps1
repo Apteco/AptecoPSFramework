@@ -90,6 +90,7 @@ function Register-NewTokenViaOauth {
         # REFRESH THE TOKEN
         #-----------------------------------------------
 
+        #$body | ConvertTo-Json -Depth 99 | set-content -path ".\b.json" -encoding UTF8
 
         # Get new token
         $newToken = Invoke-RestMethod -Uri $refreshUrl -ContentType "application/x-www-form-urlencoded" -Method POST -Body $body
