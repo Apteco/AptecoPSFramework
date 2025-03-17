@@ -54,23 +54,16 @@ function Invoke-Upload{
         #$script:debug = $InputHashtable
         $uploadOnly = $false
 
-        # TODO add an option to turn off tagging for upload only
-
         If ( "" -eq $InputHashtable.MessageName ) {
-            #Write-Log "A"
 
             $uploadOnly = $true
             $mailing = [Mailing]::new(999, "UploadOnly")
 
         } else {
-            #Write-Log "B"
 
             Write-Log "Parsing message: '$( $InputHashtable.MessageName )' with '$( $Script:settings.nameConcatChar )' as separator"
             $mailing = [Mailing]::new($InputHashtable.MessageName)
             Write-Log "Got chosen message entry with id '$( $mailing.mailingId )' and name '$( $mailing.mailingName )'"
-
-            #$mailing = [Mailing]::new($InputHashtable.MessageName)
-            #Write-Log "Got chosen message entry with id '$( $mailing.mailingId )' and name '$( $mailing.mailingName )'"
 
         }
 
@@ -90,16 +83,13 @@ function Invoke-Upload{
 
         # Count the rows
         $rowsCount = 0
-        # [ ] if this needs to much performance, this is not needed
+        # if this needs to much performance, this is not needed
         If ( $Script:settings.upload.countRowsInputFile -eq $true ) {
             $rowsCount = Measure-Rows -Path $file.FullName -SkipFirstRow
             Write-Log -Message "Got a file with $( $rowsCount ) rows"
         } else {
             Write-Log -Message "RowCount of input file not activated"
         }
-        #throw [System.IO.InvalidDataException] $msg
-
-        #Write-Log -Message "Debug Mode: $( $Script:debugMode )"
 
 
         #-----------------------------------------------
@@ -108,12 +98,10 @@ function Invoke-Upload{
 
         try {
 
-            #Test-CleverReachConnection
+            #TODO Implement connection test
 
         } catch {
 
-            #$msg = "Failed to connect to CleverReach, unauthorized or token is expired"
-            #Write-Log -Message $msg -Severity ERROR
             Write-Log -Message $_.Exception -Severity ERROR
             throw [System.IO.InvalidDataException] $msg
             exit 0
@@ -162,14 +150,8 @@ function Invoke-Upload{
             # CHECK CAMPAIGN
             #-----------------------------------------------
 
-            # TODO [ ] put into docs, that I need a idlookup field that simply mirrors the id field
             $campaignId = $mailing.mailingId
-
-            #$campaign = Invoke-SFSCQuery -Query "Select Id, Name, idlookup__c from Campaign where idlookup__c like '%$( $campaignId.substring(0,$campaignId.length-3) )%'"
-
-            # TODO [ ] Change this back to campaign query or influence the limit via settings
             $campaign = @( Get-SFSCObjectData -Object "Campaign" -Fields "id", "name" -Where $Script:settings.upload.campaignFilter -limit 200 ) | where-object { $_.Id -like "*$( $campaignId )" } | Select-Object -first 1
-
             Write-Log "Using salesforce campaign '$( $campaign.Name )' with id '$( $campaign.id )'"
 
 
@@ -188,9 +170,6 @@ function Invoke-Upload{
             $listName = $list.mailingListName
             $listId = $list.mailingListId
 
-            #$campaignMemberStatus = Invoke-SFSCQuery -Query "Select Id, Label from CampaignMemberStatus where Name = '$( $listname )' and CampaignId = '$( $campaign.Id )'"
-
-            #Write-Log "Using salesforce campaign member status '$( $campaignMemberStatus.Label )' with id '$( $campaignMemberStatus.Id )'"
             Write-Log "Using salesforce campaign member status '$( $listName )'"
 
 
@@ -198,16 +177,13 @@ function Invoke-Upload{
             # TRANSFORM THE DATA
             #-----------------------------------------------
 
-            # TODO [ ] maybe scale this up in future or think about multipart upload
-            # TODO [ ] check if ContactID or LeadID is present
-
             # SF fields metadata
             $sfFields = Get-SFSCObjectField -Object "CampaignMember" | where-object { $_.createable -eq $True }
             $sfFieldsNames = $sfFields.Name
 
             # CSV fields metadata
             $urnFieldName = $InputHashtable.UrnFieldName
-            $excludeColumns = $Script:settings.upload.reservedFields  #@( "Id" )# Add columns here that definitely shouldn't be uploaded
+            $excludeColumns = $Script:settings.upload.reservedFields
 
             # Load subcampaigns, if needed
             If ( $Script:settings.upload.uploadIntoSubCampaigns -eq $True ) {
@@ -222,13 +198,12 @@ function Invoke-Upload{
                 $subCampaigns = [Hashtable]@{}
                 $subCampaignsTable | ForEach-Object {
                     $sc = $_
-                    $subCampaigns.Add($sc.name, $sc.id) # TODO this could be another column with segment names
+                    $subCampaigns.Add($sc.name, $sc.id)
                 }
 
                 Write-Log "Loaded $( $subCampaigns.Keys.Count ) subcampaigns"
 
             }
-
 
             <#
 
@@ -282,7 +257,6 @@ function Invoke-Upload{
                         #$prop = $_
                         If ( $sfFieldsNames -contains $prop ) {
                             [void]$props.Add($prop)
-                            #$line | Add-Member -MemberType NoteProperty -Name $prop.name -Value $prop.value
                         }
                     }
 
@@ -290,8 +264,8 @@ function Invoke-Upload{
 
                 # Check the (sub)campaign id
                 If ( $Script:settings.upload.uploadIntoSubCampaigns -eq $True ) {
-                    $segment = $row.$segmentFieldName # TODO [x] check if segmentfield is existing
-                    $subCampaignId = $subCampaigns[($subCampaigns.keys -like "*$( $segment )*")] # TODO [x] check there is only one segment left
+                    $segment = $row.$segmentFieldName
+                    $subCampaignId = $subCampaigns[($subCampaigns.keys -like "*$( $segment )*")]
                     If ( $subCampaignId.Count -eq 1 ) {
                         $campaignId = $subCampaignId[0].toString()
                     }
@@ -314,13 +288,9 @@ function Invoke-Upload{
                             "LeadId" = ""
                         }
                         
-                        #$row.psobject.properties | Where-Object { $_.name -notin $excludeColumns } | ForEach-Object {
                         ForEach ( $prop in $props ) {
-                            #$prop = $_
-                            #If ( $sfFieldsNames -contains $prop ) {
-                                $line.Add( $prop, $row.$prop )
-                                #$line | Add-Member -MemberType NoteProperty -Name $prop.name -Value $prop.value
-                            #}
+                            $line.Add( $prop, $row.$prop )
+
                         }
                         [void]$newCsv.add([PSCustomObject]$line)
     
@@ -343,16 +313,12 @@ function Invoke-Upload{
                             # Get Lead columns
                             $sfLeadFields = Get-SFSCObjectField -Object "Lead" | where-object { $_.createable -eq $True }
                             $sfLeadFieldsNames = $sfLeadFields.name
-                            #$lRowColumns = ( $row.psobject.properties | Where-Object { $_.name -notin $excludeColumns } ).name
-                            #Write-Log "Got the lead row columns: '$( $lRowColumns -join "', '" )'"
                             $externalLeadId = $Script:settings.upload.leadExternalId
 
                             $leadProps = [System.Collections.ArrayList]@()
                             ForEach ( $prop in $rowColumns ) {
-                                #$prop = $_
                                 If ( $sfLeadFieldsNames -contains $prop ) {
                                     [void]$leadProps.Add($prop)
-                                    #$line | Add-Member -MemberType NoteProperty -Name $prop.name -Value $prop.value
                                 }
                             }
 
@@ -360,20 +326,10 @@ function Invoke-Upload{
 
                         # Create the line for the leads object
                         $leadLine = [Ordered]@{
-                            $externalLeadId = $row.$urnFieldName # TODO put this into the settings 
+                            $externalLeadId = $row.$urnFieldName
                         }
-                        # ForEach ( $prop in $lRowColumns ) {
-                        #     If ( $prop -notlike "Apteco_Test_Varchar*" ) { # TODO remove this
-                        #         If ( $sfLeadFieldsNames -contains $prop ) {
-                        #             $leadLine.Add( $prop, $row.$prop )
-                        #             #$line | Add-Member -MemberType NoteProperty -Name $prop.name -Value $prop.value
-                        #         }
-                        #     }
-                        # }
                         ForEach ( $prop in $leadProps ) {
-                            If ( $prop -notlike "Apteco_Test_Varchar*" ) { # TODO remove this
-                                $leadLine.Add( $prop, $row.$prop )
-                            }
+                            $leadLine.Add( $prop, $row.$prop )
                         }
                         [void]$leadCsv.add([PSCustomObject]$leadLine)
 
@@ -384,23 +340,10 @@ function Invoke-Upload{
                             "ContactId" = ""
                             "LeadId" = $row.$urnFieldName
                         }
-                        # ForEach ( $prop in $rowColumns ) {
-                        #     #$prop = $_
-                        #     If ( $sfFieldsNames -contains $prop ) {
-                        #         $line.Add( $prop, $row.$prop )
-                        #         #$line | Add-Member -MemberType NoteProperty -Name $prop.name -Value $prop.value
-                        #     }
-                        # }
                         ForEach ( $prop in $props ) {
-                            #$prop = $_
-                            #If ( $sfFieldsNames -contains $prop ) {
-                                $line.Add( $prop, $row.$prop )
-                                #$line | Add-Member -MemberType NoteProperty -Name $prop.name -Value $prop.value
-                            #}
+                            $line.Add( $prop, $row.$prop )
                         }
                         [void]$upsertedLeadCsv.add([PSCustomObject]$line)
-
-                        #Write-Log "Added a row to leads"
 
                     } else {
     
@@ -441,11 +384,6 @@ function Invoke-Upload{
 
                 $leadCount = 0
                 $skippedLines = 0
-
-                #Write-Log "Using temporary lead file '$( $lf )'"
-                # TODO [x] Not the best way when you have quotes in values
-                # TODO [x] Implement better streaming for upload
-                #$newCsvContent | set-content -Path $nf -Encoding UTF8
                 
                 # Create all files to upload
                 Write-Log "Writing lead files"
@@ -456,8 +394,8 @@ function Invoke-Upload{
                     $start = $i * $Script:settings.upload.uploadSize
                     $end = $start + $Script:settings.upload.uploadSize -1
 
-                    $lf = Join-Path -Path $Env:tmp -ChildPath "lead_$( $Script:processId )_$( $i ).csv" #New-TemporaryFile # TODO delete afterwards
-                    $leadCsvContent = $leadCsv[$start..$end] | convertto-csv -NoTypeInformation -Delimiter "`t" #| ForEach-Object { $_ -replace '"','' }
+                    $lf = Join-Path -Path $Env:tmp -ChildPath "lead_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
+                    $leadCsvContent = $leadCsv[$start..$end] | convertto-csv -NoTypeInformation -Delimiter "`t"
                     [IO.File]::WriteAllLines( $lf, $leadCsvContent )
                     [void]$leadFilesToUpload.Add( $lf )
 
@@ -484,7 +422,7 @@ function Invoke-Upload{
                         "Object" = "Lead"
                         "Path" = $leadFilesToUpload[$i]
                         "Operation" = "upsert"
-                        "CheckSeconds" = $Script:settings.upload.checkSeconds # TODO [x] maybe put this into settings
+                        "CheckSeconds" = $Script:settings.upload.checkSeconds
                         "MaxSecondsWait" = $Script:settings.upload.maximumWaitUntilJobFinished
                         "DownloadSuccessful" = $True
                         "SuccessfulFilename" = $successfulFilename
@@ -498,7 +436,7 @@ function Invoke-Upload{
                     # Create a hashtable for externalid / sfleadid
                     $lJob.successfulObj | ForEach-Object {
                         $o = $_
-                        $leadLookup.Add($o.$externalLeadId, $o."sf__Id") # TODO put into settings?
+                        $leadLookup.Add($o.$externalLeadId, $o."sf__Id")
                     }
 
                     # Output failures
@@ -544,7 +482,6 @@ function Invoke-Upload{
                     $c = $_
                     Write-Log -Severity VERBOSE -Message "  $( $c.Name ): $( $c.Count ) leads"
                 }
-               
 
             }
 
@@ -562,8 +499,8 @@ function Invoke-Upload{
                 $start = $i * $Script:settings.upload.uploadSize
                 $end = $start + $Script:settings.upload.uploadSize -1
 
-                $nf = Join-Path -Path $Env:tmp -ChildPath "cm_$( $Script:processId )_$( $i ).csv" #New-TemporaryFile # TODO delete afterwards
-                $cmCsvContent = $newCsv[$start..$end] | Sort-Object CampaignID | convertto-csv -NoTypeInformation -Delimiter "`t" #| ForEach-Object { $_ -replace '"','' } # TODO maybe do the sorting earlier?
+                $nf = Join-Path -Path $Env:tmp -ChildPath "cm_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
+                $cmCsvContent = $newCsv[$start..$end] | Sort-Object CampaignID | convertto-csv -NoTypeInformation -Delimiter "`t" # TODO maybe do the sorting earlier?
                 [IO.File]::WriteAllLines( $nf, $cmCsvContent )
                 [void]$campaignMemberFilesToUpload.Add( $nf )
 
@@ -613,8 +550,6 @@ function Invoke-Upload{
                 }
     
                 [void]$cmJobs.Add((Add-BulkJob @cmJobParams))
-                #$cmJob = Add-BulkJob @cmJobParams
-                #$cmJob | ConvertTo-Json | sc ".\jobresult.json" -encoding UTF8
     
             }
 
@@ -634,12 +569,6 @@ function Invoke-Upload{
                 Write-Log -Severity VERBOSE -Message "Job $( $j.jobid ): $( $j.processed ) processed, $( $j.successful ) successful, $( $j.failed ) failed "
 
                 If ( $j.failed -gt 0 ) {
-                    #Write-Log -Severity VERBOSE -Message "  Failed records written to '$( $j.failureFile )'"
-
-                    # import-csv -path "$( $j.failureFile )" -Delimiter "`t" -Encoding UTF8 | Group-Object "sf__Error" | Sort-Object Count -Descending | ForEach-Object {
-                    #     $fail = $_
-                    #     Write-Log -Severity VERBOSE -Message "  $( $fail.Count ) Error '$( $fail.Name )'"
-                    # }
 
                     $j.failureObj | Group-Object "sf__Error" | Sort-Object Count -Descending | ForEach-Object {
                         $fail = $_
@@ -712,8 +641,6 @@ function Invoke-Upload{
             $processDuration = New-TimeSpan -Start $processStart -End $processEnd
             Write-Log -Message "Needed $( [int]$processDuration.TotalSeconds ) seconds in total"
 
-            #Write-Host "Uploaded $( $j ) record. Confirmed $( $tagcount ) receivers with tag '$( $tags )'"
-
         }
 
 
@@ -722,10 +649,10 @@ function Invoke-Upload{
         #-----------------------------------------------
 
         # count the number of successful upload rows
-        $recipients = $successful #$dataCsv.Count # TODO work out what to be saved
+        $recipients = $successful
 
         # there could be multiple jobs per upload, so better using the guid here
-        $transactionId = $Script:processId #$job.id #$Script:processId #$targetGroup.targetGroupId # TODO or try to log the used tag?
+        $transactionId = $Script:processId
 
         # return object
         $return = [Hashtable]@{
