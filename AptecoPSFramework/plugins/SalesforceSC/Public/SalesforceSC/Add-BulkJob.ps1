@@ -324,7 +324,6 @@ function Add-BulkJob {
         # CHECK INPUT FILES AND SPLIT THEM IF TOO BIG
         #-----------------------------------------------
 
-        # TODO Split-File is already added to helpers, but implement it here and loop through everything
         <#
         
         To fulfill the maximum filesize of 150MB after base64 (enlarges around 33%), the file shouldn't be
@@ -450,6 +449,7 @@ function Add-BulkJob {
         #$upload = Invoke-RestMethod -URI "$( $base )/services/data/v$( $version )/jobs/ingest/$( $job.id )/batches/" -Method PUT -verbose -ContentType "text/csv" -Headers $headers -body $accountsCsv
         
         # TODO Switch to multipart upload for better performance
+        # When using pwsh, this is supported by the -form parameter: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-restmethod?view=powershell-7.5#parameters
         
         If ($PSCmdlet.ParameterSetName -eq "Ingest") {
 
@@ -520,15 +520,12 @@ function Add-BulkJob {
                 }
             
             }
-            Write-Log "  Job status: $( $jobStatus.state ) - $( $jobStatus.numberRecordsProcessed ) records done - $( $jobStatus.numberRecordsFailed ) records failed" # TODO maybe remove this log
-            #$jobStatus.state
+            Write-Log "  Job status: $( $jobStatus.state ) - $( $jobStatus.numberRecordsProcessed ) records done - $( $jobStatus.numberRecordsFailed ) records failed"
             
             $jobTs = New-TimeSpan -Start $jobStartTs -End ( [datetime]::now )
 
         } Until ( @("Failed", "JobComplete", "Aborted") -contains $jobStatus.state -or $jobTs.TotalSeconds -gt $MaxSecondsWait )
         
-        #$jobStatus | ConvertTo-Json | sc ".\jobstatus.json" -encoding UTF8
-
         If ( $jobStatus.state -ne "JobComplete" ) {
             Write-Log -Severity ERROR -Message "Job $( $job.id ) with status '$( $jobStatus.state )': '$( $jobStatus.errorMessage )'"
             throw "$( $jobStatus.errorMessage )"
@@ -568,7 +565,7 @@ function Add-BulkJob {
 
         
         #-----------------------------------------------
-        # GET RESULTS AND BUILD RETURN OBJECT
+        # GET RESULTS
         #-----------------------------------------------
 
         #$jobResults = Invoke-SFSC -Service "data" -Object "jobs" -Path "/ingest/$( $job.id )/" -method get
@@ -613,9 +610,7 @@ function Add-BulkJob {
 
         # Download file via paging
         If ( $PSCmdlet.ParameterSetName -eq "Query") {
-            # TODO [x] implement paging
-            # TODO add maxRecords to Parameter or settings
-            $data = Invoke-SFSC -Service "data" -Object "jobs" -Path "/query/$( $job.id )/results" -Query ( [PSCustomObject]@{ "maxRecords" = "50000" } ) -method get -headers ( [Hashtable]@{ "Accept-Encoding" = "gzip" } )
+            $data = Invoke-SFSC -Service "data" -Object "jobs" -Path "/query/$( $job.id )/results" -Query ( [PSCustomObject]@{ "maxRecords" = $Script:settings.upload.maxRecordsPerPageBulkDownload } ) -method get -headers ( [Hashtable]@{ "Accept-Encoding" = "gzip" } )
         }
 
 

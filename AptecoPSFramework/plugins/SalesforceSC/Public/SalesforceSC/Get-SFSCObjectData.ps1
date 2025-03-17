@@ -58,11 +58,10 @@ function Get-SFSCObjectData {
 
     [CmdletBinding()]
     param (
-        #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
-        [Parameter(Mandatory=$true)][String] $Object
+         [Parameter(Mandatory=$true)][String] $Object
         ,[Parameter(Mandatory=$false)][String[]] $Fields = [Array]@() # If not defined, all fields are loaded like *
         ,[Parameter(Mandatory=$false)][String] $Where = ""
-        ,[Parameter(Mandatory=$false)][int] $Limit = 100 # If -1, then it loads all records
+        ,[Parameter(Mandatory=$false)][int] $Limit = 100
         ,[Parameter(Mandatory=$false)][Switch] $IncludeAttributes = $False
         ,[Parameter(Mandatory=$false)][Switch] $Bulk = $false
 

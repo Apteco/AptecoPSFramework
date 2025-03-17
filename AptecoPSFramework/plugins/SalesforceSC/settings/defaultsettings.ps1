@@ -4,12 +4,11 @@
     "providername" = "PSSalesforceSalesCloud"
 
     # API
-    "base" = "my.salesforce.com"             # will be combined with the account domain
-    "apiversion" = "58.0"
-    "instanceId" = "FS0" # This is the 3 to 6 character in a salesforce ID
-    #"contentType" = "application/json; charset=utf-8"       # content type string that is always used for API requests
-    "pageSize" = 500                                        # if paging is used for the API requests, this is the default setting for a pagesize
-    #"mailingLimit" = 999
+    "base" = "my.salesforce.com"                            # will be combined with the account domain
+    "apiversion" = "58.0"                                   # Salesforce API version
+    "instanceId" = "FS0"                                    # This is the 3 to 6 character in a salesforce ID
+    #"contentType" = "application/json; charset=utf-8"      # content type string that is always used for API requests
+    #"pageSize" = 500                                       # if paging is used for the API requests, this is the default setting for a pagesize
     "additionalHeaders" = [PSCustomObject]@{
         #"X-API" = "abcdef"
     }                                                       # static headers that should be send to the URL, sometimes needed for API gateways
@@ -22,19 +21,13 @@
     # Token refreshment
     "token" = [PSCustomObject]@{
 
-        # Email notifications
-        # "notificationReceiver" =  "admin@example.com"
-        # "sendMailOnSuccess" =  $false
-        # "sendMailOnCheck" =  $false
-        # "sendMailOnFailure" =  $false
-
         # Refreshing task
-        "taskDefaultName" =  "Apteco SalesforceSC Token Refresher"
-        "dailyTaskSchedule" =  1 # runs every day at 6 local time in the morning
-        "refreshTtl" = 604800 # seconds; refresh one week before expiration
+        # "taskDefaultName" =  "Apteco SalesforceSC Token Refresher"
+        # "dailyTaskSchedule" =  1 # runs every day at 6 local time in the morning
+        # "refreshTtl" = 604800 # seconds; refresh one week before expiration
 
         # Process to use for refresh task
-        "powershellExePath" = "powershell.exe" # e.g. use pwsh.exe for PowerShell7
+        # "powershellExePath" = "powershell.exe" # e.g. use pwsh.exe for PowerShell7
 
         #"tokenfile" =  "C:\Test\cr.token"
         #"createTokenFile" = $true
@@ -52,7 +45,7 @@
 
     # API Authentication
     "login" = [PSCustomObject]@{
-        #"refreshTtl" = 604800                               # 7 days in seconds
+        #"refreshTtl" = 604800                              # 7 days in seconds
         "refreshtoken" = ""
         "accesstoken" = ""
         "refreshTokenAutomatically" = $true
@@ -62,21 +55,23 @@
     # Upload settings
     "upload" = [PSCustomObject]@{
         
-        "countRowsInputFile" = $true    # Count the rows
+        "countRowsInputFile" = $true                        # Count the rows of input file
 
-        "campaignFilter" = "IsDeleted = false and Status = 'Planned' and ParentId = null ORDER BY LastModifiedDate DESC"    # The filter to show campaigns in a dropdown
+        "campaignFilter" = "IsDeleted = false and Status = 'Planned' and ParentId = null ORDER BY LastModifiedDate DESC"
+                                                            # The filter to show campaigns in a dropdown
         
-        "reservedFields" = [Array]@(,"Id")                # Those fields are removed on the upload
+        "reservedFields" = [Array]@(,"Id")                  # Those fields are removed on the upload
 
-        "segmentVariablename" = ""                   # The segment variable name that is used to match against existing sub campaigns           
+        "segmentVariablename" = ""                          # The segment variable name that is used to match against existing sub campaigns           
         "uploadIntoSubCampaigns" = $false                   # When you set this, you need a segment variable
-        "leadExternalId" = ""                           # The external id for upsert into leads object
-        "uploadSize" = 20000                            # The size for the uploads
+        "leadExternalId" = ""                               # The external id for upsert into leads object
+        "uploadSize" = 20000                                # The size for the uploads
 
         "checkSeconds" = 20
         "maximumWaitUntilJobFinished" = 3000                # 3000 seconds per default to wait for a job to finish
         "downloadFailedResults" = $True
         "errorThreshold" = 20                               # When we have n % errors of 100% records, throw an exception
+        "maxRecordsPerPageBulkDownload" = 50000             # When results are downloaded as bulk job, then this paging parameter is used
 
     }
 
