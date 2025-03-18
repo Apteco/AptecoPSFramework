@@ -17,6 +17,37 @@ Calling with one of the Flags, just does this part
 
     Begin {
 
+        
+        #-----------------------------------------------
+        # ADD MODULE PATH, IF NOT PRESENT
+        #-----------------------------------------------
+
+        $modulePath = @( [System.Environment]::GetEnvironmentVariable("PSModulePath") -split ";" ) + @(
+            "C:\Program Files\WindowsPowerShell\Modules"
+            #C:\Program Files\powershell\7\Modules
+            "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Modules"
+            "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Modules"
+            "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Modules"
+            "$( [System.Environment]::GetEnvironmentVariable("windir") )\system32\WindowsPowerShell\v1.0\Modules"
+        )
+        $Env:PSModulePath = ( $modulePath | Sort-Object -unique ) -join ";"
+        # Using $env:PSModulePath for only temporary override
+
+
+        #-----------------------------------------------
+        # ADD SCRIPT PATH, IF NOT PRESENT
+        #-----------------------------------------------
+
+        #$envVariables = [System.Environment]::GetEnvironmentVariables()
+        $scriptPath = @( [System.Environment]::GetEnvironmentVariable("Path") -split ";" ) + @(
+            "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Scripts"
+            "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Scripts"
+            "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Scripts"
+        )
+        $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
+        # Using $env:Path for only temporary override
+
+
         #-----------------------------------------------
         # LOAD DEPENDENCY VARIABLES
         #-----------------------------------------------
@@ -71,6 +102,46 @@ Calling with one of the Flags, just does this part
 
 
         #-----------------------------------------------
+        # CHECK ELEVATION
+        #-----------------------------------------------
+
+        $isElevated = $false
+        if ($os -eq "Windows") {
+            $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+            $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+            $isElevated = $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+            Write-Verbose -Message "User: $( $identity.Name )" -Verbose
+            Write-Verbose -Message "Elevated: $( $isElevated )" -Verbose
+        } else {
+            Write-Verbose -Message "No user and elevation check due to OS" -Verbose
+        }
+
+
+        #-----------------------------------------------
+        # CHECK AND INSTALL SCRIPT DEPENDENCIES
+        #-----------------------------------------------
+
+        # Install newer PackageManagement when it is the default at 1.0.0.1
+        $currentPM = get-installedmodule | where-object { $_.Name -eq "PackageManagement" }
+        If ( $currentPM.Version -eq "1.0.0.1" -or $currentPSGet.Count -eq 0 ) {
+            Write-Verbose "PackageManagement is outdated with v$( $currentPSGet.Version ). Please update now." -Verbose
+        }
+
+        # Install newer PowerShellGet version when it is the default at 1.0.0.1
+        $currentPSGet = get-installedmodule | where-object { $_.Name -eq "PowerShellGet" }
+        If ( $currentPSGet.Version -eq "1.0.0.1" -or $currentPSGet.Count -eq 0 ) {
+            Write-Verbose "PowerShellGet is outdated with v$( $currentPSGet.Version ). Please update now." -Verbose
+        }
+
+        # Check if Install-Dependenies is present
+        If ( @( Get-InstalledScript | Where-Object { $_.Name -eq "Install-Dependencies" } ).Count -lt 1 ) {
+            Write-Verbose -Message "Missing dependency, executing: 'Install-Script Install-Dependencies'" -Verbose
+            #throw "Missing dependency, execute: 'Install-Script Install-Dependencies'"
+            Install-Script Install-Dependencies -Force
+        }
+
+
+        #-----------------------------------------------
         # INSTALL/UPDATE VCREDIST
         #-----------------------------------------------
 
@@ -78,38 +149,104 @@ Calling with one of the Flags, just does this part
 
         If ( $os -eq "Windows" ) {
 
-            # Set the paths
-            $vcredistPermalink = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
-            $vcredistTargetFile = Join-Path -Path ( [System.Environment]::GetEnvironmentVariable("TMP")) -ChildPath "vc_redist.x64.exe"
+            Write-Verbose -Message "Checking vcredist" -Verbose
 
-            # Download file - iwr is a bit slow, but works on all operating system
-            #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile
+            $vcredistInstalled = $False
+            $pref = $ErrorActionPreference
+            Try {
 
-            # Downlading with Bits as this package is windows only
-            Start-BitsTransfer -Destination $vcredistTargetFile -Source $vcredistPermalink
+                $ErrorActionPreference = "stop"
+                $vcReg = Get-ItemProperty 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\x64'
+                If ( $vcReg.Installed -gt 0 ) {
 
-            # Install/Update file quietly
-            Start-Process -FilePath $vcredistTargetFile -ArgumentList "/install /q /norestart" -Verb RunAs -Wait
+                    $vcredistInstalled = $True
+                    Write-Verbose -Message "  Version: $( $vcReg.Version )" -Verbose
+                    Write-Verbose -Message "  Major: $( $vcReg.Major )" -Verbose
+                    Write-Verbose -Message "  Minor: $( $vcReg.Minor )" -Verbose
+                    Write-Verbose -Message "  Build: $( $vcReg.Build )" -Verbose
+
+                }
+
+            } Catch [System.Management.Automation.PSArgumentException] {                
+                Write-Warning "vcredist x64 not found" -Verbose
+            } Catch [System.Management.Automation.ItemNotFoundException] {               
+                Write-Warning "vcredist not found" -Verbose
+            } Finally {
+                $ErrorActionPreference = $pref
+            }
+
+            If ($vcredistInstalled -eq $false ) {
+
+                Write-Warning -Message "Do you want to install vcredist? This is needed for DuckDB, but not to run this module in general." #-Severity WARNING
+                $vcredistChoice = Request-Choice -title "Install vcredist?" -message "Do you want to install the newest x64 vcredist?" -choices @("Yes", "No")
+
+                If ( $vcredistChoice -eq 1 ) {
+
+                    Write-Verbose -Message "Installing vcredist... This will need a few minutes" -Verbose
+
+                    # Set the paths1
+                    $vcredistPermalink = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+                    $vcredistTargetFile = Join-Path -Path ( [System.Environment]::GetEnvironmentVariable("TMP")) -ChildPath "vc_redist.x64.exe"
+
+                    # Download file - iwr is a bit slow, but works on all operating system
+                    #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile 
+
+                    # Downlading with Bits as this package is windows only
+                    Start-BitsTransfer -Destination $vcredistTargetFile -Source $vcredistPermalink
+
+                    # Install/Update file quietly
+                    Start-Process -FilePath $vcredistTargetFile -ArgumentList "/install /q /norestart" -Verb RunAs -Wait
+
+                    Write-Verbose -Message "vcredist installed" -Verbose
+
+                } else {
+
+                    Write-Verbose -Message "Not installing vcredist" -Verbose                
+
+                }
+
+            }
 
         }
-
 
         #-----------------------------------------------
         # CHECK AND INSTALL DEPENDENCIES
         #-----------------------------------------------
 
         # Check if Install-Dependenies is present
-        If ( @( Get-InstalledScript | Where-Object { $_.Name -eq "Install-Dependencies" } ).Count -lt 1 ) {
-            throw "Missing dependency, execute: 'Install-Script Install-Dependencies'"
-        }
+        # If ( @( Get-InstalledScript | Where-Object { $_.Name -eq "Install-Dependencies" } ).Count -lt 1 ) {
+        #     throw "Missing dependency, execute: 'Install-Script Install-Dependencies'"
+        #     Install-Script Install-Dependencies, Import-Dependencies
+        # }
 
         # Load dependencies as variables
         . ( Join-Path -Path $Script:moduleRoot -ChildPath "/bin/dependencies.ps1" )
 
         # Call the script to install dependencies
-        Install-Dependencies -Script $psScripts -Module $psModules
-        Install-Dependencies -LocalPackage $psLocalPackages -GlobalPackage $psGlobalPackages -ExcludeDependencies
+        Write-Verbose "Trying to install/update scripts: $( ( $psScripts -join ", " ) )" -Verbose
+        Write-Verbose "Trying to install/update modules: $( ( $psModules -join ", " ) )" -Verbose
 
+
+        $dependencyParams = [Hashtable]@{
+            "Script" = $psScripts
+            "Module" = $psModules
+            "LocalPackage" = $psLocalPackages
+            "GlobalPackage" = $psGlobalPackages
+            "ExcludeDependencies" = $True
+        }
+
+        If ( $isElevated -eq $False ) {
+            $dependencyParams.Add("InstallScriptAndModuleForCurrentUser", $true)
+        }
+
+        If ($vcredistInstalled -eq $False ) {
+           $dependencyParams.LocalPackage = $psLocalPackages | Where-Object { $_ -notlike 'DuckDB*' -and $_.Name -notlike 'DuckDB*' }
+        }
+
+        Write-Verbose "Trying to install/update local packages: $( ( $dependencyParams.LocalPackage -join ", " ) )" -Verbose
+        Write-Verbose "Trying to install/update global packages: $( $psGlobalPackages )" -Verbose
+
+        Install-Dependencies @dependencyParams 
 
 
         #-----------------------------------------------
@@ -123,7 +260,7 @@ Calling with one of the Flags, just does this part
             #try {
 
         Write-Verbose "This script is copying the boilerplate (needed for installation ) to your current directory." -Verbose
-        Write-Warning "This is only needed for the first installation"
+        Write-Warning "This is only needed for the first installation, but recommended after every update. You can also copy the files manually."
 
         Copy-Item -Path "$( $Script:moduleRoot )\boilerplate\*" -Destination "." -Confirm
 

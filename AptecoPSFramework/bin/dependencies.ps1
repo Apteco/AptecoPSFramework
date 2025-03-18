@@ -14,7 +14,8 @@ $psModules = [Array]@(
     "InvokeWebRequestUTF8"
     #"Microsoft.PowerShell.Utility"
     #"PSOAUth"  # is defined in the local plugins where it is needed
-    "PackageManagement"
+    #"PackageManagement"
+    #"PowerShellGet"
     "ConvertStrings"
     "SimplySql" # Added to use for job management instead of DuckDB which only support x64
     "MergeHashtable"

@@ -25,11 +25,13 @@ This has been put into the wiki: https://github.com/Apteco/AptecoPSFramework/wik
 But this is the Quickstart
 
 ```PowerShell
+install-module PackageManagement -MinimumVersion 1.4  -Force -AllowClobber
+install-module PowerShellGet -MinimumVersion 2.0  -Force -AllowClobber
 Install-Module WriteLog
-Install-Script Install-Dependencies, Import-Dependencies
+Install-Script Install-Dependencies
 Install-Module AptecoPSFramework
 Import-Module AptecoPSFramework
-Install-AptecoPSFramework
+Install-AptecoPSFramework -Verbose
 ```
 
 If you have downloaded this repository as zip file directly from github, you maybe need to unblock all files first. This is something you can do like this, when you go to the directory where you extracted the files to:
