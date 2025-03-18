@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.3.3'
+ModuleVersion = '0.4.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -20,7 +20,7 @@ Author = 'florian.von.bracht@apteco.de'
 CompanyName = 'Apteco GmbH'
 
 # Copyright statement for this module
-Copyright = '(c) 2024 Apteco GmbH. All rights reserved.'
+Copyright = '(c) 2025 Apteco GmbH. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Apteco PS Modules - Framework
@@ -66,7 +66,8 @@ PowerShellVersion = '5.1'
 # Modules that must be imported into the global environment prior to importing this module
 # Using our own dependency module later for more scripts/modules/packages
 RequiredModules = @(
-    #"WriteLog"
+    "WriteLog"
+    #"PowerShellGet"
     #"SqlServer"
     #"EncryptCredential"
     #"ConvertUnixTimestamp"
@@ -156,6 +157,7 @@ PrivateData = @{
 
         # Eine URL zur Lizenz für dieses Modul.
         LicenseUri = 'https://gist.github.com/gitfvb/58930387ee8677b5ccef93ffc115d836'
+        # For future use: <license type="expression">MIT</license>
 
         # Eine URL zur Hauptwebsite für dieses Projekt.
         ProjectUri = 'https://github.com/Apteco/AptecoPSFramework'
@@ -168,7 +170,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
-      Feature: Massive improvements for the Salesforce integration. Have a look at the documentation for more information
+
+0.4.0 Feature: Massive improvements for the Salesforce integration. Have a look at the documentation for more information
       Feature: Added MergeHashtable and MergePSCustomObject as Dependencies for future use in settings
       Feature CleverReach: New function to download all receivers of a list
       Feature: Improved boilerplate files to be runnable with -Debug flag instead of setting that in the script file.
