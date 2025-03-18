@@ -6,7 +6,7 @@ function Get-Messages {
 
          [Parameter(Mandatory=$true, ParameterSetName = 'Object')]
          [Hashtable]$InputHashtable             # This creates a new entry in joblog
-        
+
         ,[Parameter(Mandatory=$true, ParameterSetName = 'Job')]
          [Int]$JobId                            # This uses an existing joblog entry
 

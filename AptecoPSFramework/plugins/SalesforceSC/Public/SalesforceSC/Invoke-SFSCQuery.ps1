@@ -84,7 +84,7 @@ function Invoke-SFSCQuery {
             Write-Log "Writing results to '$( $bulkPath )'"
 
             $bulkParams = [Hashtable]@{
-                "Query" = $Query                
+                "Query" = $Query
                 "Path" = $bulkPath
             }
             If ( $QueryAll -eq $True ) {
@@ -113,7 +113,7 @@ function Invoke-SFSCQuery {
                 )
             }
             #>
-        
+
 
             #$objects = Invoke-RestMethod -URI "$( $base )/services/data/v$( $version )/sobjects/" -Method Get -verbose -ContentType $contentType -Headers $headers
 

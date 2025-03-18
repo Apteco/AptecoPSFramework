@@ -17,7 +17,7 @@ Calling with one of the Flags, just does this part
 
     Begin {
 
-        
+
         #-----------------------------------------------
         # ADD MODULE PATH, IF NOT PRESENT
         #-----------------------------------------------
@@ -167,9 +167,9 @@ Calling with one of the Flags, just does this part
 
                 }
 
-            } Catch [System.Management.Automation.PSArgumentException] {                
+            } Catch [System.Management.Automation.PSArgumentException] {
                 Write-Warning "vcredist x64 not found" -Verbose
-            } Catch [System.Management.Automation.ItemNotFoundException] {               
+            } Catch [System.Management.Automation.ItemNotFoundException] {
                 Write-Warning "vcredist not found" -Verbose
             } Finally {
                 $ErrorActionPreference = $pref
@@ -189,7 +189,7 @@ Calling with one of the Flags, just does this part
                     $vcredistTargetFile = Join-Path -Path ( [System.Environment]::GetEnvironmentVariable("TMP")) -ChildPath "vc_redist.x64.exe"
 
                     # Download file - iwr is a bit slow, but works on all operating system
-                    #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile 
+                    #Invoke-WebRequest -UseBasicParsing -Uri $vcredistPermalink -Method Get -OutFile $vcredistTargetFile
 
                     # Downlading with Bits as this package is windows only
                     Start-BitsTransfer -Destination $vcredistTargetFile -Source $vcredistPermalink
@@ -201,7 +201,7 @@ Calling with one of the Flags, just does this part
 
                 } else {
 
-                    Write-Verbose -Message "Not installing vcredist" -Verbose                
+                    Write-Verbose -Message "Not installing vcredist" -Verbose
 
                 }
 
@@ -246,7 +246,7 @@ Calling with one of the Flags, just does this part
         Write-Verbose "Trying to install/update local packages: $( ( $dependencyParams.LocalPackage -join ", " ) )" -Verbose
         Write-Verbose "Trying to install/update global packages: $( $psGlobalPackages )" -Verbose
 
-        Install-Dependencies @dependencyParams 
+        Install-Dependencies @dependencyParams
 
 
         #-----------------------------------------------

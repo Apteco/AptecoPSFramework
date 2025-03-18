@@ -54,15 +54,15 @@
 
     # Upload settings
     "upload" = [PSCustomObject]@{
-        
+
         "countRowsInputFile" = $true                        # Count the rows of input file
 
         "campaignFilter" = "IsDeleted = false and Status = 'Planned' and ParentId = null ORDER BY LastModifiedDate DESC"
                                                             # The filter to show campaigns in a dropdown
-        
+
         "reservedFields" = [Array]@(,"Id")                  # Those fields are removed on the upload
 
-        "segmentVariablename" = ""                          # The segment variable name that is used to match against existing sub campaigns           
+        "segmentVariablename" = ""                          # The segment variable name that is used to match against existing sub campaigns
         "uploadIntoSubCampaigns" = $false                   # When you set this, you need a segment variable
         "leadExternalId" = ""                               # The external id for upsert into leads object
         "uploadSize" = 20000                                # The size for the uploads

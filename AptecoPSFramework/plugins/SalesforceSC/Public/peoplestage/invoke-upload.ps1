@@ -210,7 +210,7 @@ function Invoke-Upload{
                 # Another way to stream through files
 
                 $arr = [System.Collections.ArrayList]@()
-                $elapsed = [System.Diagnostics.Stopwatch]::StartNew() 
+                $elapsed = [System.Diagnostics.Stopwatch]::StartNew()
 
                 # Open the text file from disk
                 $reader = New-Object System.IO.StreamReader("c:\faststats\Publish\DB01\system\Deliveries\PowerShell_Sent ~ Sent_2a165893-f884-4e6b-b5d8-d031f628eaf2.txt")
@@ -227,10 +227,10 @@ function Invoke-Upload{
                         $c += 1
                     }
                     [void]$arr.Add([PSCustomObject]$o)
-                    $i++; if (($i % 10000) -eq 0) { 
+                    $i++; if (($i % 10000) -eq 0) {
                         Write-Host "$i rows have been inserted in $($elapsed.Elapsed.ToString())."
-                    } 
-                } 
+                    }
+                }
 
                 # Clean Up
                 $reader.Close(); $reader.Dispose()
@@ -287,20 +287,20 @@ function Invoke-Upload{
                             "ContactId" = $row.$urnFieldName
                             "LeadId" = ""
                         }
-                        
+
                         ForEach ( $prop in $props ) {
                             $line.Add( $prop, $row.$prop )
 
                         }
                         [void]$newCsv.add([PSCustomObject]$line)
-    
+
                     } else {
-    
+
                         $skippedLines += 1
-    
+
                     }
 
-                    
+
                 } else {
 
                     # THIS MEANS IT IS A LEAD, SO PREPARE THAT
@@ -346,12 +346,12 @@ function Invoke-Upload{
                         [void]$upsertedLeadCsv.add([PSCustomObject]$line)
 
                     } else {
-    
+
                         $skippedLines += 1
-    
+
                     }
 
-                    
+
                 }
 
                 $c += 1
@@ -379,12 +379,12 @@ function Invoke-Upload{
             #-----------------------------------------------
             # CHECK LEADS
             #-----------------------------------------------
-            
+
             If ( $leadCsv.Count -gt 0 ) {
 
                 $leadCount = 0
                 $skippedLines = 0
-                
+
                 # Create all files to upload
                 Write-Log "Writing lead files"
                 $leadFilesToUpload = [System.Collections.ArrayList]@()
@@ -428,7 +428,7 @@ function Invoke-Upload{
                         "SuccessfulFilename" = $successfulFilename
                         "ExternalIdFieldName" = $externalLeadId
                         "DownloadFailures" = $Script:settings.upload.downloadFailedResults
-                        "FailureFilename" = ".\failedleads_$( $Script:processId )_$( [datetime]::now.toString("yyyyMMdd_HHmmss") )_$( $i ).csv"    
+                        "FailureFilename" = ".\failedleads_$( $Script:processId )_$( [datetime]::now.toString("yyyyMMdd_HHmmss") )_$( $i ).csv"
                     }
                     $lJob = Add-BulkJob @lJobParams
 
@@ -470,7 +470,7 @@ function Invoke-Upload{
                         $skippedLines += 1
 
                     }
-                                        
+
                 }
 
                 Write-Log "Stats after upserting leads file"
@@ -485,7 +485,7 @@ function Invoke-Upload{
 
             }
 
-            
+
             #-----------------------------------------------
             # WRITE THE DATA FILE
             #-----------------------------------------------
@@ -530,27 +530,27 @@ function Invoke-Upload{
                     "FailureFilename" = ".\failed_$( $Script:processId )_$( [datetime]::now.toString("yyyyMMdd_HHmmss") )_$( $j ).csv"
                     #"ExternalIdFieldName" = "ContactId"    # This does not work ;-)
                 }
-    
+
                 If ( $InputHashtable.operation -ne "" ) {
-    
+
                     Switch ( $InputHashtable.operation ) {
-    
+
                         # TODO implement more operations
-    
+
                         "delete" {
                             $cmJobParams.Add( "Operation", "delete" )
                         }
-    
+
                         default {
                             $cmJobParams.Add( "Operation", "insert" )
                         }
-    
+
                     }
-    
+
                 }
-    
+
                 [void]$cmJobs.Add((Add-BulkJob @cmJobParams))
-    
+
             }
 
 
@@ -592,7 +592,7 @@ function Invoke-Upload{
                     throw "There has been a problem with $( $errorRate )% error rate. There are more than $( $Script:settings.upload.errorThreshold )% errors."
                 }
             }
-            
+
 
         } catch {
 
@@ -622,7 +622,7 @@ function Invoke-Upload{
                 #$lf
             }
             If ( Test-Path $successfulFilename ) {
-                #$successfulFilename 
+                #$successfulFilename
             }
             #>
 
