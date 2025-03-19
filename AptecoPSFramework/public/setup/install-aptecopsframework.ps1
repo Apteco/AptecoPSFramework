@@ -70,7 +70,7 @@ Calling with one of the Flags, just does this part
 
         Write-Verbose -Message "Using OS: $( $os )" -Verbose
 
-        
+
         #-----------------------------------------------
         # ADD MODULE PATH, IF NOT PRESENT
         #-----------------------------------------------
@@ -86,7 +86,7 @@ Calling with one of the Flags, just does this part
         If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
             $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Modules"
         }
-        
+
         # Add pwsh core path
         If ( $isCore -eq $true ) {
             If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
@@ -95,10 +95,10 @@ Calling with one of the Flags, just does this part
             $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Modules"
             $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Modules"
         }
-        
+
         # Add all paths
-        $Env:PSModulePath = ( $modulePath | Sort-Object -unique ) -join ";"
         # Using $env:PSModulePath for only temporary override
+        $Env:PSModulePath = @( $modulePath | Sort-Object -unique ) -join ";"
 
 
         #-----------------------------------------------
@@ -111,23 +111,24 @@ Calling with one of the Flags, just does this part
             "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Scripts"
             "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Scripts"
         )
-        $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
-        # Using $env:Path for only temporary override
 
         # Add the 64bit path, if present. In 32bit the ProgramFiles variables only returns the x86 path
         If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
-            $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Scripts"
+            $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Scripts"
         }
-        
+
         # Add pwsh core path
         If ( $isCore -eq $true ) {
             If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
-                $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Scripts"
+                $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Scripts"
             }
-            $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Scripts"
-            $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Scripts"
+            $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Scripts"
+            $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Scripts"
         }
-        
+
+        # Using $env:Path for only temporary override
+        $Env:Path = @( $scriptPath | Sort-Object -unique ) -join ";"
+
 
         #-----------------------------------------------
         # CHECK ELEVATION

@@ -13,10 +13,17 @@ Email|CleverReach|v3|REST|Tagging, Upload, Broadcast-Preparation, Broadcast, Rec
 CRM|SalesForce SalesCloud|REST/Bulk API|REST|Load CRM Data, Upload to CampaignMembers
 CRM|Hubspot|CRM API v3|REST|Download all CRM object data full/delta, Upload to Marketing Lists
 CRM|Microsoft Dynamics 365 CRM|DataVerse oData WebAPI|REST|Download all CRM object data and picklists full/delta
-Email|emarsys (An SAP Company)|Emarsys Core API|REST|Adding Lists and Contacts, get lists, campaigns, fields, contact data
+CRM|Fundraising Box||REST|Get contacts, donations, projects and much more to build a system
+Data|künzlerbachmann DIRECTMARKETING|kbDATA|REST|Upload existing customer data, get it matched and download matched data and enrich it. This one is not published, so please ask for it.
 Email|ActiveCampaign||REST|Still under development
 Email|Apteco email||REST|Get lists and contacts on that list
-CRM|Fundraising Box||REST|Get contacts, donations, projects and much more to build a system
+Email|Brevo|Brevo|REST|Still under development
+Email|Brevo|SendInBlue/Newsletter2Go|REST|Still under development
+Email|Inxmail|Professional|REST|Still in migration
+Email|emarsys (An SAP Company)|Emarsys Core API|REST|Adding Lists and Contacts, get lists, campaigns, fields, contact data
+Print|Bertelsmann eesii||REST|Upload recipients for specific mailings with automatic field matching. This one is not published, so please ask for it.
+
+You can find more integrations here that could be easily migrated to this framework: https://github.com/Apteco/CustomChannels
 
 # Installation / Update / Uninstall
 
@@ -79,9 +86,11 @@ Please consider to create a channel multiple times, e.g. for every table level.
 
 ## Create your settings json/yaml file
 
-The first target is to create your settings json file, because that contains all the information that the module needs for being triggered by PeopleStage. In the boiletplate you can find a rough example of how to create that file. But specific for the chosen plugins you can set more or less parameters. They can be changed through that `create_settings.ps1` script or later in your json file. It depends on how often you change the settings json file. This path to the settings file json needs to be exchanged in the channel editor settings in the integration parameter. This needs to be an absolute path.
+The first target is to create your settings file, because that contains all the information that the module needs for being triggered by PeopleStage. In the boiletplate you can find a rough example of how to create that file. But specific for the chosen plugins you can set more or less parameters. They can be changed through that `create_settings.ps1` script or later in your file. It depends on how often you change the settings file. This path to the settings file needs to be exchanged in the channel editor settings in the integration parameter. This needs to be an absolute path.
 
 Tool tip: If you want to visualise (and edit) the JSON, this tool can help: https://jsoncrack.com/editor
+
+If you are using yaml, it is just simple to read.
 
 ```PowerShell
 

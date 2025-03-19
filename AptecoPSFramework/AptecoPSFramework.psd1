@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.2'
+ModuleVersion = '0.4.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -170,6 +170,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.4.3 Fixed temporary module and script path loading
 0.4.2 Fix: Added more common module and script paths
       Fix: Handling dependency problems in plugins as warnings rather than errors
 0.4.1 Fix: Small bugfix for Install-AptecoPSFramework where the vcredist installation is not checked again after installation
