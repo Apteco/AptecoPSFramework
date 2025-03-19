@@ -42,40 +42,6 @@ Write-Verbose "Current Path: $( $scriptPath )" -Verbose
 
 
 #-----------------------------------------------
-# ADD MODULE PATH, IF NOT PRESENT
-#-----------------------------------------------
-
-$modulePaths = @( [System.Environment]::GetEnvironmentVariable("PSModulePath") -split ";" ) + @(
-    "C:\Program Files\WindowsPowerShell\Modules"
-    #C:\Program Files\powershell\7\Modules
-    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Modules"
-    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Modules"
-    "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Modules"
-    "$( [System.Environment]::GetEnvironmentVariable("windir") )\system32\WindowsPowerShell\v1.0\Modules"
-)
-$Env:PSModulePath = ( $modulePaths | Sort-Object -unique ) -join ";"
-# Using $env:PSModulePath for only temporary override
-
-Write-Verbose "[OK] Adding module path" -Verbose
-
-
-#-----------------------------------------------
-# ADD SCRIPT PATH, IF NOT PRESENT
-#-----------------------------------------------
-
-#$envVariables = [System.Environment]::GetEnvironmentVariables()
-$scriptPaths = @( [System.Environment]::GetEnvironmentVariable("Path") -split ";" ) + @(
-    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Scripts"
-    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Scripts"
-    "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Scripts"
-)
-$Env:Path = ( $scriptPaths | Sort-Object -unique ) -join ";"
-# Using $env:Path for only temporary override
-
-Write-Verbose "[OK] Adding script path" -Verbose
-
-
-#-----------------------------------------------
 # CHECKING PS AND OS
 #-----------------------------------------------
 
@@ -104,6 +70,64 @@ if ($isCore -eq $true) {
 }
 
 Write-Verbose -Message "Using OS: $( $os )" -Verbose
+
+
+#-----------------------------------------------
+# ADD MODULE PATH, IF NOT PRESENT
+#-----------------------------------------------
+
+$modulePath = @( [System.Environment]::GetEnvironmentVariable("PSModulePath") -split ";" ) + @(
+    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Modules"
+    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Modules"
+    "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Modules"
+    "$( [System.Environment]::GetEnvironmentVariable("windir") )\system32\WindowsPowerShell\v1.0\Modules"
+)
+
+# Add the 64bit path, if present. In 32bit the ProgramFiles variables only returns the x86 path
+If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Modules"
+}
+
+# Add pwsh core path
+If ( $isCore -eq $true ) {
+    If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+        $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Modules"
+    }
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Modules"
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Modules"
+}
+
+# Add all paths
+$Env:PSModulePath = ( $modulePath | Sort-Object -unique ) -join ";"
+# Using $env:PSModulePath for only temporary override
+
+
+#-----------------------------------------------
+# ADD SCRIPT PATH, IF NOT PRESENT
+#-----------------------------------------------
+
+#$envVariables = [System.Environment]::GetEnvironmentVariables()
+$scriptPath = @( [System.Environment]::GetEnvironmentVariable("Path") -split ";" ) + @(
+    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Scripts"
+    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Scripts"
+    "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Scripts"
+)
+$Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
+# Using $env:Path for only temporary override
+
+# Add the 64bit path, if present. In 32bit the ProgramFiles variables only returns the x86 path
+If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Scripts"
+}
+
+# Add pwsh core path
+If ( $isCore -eq $true ) {
+    If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+        $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Scripts"
+    }
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Scripts"
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Scripts"
+}
 
 
 #-----------------------------------------------

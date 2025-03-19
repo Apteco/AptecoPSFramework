@@ -275,8 +275,7 @@
                 #}
                 Import-Dependencies @dependencyParams
             } catch {
-                Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now"
-                Exit 0
+                Write-Warning "Error loading module, script and package dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now" -Verbose
             }
 
             # Load assemblies

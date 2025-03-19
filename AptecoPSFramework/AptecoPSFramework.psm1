@@ -18,6 +18,35 @@ https://github.com/RamblingCookieMonster/PSStackExchange/blob/db1277453374cb1668
 #-----------------------------------------------
 
 
+#-----------------------------------------------
+# CHECKING PS AND OS
+#-----------------------------------------------
+
+Write-Verbose "Check PowerShell and Operating system" -Verbose
+
+# Check if this is Pwsh Core
+$isCore = ($PSVersionTable.Keys -contains "PSEdition") -and ($PSVersionTable.PSEdition -ne 'Desktop')
+
+Write-Verbose -Message "Using PowerShell version $( $PSVersionTable.PSVersion.ToString() ) and $( $PSVersionTable.PSEdition ) edition" -Verbose
+
+# Check the operating system, if Core
+if ($isCore -eq $true) {
+    $os = If ( $IsWindows -eq $true ) {
+        "Windows"
+    } elseif ( $IsLinux -eq $true ) {
+        "Linux"
+    } elseif ( $IsMacOS -eq $true ) {
+        "MacOS"
+    } else {
+        throw "Unknown operating system"
+    }
+} else {
+    # [System.Environment]::OSVersion.VersionString()
+    # [System.Environment]::Is64BitOperatingSystem
+    $os = "Windows"
+}
+
+Write-Verbose -Message "Using OS: $( $os )" -Verbose
 
 
 #-----------------------------------------------
@@ -25,13 +54,27 @@ https://github.com/RamblingCookieMonster/PSStackExchange/blob/db1277453374cb1668
 #-----------------------------------------------
 
 $modulePath = @( [System.Environment]::GetEnvironmentVariable("PSModulePath") -split ";" ) + @(
-    "C:\Program Files\WindowsPowerShell\Modules"
-    #C:\Program Files\powershell\7\Modules
     "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Modules"
     "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Modules"
     "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Modules"
     "$( [System.Environment]::GetEnvironmentVariable("windir") )\system32\WindowsPowerShell\v1.0\Modules"
 )
+
+# Add the 64bit path, if present. In 32bit the ProgramFiles variables only returns the x86 path
+If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Modules"
+}
+
+# Add pwsh core path
+If ( $isCore -eq $true ) {
+    If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+        $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Modules"
+    }
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Modules"
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Modules"
+}
+
+# Add all paths
 $Env:PSModulePath = ( $modulePath | Sort-Object -unique ) -join ";"
 # Using $env:PSModulePath for only temporary override
 
@@ -48,6 +91,20 @@ $scriptPath = @( [System.Environment]::GetEnvironmentVariable("Path") -split ";"
 )
 $Env:Path = ( $scriptPath | Sort-Object -unique ) -join ";"
 # Using $env:Path for only temporary override
+
+# Add the 64bit path, if present. In 32bit the ProgramFiles variables only returns the x86 path
+If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Scripts"
+}
+
+# Add pwsh core path
+If ( $isCore -eq $true ) {
+    If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
+        $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Scripts"
+    }
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Scripts"
+    $modulePath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Scripts"
+}
 
 
 #-----------------------------------------------
