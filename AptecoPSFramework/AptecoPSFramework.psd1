@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.0'
+ModuleVersion = '0.4.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -170,7 +170,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
-
+0.4.1 Fix: Small bugfix for Install-AptecoPSFramework where the vcredist installation is not checked again after installation
+      Fix: Small bugfix for Packagemanagement version check at the start of Install-AptecoPSFramework
 0.4.0 Feature: Massive improvements for the Salesforce integration. Have a look at the documentation for more information
       Feature: Added MergeHashtable and MergePSCustomObject as Dependencies for future use in settings
       Feature CleverReach: New function to download all receivers of a list
@@ -259,40 +260,7 @@ PrivateData = @{
 0.0.19 Added script support for boilerplates
 0.0.18 Added a new setting for CleverReach to put response log information into a separate logfile
        Added more documentation for CleverReach response download
-0.0.17 Fixing a problem when CleverReach invokes a http502 invalid gateway error -> Repeat the call a few times
-       Fixing a problem in CleverReach when creating new attributes we get now less information back, so we are loading details of new created attributes
-       Adding functionality to repeat REST calls, when specific problems occur
-0.0.16 Added String values for Preheaders that are nulled when they are used
-0.0.15 Fixing a problem with WriteLog module
-0.0.14 Fixing a problem with the preview read of the input file when it has more than 100 rows
-0.0.13 Fixing a problem with newly created lists/groups without any attributes for CleverReach
-       Preventing a problem with empty upserts for CleverReach
-0.0.12 Fixing a problem when there is no preheader html already present in CleverReach
-0.0.11 Fixing updating the settings.json file after an module update
-0.0.10 Enrolling fix for changed function name
-       Changed the Tag removal to wait until finished
-0.0.9 Support for waiting until the mailing is released for CleverReach
-      Fixed a query for global deactivated receivers
-      Fixed a request for group stats to be at the end of the broadcast for CleverReach
-      Changed a setting for global receiver deactivations
-      Query group stats by runtime filters instead of cached stats
-      Added more documentation and FAQs about this integration
-      Changed the preheader behaviour for CleverReach (now dependent on a variable)
-0.0.8 Preheader Support for CleverReach, just needs a "Preheader" variable
-      Fixed a visual problem after the mailing was sent. Needed the "eddytor" for this
-0.0.7 Removing not needed zip files
-      Fixing a problem with the pluginsfolder in the settings
-      Complete rewriting of the settings part for joining PSCustomObjects and Hashtables
-0.0.6 Added tags support for uploading data and preview
-      Fixed a bug in the CleverReach Preview regarding new attributes
-0.0.5 Added CleverReach Email Preview
-0.0.4 Changed URLs
-      Many improvements and fixes for the CleverReach plugin
-      Boilerplate fixes for loading psmodulepath environment variable
-0.0.3 Automatically load new plugin folders and save them in the settings
-      Support response gathering for CleverReach Plugin
-0.0.2 Small fixes after testing
-0.0.1 Initial release of Apteco PS module through psgallery
+...ReleaseNotes truncated...
 '
 
     } # Ende der PSData-Hashtabelle

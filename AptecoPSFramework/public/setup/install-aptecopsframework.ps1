@@ -123,8 +123,8 @@ Calling with one of the Flags, just does this part
 
         # Install newer PackageManagement when it is the default at 1.0.0.1
         $currentPM = get-installedmodule | where-object { $_.Name -eq "PackageManagement" }
-        If ( $currentPM.Version -eq "1.0.0.1" -or $currentPSGet.Count -eq 0 ) {
-            Write-Verbose "PackageManagement is outdated with v$( $currentPSGet.Version ). Please update now." -Verbose
+        If ( $currentPM.Version -eq "1.0.0.1" -or $currentPM.Count -eq 0 ) {
+            Write-Verbose "PackageManagement is outdated with v$( $currentPM.Version ). Please update now." -Verbose
         }
 
         # Install newer PowerShellGet version when it is the default at 1.0.0.1
@@ -198,6 +198,30 @@ Calling with one of the Flags, just does this part
                     Start-Process -FilePath $vcredistTargetFile -ArgumentList "/install /q /norestart" -Verb RunAs -Wait
 
                     Write-Verbose -Message "vcredist installed" -Verbose
+
+                    # Evaluate vcredist again
+                    $pref = $ErrorActionPreference
+                    Try {
+
+                        $ErrorActionPreference = "stop"
+                        $vcReg = Get-ItemProperty 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\x64'
+                        If ( $vcReg.Installed -gt 0 ) {
+
+                            $vcredistInstalled = $True
+                            Write-Verbose -Message "  Version: $( $vcReg.Version )" -Verbose
+                            Write-Verbose -Message "  Major: $( $vcReg.Major )" -Verbose
+                            Write-Verbose -Message "  Minor: $( $vcReg.Minor )" -Verbose
+                            Write-Verbose -Message "  Build: $( $vcReg.Build )" -Verbose
+
+                        }
+
+                    } Catch [System.Management.Automation.PSArgumentException] {
+                        Write-Warning "vcredist x64 not found" -Verbose
+                    } Catch [System.Management.Automation.ItemNotFoundException] {
+                        Write-Warning "vcredist not found" -Verbose
+                    } Finally {
+                        $ErrorActionPreference = $pref
+                    }
 
                 } else {
 
