@@ -458,3 +458,7 @@ If you already have installed the AptecoPSFramework, make sure to re-install the
 ## There was no parameter found named "-Destination"
 
 This message could be slightly different. But this results from an older 32 bit package of `Packagemanagement` that comes with Windows. And that one is outdated and not supported by this Framework. Make sure you have a newer version available. Best is to open a PowerShell as Administrator and install it via `Install-Module "PackageManagement" -Scope AllUsers`. Or update an existing one with `Update-Module PackageManagement`. Because when PowerShell is called via C#, it can load the older PackageManagement. You can safely remove it from `C:\Program Files (x86)\WindowsPowerShell\Modules`. The new installed one should be in `C:\Program Files\WindowsPowerShell\Modules`.
+
+## Channel is working from PowerShell, but not from Apteco FastStats Service
+
+Then it might be, that the FastStats Service is not running with a service user. It may be `network service` or `local system`. But those users are not able to decrypt encrypted credentials. So your service should run with a specified service user.
