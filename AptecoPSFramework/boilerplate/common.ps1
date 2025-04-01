@@ -151,9 +151,9 @@ If ( $params.ForcePython -eq "true" ) {
 #-----------------------------------------------
 
 If ($debug -eq $true) {
-    Import-Module "C:\FastStats\Scripts\github\AptecoPSFramework" -Verbose
+    Import-Module "AptecoPSFramework" -Verbose
 } else {
-    Import-Module "C:\FastStats\Scripts\github\AptecoPSFramework"
+    Import-Module "AptecoPSFramework"
 }
 
 
@@ -215,6 +215,7 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
 #-----------------------------------------------
 # FIND OUT ABOUT PS CORE
 #-----------------------------------------------
+
 try {
     $calc = . $s.psCoreExePath { 1+1 }
 } catch {

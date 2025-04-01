@@ -4,6 +4,7 @@
 
     # General
     "logfile" = "./logfile.log"                             # default logfile
+    "useOnlyOneLogfile" = $false                          # if true, then only one logfile will be used e.g. for import-dependencies and install-dependencies and psoauth
     "encoding" = "utf8"
     "nameConcatChar" = " ~ "
     "currentDate" = [datetime]::Now.ToString("yyyy-MM-dd HH:mm:ss")

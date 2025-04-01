@@ -13,6 +13,7 @@ install-module TestCredential, PSOAuth, convertunixtimestamp
 import-module aptecopsframework, convertunixtimestamp
 $plugin = get-plugins | Select guid, name, version, update, path | Out-GridView -PassThru | Select -first 1
 import-plugin -Guid $plugin.guid
+install-plugin -Guid $plugin.guid
 
 #Request-Token
 

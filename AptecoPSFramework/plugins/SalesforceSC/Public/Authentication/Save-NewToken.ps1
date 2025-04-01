@@ -38,7 +38,7 @@ function Save-NewToken {
 
 
         # Reset the logfile as it was changed by psoauth
-        Set-Logfile -Path $Script:settings.logfile
+        #Set-Logfile -Path $Script:settings.logfile
 
     }
 

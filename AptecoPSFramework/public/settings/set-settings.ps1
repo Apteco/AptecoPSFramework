@@ -26,7 +26,11 @@ Function Set-Settings {
 
         # Set the logfile, if it is set, otherwise it will create automatically a new temporary file
         If ( $Script:settings.logfile -ne "" ) {
-            Set-Logfile -Path $Script:settings.logfile
+            If ( $Script:settings.useOnlyOneLogfile -eq $True) {
+                Set-Logfile -Path $Script:settings.logfile
+            } else {
+                Set-Logfile -Path $Script:settings.logfile -DisableOverride
+            }
         }
 
     }

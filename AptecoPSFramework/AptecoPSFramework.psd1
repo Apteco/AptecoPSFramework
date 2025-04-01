@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.3'
+ModuleVersion = '0.4.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -170,6 +170,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.4.4 Feature: Currently only one logfile is used for everything. Now there is a switch in the settings to allow multiple logfiles like for import-dependencies etc.
+      Fix: The boilerplate common file had an absolute path instead of the module name for import-module
 0.4.3 Fixed temporary module and script path loading
 0.4.2 Fix: Added more common module and script paths
       Fix: Handling dependency problems in plugins as warnings rather than errors
