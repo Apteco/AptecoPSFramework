@@ -38,7 +38,7 @@ $json | Set-Content -path "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc
 
 $settings = Get-settings
 
-$settings.base = "sandbox.my.salesforce.com" # For developer accounts, please use my.salesforce.com instead
+$settings.base = "sandbox.my.salesforce.com" # For developer accounts, please use my.salesforce.com or develop.salesforce.com instead
 $settings.instanceId = "FS1"
 $settings.token.tokenSettingsFile = "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc\sf_token_settings.json"
 $settings.token.tokenFilePath = "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc\npc.token"
