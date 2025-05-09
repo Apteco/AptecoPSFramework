@@ -11,7 +11,8 @@ install-module TestCredential, PSOAuth, convertunixtimestamp
 #Add-PluginFolder "C:\FastStats\Scripts\AptecoPSFramework\plugins"
 
 import-module aptecopsframework, convertunixtimestamp
-$plugin = get-plugins | Select guid, name, version, update, path | Out-GridView -PassThru | Select -first 1
+#$plugin = get-plugins | Select guid, name, version, update, path | Out-GridView -PassThru | Select -first 1
+$plugin = get-plugins | where { $_.name -like "Salesforce*" }
 import-plugin -Guid $plugin.guid
 install-plugin -Guid $plugin.guid
 
