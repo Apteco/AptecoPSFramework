@@ -67,7 +67,14 @@ function Invoke-WebRequestWithErrorHandling {
 
                     # Exceeded all retries
                     if ($specificCounter -ge $MaxTriesSpecific) {
-                        Write-Log -Message "Request $( $specificCounter ) failed with $( $errResponse.StatusCode.value__ ) $( $errResponse.StatusCode.ToString() ). Command failed the maximum number of $( $MaxTriesSpecific ) times."  -Severity WARNING
+
+                        If ( $null -eq $errResponse.StatusCode.value__ ) {
+                            $errString = "Unknown error"
+                        } else {
+                            $errString = "$( $errResponse.StatusCode.value__ ) $( $errResponse.StatusCode.ToString() )"
+                        }
+
+                        Write-Log -Message "Request attempt $( $specificCounter ) failed with '$( $errString )'. Command failed the maximum number of $( $MaxTriesSpecific ) times."  -Severity WARNING
                         #Write-Log -Message $_.Exception.Message -Severity ERROR
                         Write-Log -Message "RESPONSE: $( ConvertTo-Json -InputObject $errBody -Depth 99 -Compress)" -Severity WARNING
                         throw $e #.Exception

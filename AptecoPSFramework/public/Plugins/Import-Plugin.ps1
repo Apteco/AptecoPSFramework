@@ -177,7 +177,7 @@
 
             Set-ProcessId -Id $InputPlugin.variables.processId
 
-            Write-Log -message $logDivider
+            Write-Log -message $Script:logDivider
             Write-Log -Message "Using the process id $( $InputPlugin.variables.processId )"
 
 

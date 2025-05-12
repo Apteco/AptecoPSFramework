@@ -87,6 +87,48 @@ Add-ContactMetadata -Name "Mobilnummer" -DataType "str"
 # Remove a field/property for all contacts
 Remove-ContactMetadata -ContactMetadataId 354972
 
+# Get all send out messages
+Get-Message
+
+# Get message with id 123
+Get-Message -CampaignId 123
+
+# Get all transactional sent messages
+Get-Message -FromType Transactional
+
+# Get all transactional sent messages with subject line
+Get-Message -FromType Transactional -ShowSubject
+
+# Get messages sent to id 456
+Get-Message -ContactId 456
+
+# Count all sent out messages
+Get-Message -CountOnly
+
+# Count all contacts
+Get-ListRecipient -CountOnly
+
+# Count all unsubscribes
+Get-ListRecipient -Unsub -CountOnly
+
+# Get all unsubscribes
+Get-ListRecipient -Unsub
+
+# Get all recipients that are excluded from campaigns
+Get-ListRecipient -IsExcludedFromCampaigns
+
+# Get all recipients that have opened
+Get-ListRecipient -Opened
+
+# Get all recipients from a list and do not ignore the deleted ones
+Get-ListRecipient -ListId 123 -IgnoreDeleted
+
+# Get recipient with contact id
+Get-ListRecipient -ContactId 456
+
+# Get recipient by email address
+Get-ListRecipient -ContactEmail "example@test.com"
+
 ```
 
 ## Use as preload action with Apteco FastStats Designer

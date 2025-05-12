@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.4'
+ModuleVersion = '0.4.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -170,6 +170,9 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.4.5 Feature: Added new functions for Apteco email
+      Fix: Improved the error handling in the http functions when the domain name cannot be resolved
+      Fix: Use of $Script:logdivider instead of $logdivider
 0.4.4 Feature: Currently only one logfile is used for everything. Now there is a switch in the settings to allow multiple logfiles like for import-dependencies etc.
       Fix: The boilerplate common file had an absolute path instead of the module name for import-module
 0.4.3 Fixed temporary module and script path loading

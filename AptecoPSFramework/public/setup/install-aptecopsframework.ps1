@@ -383,7 +383,7 @@ Calling with one of the Flags, just does this part
         #-----------------------------------------------
 
         #If ( $success -eq $true ) {
-            Write-Verbose -Message "All good. Installation finished!" #-Severity INFO
+            Write-Verbose -Message "All good. Installation finished! Please open a new PowerShell session to use AptecoPSFramework." #-Severity INFO
         #} else {
         #    Write-Error -Message "There was a problem. Please check the output in this window and retry again." #-Severity ERROR
         #}
