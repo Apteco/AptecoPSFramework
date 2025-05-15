@@ -14,7 +14,7 @@ import-module aptecopsframework, convertunixtimestamp
 #$plugin = get-plugins | Select guid, name, version, update, path | Out-GridView -PassThru | Select -first 1
 $plugin = get-plugins | where { $_.name -like "Salesforce*" }
 import-plugin -Guid $plugin.guid
-install-plugin -Guid $plugin.guid
+#install-plugin -Guid $plugin.guid
 
 #Request-Token
 
@@ -39,7 +39,7 @@ $json | Set-Content -path "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc
 $settings = Get-settings
 
 $settings.base = "sandbox.my.salesforce.com" # For developer accounts, please use my.salesforce.com or develop.salesforce.com instead
-$settings.instanceId = "FS1"
+$settings.instanceId = "<instanceid>"   # This is the 3 characters after the third character, so for any id like 0017R000033V6M1QAK the instance ID is 7R0
 $settings.token.tokenSettingsFile = "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc\sf_token_settings.json"
 $settings.token.tokenFilePath = "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc\npc.token"
 $settings.login.refreshTokenAutomatically = $False
@@ -106,5 +106,18 @@ Get-SFSCObjectData -Object 'Contact' -Fields "Id", "FirstName" -Bulk
 
 # Get all fields from the Lead object and return the first 100 records
 Get-SFSCObjectData -Object "Lead" -Limit 100 -Verbose
+
+# Add a campaign
+$campaign = [PSCustomObject]@{
+    "Name" = "New Apteco Campaign"
+    "Type" = "Email"
+}
+Add-SFSCObjectData -Object "Campaign" -Attributes $campaign -verbose
+
+# List first 100 campaigns campaigns
+Get-SFSCObjectData -Object "Campaign" -Fields "id", "name" -Limit 100
+
+# Remove a created campaign by id
+Remove-SFSCObjectData -Object "Campaign" -Id "701KB000000cPiiYAE"
 
 ```

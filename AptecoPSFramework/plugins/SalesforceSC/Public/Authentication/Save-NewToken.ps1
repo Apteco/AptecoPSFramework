@@ -33,6 +33,7 @@ function Save-NewToken {
         } catch {
 
             Write-Log -message "There was a problem with generating the token" -Severity ERROR
+            throw $_
 
         }
 

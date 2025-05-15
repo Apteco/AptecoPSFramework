@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.5'
+ModuleVersion = '0.4.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -170,6 +170,10 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+0.4.6 Feature: Removed dependency to install modules globally
+      Feature Salesforce: Added new functions to add/remove records without bulk api
+      Feature Salesforce: Added new function to upload accounts and personaccounts into CampaignMember object
+      Fix: Some confusion with logfiles when importing plugins and settings
 0.4.5 Feature: Added new functions for Apteco email
       Fix: Improved the error handling in the http functions when the domain name cannot be resolved
       Fix: Use of $Script:logdivider instead of $logdivider

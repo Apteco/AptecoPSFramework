@@ -284,8 +284,11 @@ Calling with one of the Flags, just does this part
             "Script" = $psScripts
             "Module" = $psModules
             "LocalPackage" = $psLocalPackages
-            "GlobalPackage" = $psGlobalPackages
             "ExcludeDependencies" = $True
+        }
+
+        If ( $psGlobalPackages.Count -gt 0 ) {
+            $dependencyParams.Add("GlobalPackage", $psGlobalPackages)
         }
 
         If ( $isElevated -eq $False ) {

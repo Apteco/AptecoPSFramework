@@ -109,6 +109,8 @@
             $pluginParam.variables.processId = $ProcessId
         }
 
+        Write-Verbose "Starting to load the temporary module"
+
         New-Module -Name "$( $plugin.Name )" -ArgumentList $pluginParam -ScriptBlock {
 
             # argument input object
@@ -131,6 +133,7 @@
             #-----------------------------------------------
 
             $InputPlugin.variables.PSObject.Properties | ForEach-Object {
+                Write-Verbose "Creating variable $( $_.Name ) with value $( $_.Value )"
                 New-Variable -Name $_.Name -Value $_.Value -Scope Script -Force
             }
 
@@ -151,6 +154,7 @@
                 $import = $_
                 #Write-Host "Load $( $import.fullname )"
                 Try {
+                    Write-Verbose "Loading $( $import.fullname )"
                     . $import.fullname
                 } Catch {
                     Write-Error -Message "Failed to import function $( $import.fullname ): $( $_ )"
@@ -175,6 +179,9 @@
             # START LOG
             #-----------------------------------------------
 
+            #$InputPlugin | ConvertTo-Json -Depth 99 | Set-Content -Path C:\faststats\Scripts\sf\test.json -Encoding UTF8
+
+            Set-Logfile -Path $Script:settings.logfile
             Set-ProcessId -Id $InputPlugin.variables.processId
 
             Write-Log -message $Script:logDivider
@@ -309,6 +316,7 @@
         # RETURN
         #-----------------------------------------------
 
+        Set-ProcessId -Id $Script:processId
         Write-Log "Plugin successfully loaded" -Severity VERBOSE
 
         #$success = $true

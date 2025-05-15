@@ -6,7 +6,7 @@
     # API
     "base" = "my.salesforce.com"                            # will be combined with the account domain
     "apiversion" = "58.0"                                   # Salesforce API version
-    "instanceId" = "FS0"                                    # This is the 3 to 6 character in a salesforce ID
+    "instanceId" = "FS0"                                    # This is the 3 to 6 character in a salesforce ID, there can be multiplic instances/orgs, so this is maybe to check later
     #"contentType" = "application/json; charset=utf-8"      # content type string that is always used for API requests
     #"pageSize" = 500                                       # if paging is used for the API requests, this is the default setting for a pagesize
     "additionalHeaders" = [PSCustomObject]@{
@@ -62,11 +62,21 @@
 
         "reservedFields" = [Array]@(,"Id")                  # Those fields are removed on the upload
 
+        # Used for the leads-creation/contacts to campaign members upload
         "segmentVariablename" = ""                          # The segment variable name that is used to match against existing sub campaigns
-        "uploadIntoSubCampaigns" = $false                   # When you set this, you need a segment variable
+        "uploadIntoSubCampaigns" = $false                   # When you set this, you need a segment variable to match segments with existing sub campaigns
         "leadExternalId" = ""                               # The external id for upsert into leads object
         "uploadSize" = 20000                                # The size for the uploads
 
+        # Used for accounts only to campaign members upload
+        "defaultCampaignType" = "Email"
+        "subCampaignIdentifier" = "Apteco Import" # It will search for subcampaigns with that identifier
+        "useDatedSubCampaigns" = $True
+        "usePersonAccounts" = $True
+        "personContactIdVariablename" = "PersonContactId"
+        "isPersonAccountVariablename" = "IsPersonAccount"
+
+        # Bulk settings for upload
         "checkSeconds" = 20
         "maximumWaitUntilJobFinished" = 3000                # 3000 seconds per default to wait for a job to finish
         "downloadFailedResults" = $True
