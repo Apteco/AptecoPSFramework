@@ -229,6 +229,35 @@ function Invoke-UploadWithAccounts {
 
 
             #-----------------------------------------------
+            # BEFORE UPLOAD DO DOWNLOAD ALL VALID ID'S
+            #-----------------------------------------------
+
+            <#
+            # The variable names are not final yet
+            # Those are just outlines if we want to implement this check in the future
+
+            # That setting does not exist yet
+            If ($Script:settings.upload.checkValidIds -eq $true) {
+
+                $arr = [System.Collections.ArrayList]@()
+                # Get all valid account id's
+                $a = Get-SFSCObjectData -Object Account -Fields Id, PersonContactId, IsPersonAccount -Where "IsDeleted = false" -limit -1 -Bulk
+                
+                # Add the account id's to the array
+                $arr.AddRange($a.Id)
+
+                # Add the person account id's to the array
+                $arr.AddRange(($a | Where-Object { $_.IsPersonAccount -eq $True } ).PersonContactId)
+
+                # Later just check if the id is in the array
+                #$arr.Contains("003KB000005jr7GYAQ")
+
+            }
+
+            #>
+
+
+            #-----------------------------------------------
             # TRANSFORM THE DATA
             #-----------------------------------------------
 
