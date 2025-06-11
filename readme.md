@@ -462,3 +462,12 @@ This message could be slightly different. But this results from an older 32 bit 
 ## Channel is working from PowerShell, but not from Apteco FastStats Service
 
 Then it might be, that the FastStats Service is not running with a service user. It may be `network service` or `local system`. But those users are not able to decrypt encrypted credentials. So your service should run with a specified service user.
+
+## set-packagesource : Source Location 'https://api.nuget.org/v3/index.json' is not valid.
+
+Then you already have a nuget repository that does not work as expected. Just add it with this and try to execute the installation again:
+
+```PowerShell
+Register-PackageSource -Name "NuGet v2" -Location "https://www.nuget.org/api/v2" -ProviderName "NuGet"
+Install-AptecoPSFramework -verbose
+```
