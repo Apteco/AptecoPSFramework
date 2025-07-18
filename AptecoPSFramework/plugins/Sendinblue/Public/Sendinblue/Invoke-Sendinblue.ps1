@@ -58,8 +58,8 @@ function Invoke-Sendinblue {
         $updatedParameters = Skip-UnallowedBaseParameters -Base "Invoke-WebRequest" -Parameters $PSBoundParameters
 
         # Output parameters in debug mode
-        If ( $Script:debugMode -eq $true ) {
-            Write-Host "INPUT: $( Convertto-json -InputObject $PSBoundParameters -Depth 99 -Compress )"
+        If ( $Script:debugMode -eq $true -or $PSBoundParameters["Verbose"].IsPresent -eq $true) {
+            Write-Host "INPUT: $( Convertto-json -InputObject $PSBoundParameters -Depth 99 )"
         }
 
 
@@ -273,7 +273,7 @@ function Invoke-Sendinblue {
 
                 }
 
-                throw $_
+                throw $_.Exception
 
             }
 
@@ -326,6 +326,11 @@ function Invoke-Sendinblue {
             
             # documentation: https://developers.brevo.com/docs/api-limits
 <#
+
+            If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
+                Write-log $wr.Headers."Sforce-Limit-Info" -severity verbose #api-usage=2/15000
+            }
+
             $Script:pluginDebug = $req
 
             # Prevent problems as some calls do not have rate limiting

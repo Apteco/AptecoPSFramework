@@ -1,6 +1,6 @@
 # Quickstart
 
-This is all about the Brevo API
+This is all about the SendInBlue/Newsletter2Go API
 
 ```PowerShell
 
@@ -10,13 +10,13 @@ Start-Process "powershell.exe" -WorkingDirectory "C:\Users\Florian\Downloads\Bre
 # Import the module
 Import-Module "C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFramework" #-Verbose
 
-#Add-PluginFolder "C:\faststats\scripts\AptecoPSPlugins"
+Add-PluginFolder "C:\faststats\scripts\AptecoPSPlugins"
 
 # Choose a plugin
 $plugin = get-plugins | Select guid, name, version, update, path | Out-GridView -PassThru | Select -first 1
 
 # Install the plugin before loading it (installing dependencies)
-#Install-Plugin -Guid $plugin.guid
+Install-Plugin -Guid $plugin.guid # Installs psoauth
 
 
 # Import the plugin into this session
@@ -26,8 +26,8 @@ import-plugin -Guid $plugin.guid
 $settings = Get-settings
 $settings.logfile = ".\sendinblue.log"
 $settings.login.user = "test@example.org"
-$settings.login.password = Convert-PlaintextToSecure -String "abcdef"
-$settings.login.authkey = Convert-PlaintextToSecure -String "abhalsdfaldsaufzasd"
+$settings.login.password = Convert-PlaintextToSecure -String 'abcdef'
+$settings.login.authkey = Convert-PlaintextToSecure -String 'abhalsdfaldsaufzasd'
 $settings.token.tokenSettingsFile = ".\sib_token.json"
 $settings.token.tokenFilePath = ".\sib.token"
 

@@ -15,7 +15,9 @@
         # have a look at ./bin/dependencies if you need more information about how to define this
         "dependencies" = [PSCustomObject]@{
             "psScripts" = @()
-            "psModules" = @()
+            "psModules" = @(
+                "PSoAuth"
+            )
             "psPackages" = @()
         }
 

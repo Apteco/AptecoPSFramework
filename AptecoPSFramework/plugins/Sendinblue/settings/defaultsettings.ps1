@@ -41,7 +41,7 @@
 
     "token" = [PSCustomObject]@{
         #"encryptTokenFile" = $false                         # be careful, that the encryption is user dependent so cannot be shared between multiple users
-        #"tokenFilePath" = ".\sib.token"                     # path for the file containing the token that should be consumed or generated
+        "tokenFilePath" = ".\sib.token"                     # path for the file containing the token that should be consumed or generated
         #"encryptTokenInSettings" = $false
         "tokenSettingsFile" = ".\sib_token.json"            # Path for the settings file that contains important information about the token creation and refreshing
     }
