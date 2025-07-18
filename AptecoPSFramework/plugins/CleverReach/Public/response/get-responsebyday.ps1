@@ -1,10 +1,44 @@
 ﻿
+<#
 
-function Get-Response {
+Use this like
+
+```PowerShell
+$startDate = [DateTime]::ParseExact("2025-06-15","yyyy-MM-dd",$null)
+$endDate = [DateTime]::ParseExact("2025-06-20","yyyy-MM-dd",$null) #[DateTime]::Today.AddDays(-1)
+
+$days = 0
+Do {
+    
+    $today = $StartDate.AddDays($days)
+
+    $today.toString("yyyy-MM-dd")
+
+    Get-ResponseByDay -MessageStartDate $today.AddDays(-30) -MessageEndDate $today.AddDays(1).AddSeconds(-1) -ResponseStartDate $today -ResponseEndDate $today.AddDays(1).AddSeconds(-1)
+
+    $days += 1
+
+} Until ( $today -eq $endDate )
+```
+
+#>
+function Get-ResponseByDay {
 
     [CmdletBinding()]
     param (
+
+         [Parameter(Mandatory=$true)]
+         [datetime]$MessageStartDate
+        
+        ,[Parameter(Mandatory=$true)]
+         [datetime]$MessageEndDate
+
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
+        ,[Parameter(Mandatory=$true)]
+         [datetime]$ResponseStartDate
+        
+        ,[Parameter(Mandatory=$true)]
+         [datetime]$ResponseEndDate #= [DateTime]::Today.AddDays(-1).ToString("yyyy-MM-dd")
 
     )
 
@@ -51,6 +85,8 @@ function Get-Response {
         Write-Log "Debug Mode: $( $Script:debugMode )"
 
 
+
+
         #-----------------------------------------------
         # TIMESTAMPS FOR LOADING MAILING REPORTS AND RESPONSES
         #-----------------------------------------------
@@ -59,21 +95,22 @@ function Get-Response {
         $endTimestamp = Get-Unixtime
 
         # Load the response timestamp if available
-        If ( $Script:settings.responses.saveLastTimestamp -eq $true -and (Test-Path $Script:settings.responses.saveLastTimestampFile) -eq $true ) {
-            $lastTimestamp = Get-Content -Path $Script:settings.responses.saveLastTimestampFile -Encoding UTF8 -raw | convertfrom-json
-            $responseStartTimestamp = $lastTimestamp.lastResponseDownload # 30.Mai
-            Write-Log "Using last saved timestamp for responses: $( $responseStartTimestamp )"
-        } else {
-            $responseStartTimestamp = Get-Unixtime -timestamp ([DateTime]::Now.AddDays( $Script:settings.responses.responsePeriod *-1 ))
-            Write-Log "Using this timestamp for responses start: $( $responseStartTimestamp )"
 
-        }
+        $responseStartTimestamp = Get-Unixtime -timestamp $ResponseStartDate  #Get-Unixtime -timestamp ([DateTime]::Now.AddDays( $Script:settings.responses.responsePeriod *-1 ))
+        Write-Log "Using this timestamp for responses start: $( $responseStartTimestamp )"
+
+        $responseEndTimestamp = Get-Unixtime -timestamp $ResponseEndDate  #Get-Unixtime -timestamp ([DateTime]::Now.AddDays( $Script:settings.responses.responsePeriod *-1 ))
+        Write-Log "Using this timestamp for responses end: $( $responseEndTimestamp )"
+
 
         # Settings for messages
-        $messageStartTimestamp = Get-Unixtime -timestamp ([DateTime]::Now.AddDays( $Script:settings.responses.messagePeriod *-1 ))
+        $messageStartTimestamp = Get-Unixtime -timestamp $MessageStartDate
         Write-Log "Using this timestamp for messages start: $( $messageStartTimestamp )" # 01. Juli
 
-        Write-Log "Using this timestamp for end: $( $endTimestamp )"
+        $messageEndTimestamp = Get-Unixtime -timestamp $MessageEndDate
+        Write-Log "Using this timestamp for messages end: $( $messageEndTimestamp )" # 01. Juli
+
+        #Write-Log "Using this timestamp for end: $( $endTimestamp )"
 
 
         #-----------------------------------------------
@@ -153,11 +190,11 @@ function Get-Response {
 
             $reportsQuery = [PSCustomObject]@{
                 start = $messageStartTimestamp
-                end = $endTimestamp
+                end = $messageEndTimestamp
             }
             $reports = @( Invoke-CR -Object "reports" -Query $reportsQuery -Method "GET" -Paging -Pagesize 80 )
 
-            Write-Log -message "Found $( $reports.Count ) reports for the last $( $Script:settings.responses.messagePeriod ) days"
+            Write-Log -message "Found $( $reports.Count ) reports" #for the last $( $Script:settings.responses.messagePeriod ) days"
 
 
             ################################################
@@ -221,7 +258,7 @@ function Get-Response {
                             $query = [PSCustomObject]@{
                                 "detail" = $cleverReachDetailsBinary
                                 "from" = $responseStartTimestamp
-                                "to" = $endTimestamp
+                                "to" = $responseEndTimestamp
                             }
 
                             # Ask for a specific link id
@@ -431,21 +468,11 @@ function Get-Response {
 
             Write-Log -message "Exporting the data into CSV and creating a folder with the id $( $processId )"
 
-            # Save the response timestamp
-            If ( $Script:settings.responses.saveLastTimestamp -eq $true ) {
-                $tsExp = [PSCustomObject]@{
-                    lastResponseDownload = $endTimestamp
-                }
-                ConvertTo-Json -InputObject $tsExp -Depth 99 | Set-content -path $Script:settings.responses.saveLastTimestampFile -Encoding UTF8
-                Write-Log "Saved the timestamp $( $endTimestamp ) for the next execution of response download"
-            }
-
             # Trigger FERGE if there are responses
             If ( $Script:settings.responses.triggerFerge -eq $true -and $totalResponses -gt 0 ) {
                 Write-Log "Triggering FERGE to bring responses into the database"
                 Start-Process $Script:settings.responses.fergePath -WorkingDirectory "."
                 Start-Process -FilePath $Script:settings.responses.fergePath -ArgumentList $Script:settings.responses.fergeConfigurationXml
-
             }
 
 

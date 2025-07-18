@@ -170,6 +170,8 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
+      Fix CleverReach: Changed some datatypes to enhance performance of response gathering
 0.4.6 Feature: Removed dependency to install modules globally
       Feature Salesforce: Added new functions to add/remove records without bulk api
       Feature Salesforce: Added new function to upload accounts and personaccounts into CampaignMember object
