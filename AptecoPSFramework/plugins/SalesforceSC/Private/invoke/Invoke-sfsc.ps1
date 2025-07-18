@@ -45,12 +45,20 @@ function Invoke-SFSC {
         }
         #>
 
-        # check url, if it ends with a slash
+        #-----------------------------------------------
+        # CREATE URL
+        #-----------------------------------------------
+
         If ( $Script:settings.base.endswith("/") -eq $true ) {
             $base = $Script:settings.base
         } else {
             $base = "$( $Script:settings.base )/"
         }
+
+        #-----------------------------------------------
+        # CHECK INPUT PARAMETERS
+        #-----------------------------------------------
+
 
         # Build custom salesforce domain
         $base = "https://$( $Script:settings.login.mydomain ).$( $base )services/$( $Service )/v$( $script:settings.apiversion )/"
@@ -63,7 +71,10 @@ function Invoke-SFSC {
             Write-Host "INPUT: $( Convertto-json -InputObject $PSBoundParameters -Depth 99 )"
         }
 
-        # Prepare Authentication
+
+        #-----------------------------------------------
+        # AUTHENTICATION
+        #-----------------------------------------------
 
         If ( $Script:settings.token.tokenUsage -eq "consume" ) {
             #$rawToken = Get-Content -Path $Script:settings.token.tokenFilePath -Encoding UTF8 -Raw
@@ -91,8 +102,13 @@ function Invoke-SFSC {
         $token = ""
         $rawToken = ""
 
-        # Add auth header or just set it
 
+        #-----------------------------------------------
+        # HEADER
+        #-----------------------------------------------
+
+
+        # Add auth header or just set it
         If ( $updatedParameters.ContainsKey("Headers") -eq $true ) {
             $header.Keys | ForEach-Object {
                 $key = $_
@@ -103,15 +119,29 @@ function Invoke-SFSC {
         }
 
 
+        #-----------------------------------------------
+        # ADDITIONAL HEADERS
+        #-----------------------------------------------
+
         # Add additional headers from the settings, e.g. for api gateways or proxies
         $Script:settings.additionalHeaders.PSObject.Properties | ForEach-Object {
             $updatedParameters.Headers.add($_.Name, $_.Value)
         }
 
+
+        #-----------------------------------------------
+        # CONTENT TYPE
+        #-----------------------------------------------
+
         # Set content type, if not present yet
         If ( $updatedParameters.ContainsKey("ContentType") -eq $false) {
             $updatedParameters.add("ContentType",$ContentType)
         }
+
+
+        #-----------------------------------------------
+        # PATH
+        #-----------------------------------------------
 
         # normalize the path, remove leading and trailing slashes
         If ( $Path -ne "") {
@@ -123,44 +153,7 @@ function Invoke-SFSC {
             }
         }
 
-        # set the pagesize
-        <#
-        If ( $Pagesize -gt 0 ) {
-            $currentPagesize = $Pagesize
-        } else {
-            $currentPagesize = $Script:settings.pageSize
-        }
-        #>
-
-        # set paging parameters
-        <#
-        If ( $Paging -eq $true ) {
-
-            Switch ( $updatedParameters.Method ) {
-
-                "GET"{
-                    #Write-Host "get"
-                    $Query | Add-Member -MemberType NoteProperty -Name "pagesize" -Value $currentPagesize  #$Script:settings.pageSize
-                    $Query | Add-Member -MemberType NoteProperty -Name "page" -Value 0
-                }
-
-                "POST" {
-                    If ( $Body -is [PSCustomObject] ) {
-                        $Body | Add-Member -MemberType NoteProperty -Name "pagesize" -Value $currentPagesize # $Script:settings.pageSize
-                        $Body | Add-Member -MemberType NoteProperty -Name "page" -Value 0
-                    # } elseif ( $Body -is [System.Collections.Specialized.OrderedDictionary] ) {
-                    #     $Body.add("pagesize", $Script:settings.pageSize)
-                    #     $Body.add("page", 0)
-                    }
-                }
-
-            }
-
-            # Add a collection instead of a single object for the return
-            $res = [System.Collections.ArrayList]@()
-
-        }
-        #>
+        
 
         # Add a collection instead of a single object for the return
         $res = [System.Collections.ArrayList]@()
@@ -173,20 +166,27 @@ function Invoke-SFSC {
         $continueAfterTokenRefresh = $false
         Do {
 
-            # Prepare query
+            #-----------------------------------------------
+            # PREPARE QUERY
+            #-----------------------------------------------
+
             $nvCollection = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
             $Query.PSObject.Properties | ForEach-Object {
                 $nvCollection.Add( $_.Name, $_.Value )
             }
 
-            # Prepare URL
+
+            #-----------------------------------------------
+            # PREPARE URL
+            #-----------------------------------------------
+
             $uriRequest = [System.UriBuilder]::new("$( $base )$( $object )/$( $Path )")
             $uriRequest.Query = $nvCollection.ToString()
             $updatedParameters.Uri = $uriRequest.Uri.OriginalString
 
             # Prepare Body
             If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
-                $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99
+                $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99 -Compress
                 $updatedParameters.Body = $bodyJson
             }
 
