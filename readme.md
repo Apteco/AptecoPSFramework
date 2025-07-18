@@ -459,7 +459,6 @@ If you already have installed the AptecoPSFramework, make sure to re-install the
 
 This message could be slightly different. But this results from an older 32 bit package of `Packagemanagement` that comes with Windows. And that one is outdated and not supported by this Framework. Make sure you have a newer version available. Best is to open a PowerShell as Administrator and install it via `Install-Module "PackageManagement" -Scope AllUsers`. Or update an existing one with `Update-Module PackageManagement`. Because when PowerShell is called via C#, it can load the older PackageManagement. You can safely remove it from `C:\Program Files (x86)\WindowsPowerShell\Modules`. The new installed one should be in `C:\Program Files\WindowsPowerShell\Modules`.
 
-<<<<<<< Updated upstream
 ## Channel is working from PowerShell, but not from Apteco FastStats Service
 
 Then it might be, that the FastStats Service is not running with a service user. It may be `network service` or `local system`. But those users are not able to decrypt encrypted credentials. So your service should run with a specified service user.
@@ -471,7 +470,8 @@ Then you already have a nuget repository that does not work as expected. Just ad
 ```PowerShell
 Register-PackageSource -Name "NuGet v2" -Location "https://www.nuget.org/api/v2" -ProviderName "NuGet"
 Install-AptecoPSFramework -verbose
-=======
+```
+
 ## Some files are blocked
 
 Especially when you download the `*.ps1` files directly or in a zip file and unzip it with windows integrated tools, then the files get blocked. To Unblock them, this command is useful
@@ -479,5 +479,4 @@ Especially when you download the `*.ps1` files directly or in a zip file and unz
 ```PowerShell
 Set-Location "C:\...."
 get-childitem -Recurse -Include "*.ps1" | Unblock-File
->>>>>>> Stashed changes
 ```
