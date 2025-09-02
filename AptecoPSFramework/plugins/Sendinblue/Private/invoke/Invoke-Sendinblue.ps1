@@ -165,8 +165,8 @@ function Invoke-Sendinblue {
 
                 "GET"{
                     #Write-Host "get"
-                    $Query | Add-Member -MemberType NoteProperty -Name "limit" -Value $currentPagesize  #$Script:settings.pageSize
-                    $Query | Add-Member -MemberType NoteProperty -Name "offset" -Value 0
+                    $Query | Add-Member -MemberType NoteProperty -Name "_limit" -Value $currentPagesize  #$Script:settings.pageSize
+                    $Query | Add-Member -MemberType NoteProperty -Name "_offset" -Value 0
                 }
 <#
                 "POST" {
@@ -199,6 +199,26 @@ function Invoke-Sendinblue {
             $updatedParameters.Body = $bodyJson
         }
 
+
+        #-----------------------------------------------
+        # PREPARE QUERY
+        #-----------------------------------------------
+
+        $nvCollection = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
+        $Query.PSObject.Properties | ForEach-Object {
+            $nvCollection.Add( $_.Name, $_.Value )
+        }
+
+
+        #-----------------------------------------------
+        # PREPARE URL
+        #-----------------------------------------------
+
+        $uriRequest = [System.UriBuilder]::new("$( $base )$( $object )$( $Path )")
+        $uriRequest.Query = $nvCollection.ToString()
+        $updatedParameters.Uri = $uriRequest.Uri.OriginalString
+
+
         $finished = $false
         $continueAfterTokenRefresh = $false
         Do {
@@ -207,21 +227,8 @@ function Invoke-Sendinblue {
             try {
 
                 #-----------------------------------------------
-                # PREPARE QUERY
+                # DO REQUEST
                 #-----------------------------------------------
-
-                $nvCollection = [System.Web.HttpUtility]::ParseQueryString([String]::Empty)
-                $Query.PSObject.Properties | ForEach-Object {
-                    $nvCollection.Add( $_.Name, $_.Value )
-                }
-
-                #-----------------------------------------------
-                # PREPARE URL
-                #-----------------------------------------------
-
-                $uriRequest = [System.UriBuilder]::new("$( $base )$( $object )$( $Path )")
-                $uriRequest.Query = $nvCollection.ToString()
-                $updatedParameters.Uri = $uriRequest.Uri.OriginalString
 
                 # Output parameters in debug mode
                 If ( $Script:debugMode -eq $true -or $PSBoundParameters["Verbose"].IsPresent -eq $true) {
@@ -281,20 +288,21 @@ function Invoke-Sendinblue {
             If ( $Paging -eq $true ) {
 
                 Write-Verbose "Jumping into next page"
-                #$Script:pluginDebug = $wr
+                $Script:pluginDebug = $wr
 
                 # When using paging, we want the first subobject
-                $wrItems = $wr.psobject.properties.where({ $_.MemberType -eq "NoteProperty" })[0].Value
+                #$wrItems = $wr.psobject.properties.where({ $_.MemberType -eq "NoteProperty" })[0].Value
 
-                # If the result equals the pagesize, try it one more time with the next page
-                If ( $wrItems.Count -eq $currentPagesize ) {
+                # If there is a "_next" link, use it
+                If ( $null -ne $wr.info.links._next ) {
 
                     Write-Verbose "Set next batch"
 
                     Switch ( $updatedParameters.Method ) {
 
-                        "GET"{
-                            $Query.offset += $currentPagesize
+                        "GET" {
+                            # $Query.offset += $currentPagesize
+                            $updatedParameters.Uri = $wr.info.links._next
                         }
                         <#
                         "POST" {
@@ -311,7 +319,7 @@ function Invoke-Sendinblue {
                 }
 
                 # Add result to return collection
-                [void]$res.Add($wrItems)
+                [void]$res.AddRange($wr.value)
 
             } else {
 

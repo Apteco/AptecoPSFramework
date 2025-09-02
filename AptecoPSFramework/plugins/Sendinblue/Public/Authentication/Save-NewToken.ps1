@@ -16,7 +16,7 @@ function Save-NewToken {
         $newToken = Request-NewToken
         $validUntilUnixtime = ( Get-Unixtime ) + [int]( $newToken.expires_in )
         $validUntilDatetime = ConvertFrom-UnixTime -Unixtime $validUntilUnixtime -ConvertToLocalTimezone
-        Write-Log -message "Got new token valid until $( $validUntilDatetime.ToString("yyyy-MM-dd HH:mm:ss") )"
+        Write-Log -message "Got new token valid until $( $validUntilDatetime.ToString("yyyy-MM-dd HH:mm:ss") ), '$( [System.TimeZoneInfo]::Local.Id )'"
 
         # Save the new token to the variable cache for in-memory
         If ( $Script:variableCache.Keys -contains "sib_access_token" ) {
@@ -36,7 +36,7 @@ function Save-NewToken {
             } | ConvertTo-Json | Set-Content -Path $Script:settings.token.tokenSettingsFile -Encoding utf8
         }
 
-        # And to a file so the token persits
+        # And to a file so the token persists
         [void]( Request-TokenRefresh -SettingsFile $Script:settings.token.tokenSettingsFile -NewAccessToken $newToken.access_token -NewRefreshToken $newToken.refresh_token )
 
         # Return

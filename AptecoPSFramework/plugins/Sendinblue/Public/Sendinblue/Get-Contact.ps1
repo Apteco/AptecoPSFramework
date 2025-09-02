@@ -3,17 +3,28 @@ function Get-Contact {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
 
-        [Parameter(Mandatory=$true, ParameterSetName = 'Single')][Int]$Id
+         [Parameter(Mandatory=$true, ParameterSetName = 'Single')]
+         [String]$Id
 
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [String]$ListId = ""        
         
-        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][Switch]$All = $false
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [Switch]$All = $false
 
-        ,[Parameter(Mandatory=$true, ParameterSetName = 'Single')]
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
          [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$Expand = $false
         
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'Single')]
+         [Array]$Fields = [Array]@()
+                 
+         <#
+        ,[Parameter(Mandatory=$true, ParameterSetName = 'Single')]
+         [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [Switch]$IncludeStats = $false
+        #>
     )
 
     begin {
@@ -33,6 +44,7 @@ function Get-Contact {
                 }
 
                 # Create params for second call
+                <#
                 If ( $IncludeStats -eq $true ) {
                     $statsParams = [Hashtable]@{
                         "Object" = "contacts"
@@ -40,6 +52,7 @@ function Get-Contact {
                         "Path" = "$( $Id )/campaignStats"
                     }
                 }
+                #>
 
                 break
             }
@@ -64,7 +77,7 @@ function Get-Contact {
                 # Add paging
                 If ( $All -eq $true ) {
                     $params.Add("Paging", $true)
-                    $params.Add("PageSize", 1000)
+                    $params.Add("PageSize", 5000)
                 }
                 
                 break
@@ -76,6 +89,19 @@ function Get-Contact {
             $params.Add("Query",[PSCustomObject]@{
                 "_expand" = "true"
             })
+        } else {
+            $params.Add("Query",[PSCustomObject]@{
+                "_expand" = "false"
+            })
+        }
+
+        If ( $Fields.Count -gt 0 ) {
+            $params.Query | Add-Member -MemberType NoteProperty -Name "_fields" -Value ( $Fields -join "," )
+            <#
+            $params.Add("Query",[PSCustomObject]@{
+                "_fields" = $Fields -join ","
+            })
+            #>
         }
 
         # add verbose flag, if set
@@ -88,6 +114,7 @@ function Get-Contact {
 
         # Return
         switch ($PSCmdlet.ParameterSetName) {
+
             'Single' {
 
                 # return

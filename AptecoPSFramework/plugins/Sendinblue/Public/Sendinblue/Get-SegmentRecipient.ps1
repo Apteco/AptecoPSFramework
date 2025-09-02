@@ -1,39 +1,43 @@
 
-function Get-List {
+function Get-SegmentRecipient {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
 
-         [Parameter(Mandatory=$true, ParameterSetName = 'Single')]
-         [String]$Id
+         [Parameter(Mandatory=$true, ParameterSetName = 'Collection')]
+         [String]$ListId
+        
+        ,[Parameter(Mandatory=$true, ParameterSetName = 'Collection')]
+         [String]$SegmentId
         
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$All = $false
 
-        ,[Parameter(Mandatory=$false, ParameterSetName = 'Single')]
-         [Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$Expand = $false
 
     )
 
     begin {
 
+
     }
 
     process {
 
         switch ( $PSCmdlet.ParameterSetName ) {
-            
+
+            <#
             'Single' {
 
                 # Create params
                 $params = [Hashtable]@{
-                    "Object" = "lists"
+                    "Object" = "groups"
                     "Method" = "GET"
-                    "Path" = $Id
+                    "Path" = "$( $Id )"
                 }
 
                 break
-            }
+            }#>
 
             'Collection' {
 
@@ -41,16 +45,18 @@ function Get-List {
                 $params = [Hashtable]@{
                     "Object" = "lists"
                     "Method" = "GET"
+                    "Path" = "$( $ListId )/groups/$( $SegmentId )/recipients"
                 }
 
                 # Add paging
                 If ( $All -eq $true ) {
                     $params.Add("Paging", $true)
-                    $params.Add("PageSize", $Script:settings.pageSize)
+                    $params.Add("PageSize", 5000 )#$Script:settings.pageSize)
                 }
                 
                 break
             }
+
         }
 
         # Check expand
@@ -66,25 +72,26 @@ function Get-List {
 		}
 
         # Request list(s)
-        $list = Invoke-Sendinblue @params
+        $recipients = Invoke-Sendinblue @params
 
-        # Return
         switch ($PSCmdlet.ParameterSetName) {
-
+            
+            <#
             'Single' {
 
-                $list.value
+                $segments.value
 
                 break
             }
+            #>
 
             'Collection' {
 
                 # return
                 If ( $All -eq $true ) {
-                    $list
+                    $recipients
                 } else {
-                    $list.value
+                    $recipients.value
                 }
                 
                 break

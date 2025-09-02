@@ -6,7 +6,7 @@
     # API
     "base" = "https://api.newsletter2go.com/"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
     "contentType" = "application/json"       # content type string that is always used for API requests
-    "pageSize" = 10                                        # if paging is used for the API requests, this is the default setting for a pagesize
+    "pageSize" = 50                                        # if paging is used for the API requests, this is the default setting for a pagesize
     "mailingLimit" = 999
     "additionalHeaders" = [PSCustomObject]@{
         #"X-API" = "abcdef"

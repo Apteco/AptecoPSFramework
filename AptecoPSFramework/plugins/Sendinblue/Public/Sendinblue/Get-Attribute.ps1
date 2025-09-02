@@ -1,10 +1,13 @@
 
-function Get-List {
+function Get-Attribute {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
 
          [Parameter(Mandatory=$true, ParameterSetName = 'Single')]
          [String]$Id
+
+        ,[Parameter(Mandatory=$true, ParameterSetName = 'Collection')]
+         [String]$ListId
         
         ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
          [Switch]$All = $false
@@ -22,14 +25,14 @@ function Get-List {
     process {
 
         switch ( $PSCmdlet.ParameterSetName ) {
-            
+
             'Single' {
 
                 # Create params
                 $params = [Hashtable]@{
-                    "Object" = "lists"
+                    "Object" = "attributes"
                     "Method" = "GET"
-                    "Path" = $Id
+                    "Path" = "$( $Id )"
                 }
 
                 break
@@ -41,6 +44,7 @@ function Get-List {
                 $params = [Hashtable]@{
                     "Object" = "lists"
                     "Method" = "GET"
+                    "Path" = "$( $ListId )/attributes"
                 }
 
                 # Add paging
@@ -51,6 +55,7 @@ function Get-List {
                 
                 break
             }
+
         }
 
         # Check expand
@@ -66,14 +71,13 @@ function Get-List {
 		}
 
         # Request list(s)
-        $list = Invoke-Sendinblue @params
+        $attributes = Invoke-Sendinblue @params
 
-        # Return
         switch ($PSCmdlet.ParameterSetName) {
 
             'Single' {
 
-                $list.value
+                $attributes.value
 
                 break
             }
@@ -82,11 +86,11 @@ function Get-List {
 
                 # return
                 If ( $All -eq $true ) {
-                    $list
+                    $attributes
                 } else {
-                    $list.value
+                    $attributes.value
                 }
-                
+
                 break
             }
         }
