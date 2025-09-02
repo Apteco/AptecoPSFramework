@@ -39,7 +39,8 @@
 
     # Upload settings
     "upload" = [PSCustomObject]@{
-
+        defaultListFolder = 0                            # default folder to use for lists, 0 = global
+        addNewAttributes = $true                       # if attributes are found in the data that are not yet in Brevo, add them
     }
 
     # Broadcast settings

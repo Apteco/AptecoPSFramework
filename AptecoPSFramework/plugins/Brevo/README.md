@@ -102,3 +102,41 @@ Get-Process -All
 - A list contains contacts
 - Webhooks is used for realtime
 - Exports can be done through the processes (max time for events is 7 days), a notify/webhooks url is optionally
+
+# Webhooks
+
+In order to use webhooks to receive events of Brevo I would recommend to setup a receiver (ask me for a scalable sample code) and then set this webhook up via a call like this
+
+As an example, brevo webhooks need to be created through the API as the UI does not offer the batch parameter:
+
+```PowerShell
+$headers = [Hashtable]@{
+    "accept" = "application/json"
+    "api-key" = "xkeysib-abcdefasdfjklasdhf"
+}
+$body = [PSCustomObject]@{
+    type    = "marketing"
+    channel = "email"
+    auth    = [PSCustomObject]@{
+        token = "your-static-secret-token-here"
+        type  = "bearer"
+    }
+    url     = "https://cloud.server.example/webhook/payload"
+    batched = $true
+    events  = @(
+        "delivered"
+        "opened"
+        "click"
+        "hardBounce"
+        "softBounce"
+        "unsubscribed"
+        "contactUpdated"
+        "contactDeleted"
+        "listAddition"
+        "proxyOpen"
+        "spam"
+    )
+} | ConvertTo-Json -Depth 99
+
+Invoke-RestMethod -Method Post -Uri "https://api.brevo.com/v3/webhooks" -ContentType "application/json" -Headers $headers -Body $body
+```
