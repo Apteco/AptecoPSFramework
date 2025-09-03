@@ -480,3 +480,7 @@ Especially when you download the `*.ps1` files directly or in a zip file and unz
 Set-Location "C:\...."
 get-childitem -Recurse -Include "*.ps1" | Unblock-File
 ```
+
+## Create user for services
+
+To create a user that works with encryption and can be used with the FastStats Service, please create a user in the users group. It should have the local policy user rights assignments: `Allow log on locally`, `Log on as a batch job`, `Log on as a service`
