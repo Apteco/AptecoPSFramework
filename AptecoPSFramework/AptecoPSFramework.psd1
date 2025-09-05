@@ -173,6 +173,9 @@ PrivateData = @{
       Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
       Feature: Enhanced the boilerplate to output more information about the current process
       Fix CleverReach: Changed some datatypes to enhance performance of response gathering
+      Fix: Join-PSCustomObject and Join-Hashtable were not working properly if you have a filled subobject on the left
+          side and an empty subobject on the right side. It just overwrites it with the empty subobject. This is now fixed
+          to use the left object
 0.4.6 Feature: Removed dependency to install modules globally
       Feature Salesforce: Added new functions to add/remove records without bulk api
       Feature Salesforce: Added new function to upload accounts and personaccounts into CampaignMember object
