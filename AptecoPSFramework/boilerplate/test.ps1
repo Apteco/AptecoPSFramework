@@ -25,6 +25,12 @@ Param(
 
 )
 
+#-----------------------------------------------
+# VARIABLES
+#-----------------------------------------------
+
+$thisScript = ".\test.ps1"
+
 
 #-----------------------------------------------
 # DEBUG SWITCH
@@ -111,8 +117,6 @@ Set-Location $settingsFileItem.DirectoryName
 #-----------------------------------------------
 # CALL NEXT STEP
 #-----------------------------------------------
-
-$thisScript = ".\test.ps1"
 
 # Added try/catch again because of extras.xml wrapper
 try {

@@ -25,6 +25,12 @@ Param(
 
 )
 
+#-----------------------------------------------
+# VARIABLES
+#-----------------------------------------------
+
+$thisScript = ".\getmessages.ps1"
+
 
 #-----------------------------------------------
 # DEBUG SWITCH
@@ -108,8 +114,6 @@ Set-Location $settingsFileItem.DirectoryName
 #-----------------------------------------------
 # CALL NEXT STEP
 #-----------------------------------------------
-
-$thisScript = ".\getmessages.ps1"
 
 # Added try/catch again because of extras.xml wrapper
 try {

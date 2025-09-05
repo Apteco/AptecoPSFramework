@@ -10,7 +10,7 @@
 # CHECKING PS AND OS
 #-----------------------------------------------
 
-Write-Verbose "Check PowerShell and Operating system" -Verbose
+Write-Verbose "Check PowerShell and Operating system"
 
 # Check if this is Pwsh Core
 $isCore = ($PSVersionTable.Keys -contains "PSEdition") -and ($PSVersionTable.PSEdition -ne 'Desktop')
@@ -34,7 +34,7 @@ if ($isCore -eq $true) {
     $os = "Windows"
 }
 
-Write-Verbose -Message "Using OS: $( $os )" -Verbose
+Write-Verbose -Message "Using OS: $( $os )"
 
 
 #-----------------------------------------------
@@ -98,9 +98,44 @@ $Env:Path = @( $scriptPath | Sort-Object -unique ) -join ";"
 
 ################################################
 #
+# LOG
+#
+################################################
+
+
+#-----------------------------------------------
+# DEFINE TEMPORARY LOG FILE
+#-----------------------------------------------
+
+Import-Module WriteLog
+Set-Logfile -Path "$( $Env:TEMP )\AptecoPSFramework.log"
+#[System.Environment]::GetEnvironmentVariables() TEMP/TMP
+
+# Log the params, if existing
+Write-Log -message "Input Parameterset: $( $PsCmdlet.ParameterSetName )"
+If ( $PsCmdlet.ParameterSetName -eq "HashtableInput" ) {
+
+    Write-Log -message "INPUT:"
+    if ( $Params ) {
+        $Params.Keys | ForEach-Object {
+            $param = $_
+            Write-Log -message "    $( $param ) = '$( $Params[$param] )'" -writeToHostToo $false
+        }
+    }
+
+} else {
+
+    Write-Log "Using JobId: $( $JobId )"
+
+}
+
+
+################################################
+#
 # CHECKS
 #
 ################################################
+
 
 #-----------------------------------------------
 # DEFAULT VALUES
@@ -115,6 +150,19 @@ $isPsCoreInstalled = $false
 If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" -and $settingsfileLocation -ne "" ) {
     $useJob = $true
 }
+
+
+#-----------------------------------------------
+# LOGGING
+#-----------------------------------------------
+
+Write-Log -Message "This script: $( $thisScript )"
+Write-Log -Message "Using OS: $( $os )"
+Write-Log -Message "64bit OS: $( [System.Environment]::Is64BitOperatingSystem  )"
+Write-Log -Message "64bit Process: $( [System.Environment]::Is64BitProcess  )"
+Write-Log -Message "Using PowerShell version $( $PSVersionTable.PSVersion.ToString() ) and $( $PSVersionTable.PSEdition ) edition" -Verbose
+Write-Log -Message "Running as user: $( [System.Security.Principal.WindowsIdentity]::GetCurrent().Name )"
+Write-Log -Message "Debug Mode: $( $debug )"
 
 
 ################################################
@@ -145,6 +193,9 @@ If ( $params.ForcePython -eq "true" ) {
     $useJob = $true
 }
 
+Write-Log -Message "Enforce 64bit: $( $enforce64Bit )"
+Write-Log -Message "Enforce Job: $( $useJob )"
+
 
 #-----------------------------------------------
 # IMPORT MODULE
@@ -161,6 +212,8 @@ If ($debug -eq $true) {
 # SET SETTINGS
 #-----------------------------------------------
 
+Write-Log "Import settings from file: $( $settingsfileLocation )"
+
 # Set the settings
 If ( $useJob -eq $true -and $ProcessId -ne "") {
     Import-Settings -Path $settingsfileLocation -ProcessId $ProcessId
@@ -170,6 +223,8 @@ If ( $useJob -eq $true -and $ProcessId -ne "") {
 
 # Get all settings
 $s = Get-Settings
+
+Write-Log "Use process id: $( Get-ProcessIdentifier ) from now on"
 
 
 #-----------------------------------------------
@@ -187,6 +242,8 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
 
     If ( $PsCmdlet.ParameterSetName -eq "HashtableInput" ) {
 
+        Write-Log "Create a new job"
+
         # Create a new job
         $jobId = Add-JobLog
         $jobParams = [Hashtable]@{
@@ -198,7 +255,11 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
         }
         Update-JobLog @jobParams
 
+        Write-Log "Created a new job with id $( $jobId )"
+
     } else {
+
+        Write-Log "Using existing job with id $( $JobId )"
 
         $job = Get-JobLog -JobId $JobId -ConvertInput
 
@@ -208,6 +269,10 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
         }
 
     }
+
+} else {
+
+    Write-Log "No job will be used"
 
 }
 
@@ -225,6 +290,8 @@ if ( $calc -eq 2 ) {
     $isPsCoreInstalled = $true
 }
 
+Write-Log -Message "Is PSCore installed: $( $isPsCoreInstalled )"
+
 
 #-----------------------------------------------
 # FIND OUT THE MODE
@@ -238,3 +305,5 @@ If ( $enforce64Bit -eq $true ) {
 } elseif ( $enforcePython -eq $true ) {
     $mode = "Python"
 }
+
+Write-Log "Using mode: $( $mode )"
