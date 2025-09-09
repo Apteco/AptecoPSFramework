@@ -5,7 +5,7 @@
 RootModule = 'AptecoPSFramework.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.6'
+ModuleVersion = '0.4.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -170,7 +170,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
-      Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
+0.4.7 Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
       Feature: Enhanced the boilerplate to output more information about the current process
       Fix CleverReach: Changed some datatypes to enhance performance of response gathering
       Fix: Join-PSCustomObject and Join-Hashtable were not working properly if you have a filled subobject on the left
