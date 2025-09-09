@@ -153,7 +153,7 @@ function Invoke-SFSC {
             }
         }
 
-        
+
 
         # Add a collection instead of a single object for the return
         $res = [System.Collections.ArrayList]@()

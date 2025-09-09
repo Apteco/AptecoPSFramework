@@ -118,7 +118,7 @@ function Join-PSCustomObject {
                     $joined | Add-Member -MemberType NoteProperty -Name $propEqual -Value $newArrSorted
 
                 } elseif ( $MergeHashtables -eq $true -and $Left.($propEqual) -is [hashtable] -and $Right.($propEqual) -is [hashtable] -and $countRight -gt 0) {
-                    
+
                     Write-Verbose "Merging hashtables from '$( $propEqual )'"
 
                     # Recursively call this function, if it is nested hashtable
@@ -138,8 +138,8 @@ function Join-PSCustomObject {
                     # just overwrite existing values if datatypes of attribute are different or no merging is wished
                     $joined | Add-Member -MemberType NoteProperty -Name $propEqual -Value $Left.($propEqual)
                     Write-Verbose "Overwrite '$( $propEqual )' with value from left side"
-                    #Write-Verbose "Datatypes of '$( $propEqual )' are not the same on left and right"                    
-                
+                    #Write-Verbose "Datatypes of '$( $propEqual )' are not the same on left and right"
+
                 } else {
 
                     # just overwrite existing values if datatypes of attribute are different or no merging is wished

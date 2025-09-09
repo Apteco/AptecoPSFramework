@@ -10,7 +10,7 @@ function Get-StringFromByte() {
     )
 
     $stringBuilder = ""
-    $byteArray | ForEach { $stringBuilder += $_.ToString("x2") }
+    $byteArray | ForEach-Object { $stringBuilder += $_.ToString("x2") }
 
     $stringBuilder
 

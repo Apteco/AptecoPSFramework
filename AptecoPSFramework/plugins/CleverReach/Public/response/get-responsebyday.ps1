@@ -9,7 +9,7 @@ $endDate = [DateTime]::ParseExact("2025-06-20","yyyy-MM-dd",$null) #[DateTime]::
 
 $days = 0
 Do {
-    
+
     $today = $StartDate.AddDays($days)
 
     $today.toString("yyyy-MM-dd")
@@ -29,14 +29,14 @@ function Get-ResponseByDay {
 
          [Parameter(Mandatory=$true)]
          [datetime]$MessageStartDate
-        
+
         ,[Parameter(Mandatory=$true)]
          [datetime]$MessageEndDate
 
         #[Parameter(Mandatory=$false)][Hashtable] $InputHashtable
         ,[Parameter(Mandatory=$true)]
          [datetime]$ResponseStartDate
-        
+
         ,[Parameter(Mandatory=$true)]
          [datetime]$ResponseEndDate #= [DateTime]::Today.AddDays(-1).ToString("yyyy-MM-dd")
 

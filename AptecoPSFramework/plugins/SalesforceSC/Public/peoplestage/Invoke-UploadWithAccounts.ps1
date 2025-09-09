@@ -242,7 +242,7 @@ function Invoke-UploadWithAccounts {
                 $arr = [System.Collections.ArrayList]@()
                 # Get all valid account id's
                 $a = Get-SFSCObjectData -Object Account -Fields Id, PersonContactId, IsPersonAccount -Where "IsDeleted = false" -limit -1 -Bulk
-                
+
                 # Add the account id's to the array
                 $arr.AddRange($a.Id)
 

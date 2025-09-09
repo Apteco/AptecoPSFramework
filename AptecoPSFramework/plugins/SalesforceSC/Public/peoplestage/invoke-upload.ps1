@@ -478,7 +478,7 @@ function Invoke-Upload{
                 Write-Log "  Skipped another $( $skippedLines ) leads lines" # TODO should this trigger an error?
 
                 Write-Log -Severity VERBOSE -Message "Campaign summmary:"
-                $newCsv | where-object { $_.LeadID -ne "" } | group CampaignID | Sort-Object Count -Descending | ForEach-Object {
+                $newCsv | where-object { $_.LeadID -ne "" } | Group-Object CampaignID | Sort-Object Count -Descending | ForEach-Object {
                     $c = $_
                     Write-Log -Severity VERBOSE -Message "  $( $c.Name ): $( $c.Count ) leads"
                 }

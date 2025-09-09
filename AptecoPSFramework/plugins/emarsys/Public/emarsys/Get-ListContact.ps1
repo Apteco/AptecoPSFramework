@@ -62,7 +62,7 @@ function Get-ListContact {
             #$res.AddRange($fetchList.value)
 
             # Setup next page
-            If ( $fetchList.next -ne $null ) {
+            If ( $null -ne $fetchList.next ) {
                 $queryChar = $fetchList.next.IndexOf("?")
                 $nextQueryParams = [System.Web.HttpUtility]::ParseQueryString($fetchList.next.Substring( $queryChar+1 ))
                 $SkipToken = $nextQueryParams['$skiptoken']
@@ -73,7 +73,7 @@ function Get-ListContact {
             $percent = [math]::Floor(($i/$listCount)*100)
             Write-Progress -Activity "Loading list contacts" -Status "$( $percent )% complete" -PercentComplete $percent
 
-        } While ( $All -eq $true -and $fetchList.next -ne $null )
+        } While ( $All -eq $true -and $null -ne $fetchList.next )
 
         # return
         #$res

@@ -870,7 +870,7 @@ class Emarsys : DCSP {
 
         # Transform result to objects
         $fields = [System.Collections.ArrayList]@()
-        $res | ForEach {
+        $res | ForEach-Object {
 
             $f = $_
 
@@ -885,7 +885,7 @@ class Emarsys : DCSP {
                         uri = "$( $this.baseUrl)field/$( $f.id )/choice"
                     }
                     $choices = Invoke-emarsys @params
-                    $choices | ForEach {
+                    $choices | ForEach-Object {
                         $c = $_
                         [void]$choice.Add([DCSPFieldChoice]@{
                             "id" = $c.id
@@ -934,7 +934,7 @@ class Emarsys : DCSP {
 
         # Transform result to objects
         $lists = [System.Collections.ArrayList]@()
-        $res | ForEach {
+        $res | ForEach-Object {
 
             $l = $_
 
@@ -1133,7 +1133,7 @@ class Emarsys : DCSP {
 
         # Transform result to objects
         $campaigns = [System.Collections.ArrayList]@()
-        $res | ForEach {
+        $res | ForEach-Object {
 
             $c = $_
 
@@ -1262,7 +1262,7 @@ class Emarsys : DCSP {
         # split the fields automatically
         # TODO [ ] find out if the primary key is always included
 
-        $fields = $this.getFields($false) | where { $_.excludeForExport -eq $false }
+        $fields = $this.getFields($false) | Where-Object { $_.excludeForExport -eq $false }
 
         # paging through fields and create exports
         $count = $fields.count
@@ -1294,7 +1294,7 @@ class Emarsys : DCSP {
         # TODO [ ] make delimiter available as enum
         # TODO [ ] implement language
 
-        $exportFields = $fields | where { $_.excludeForExport -eq $false }
+        $exportFields = $fields | Where-Object { $_.excludeForExport -eq $false }
 
         # Create export
         $body = @{
@@ -1568,7 +1568,7 @@ function Invoke-emarsys {
             "Verbose" = $true
         }
 
-        if ( $body -ne $null ) {
+        if ( $null -ne $body ) {
             $params += @{
                 "Body" = $body
             }
