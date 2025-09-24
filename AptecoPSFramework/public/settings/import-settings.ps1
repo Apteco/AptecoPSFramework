@@ -63,7 +63,7 @@ Function Import-Settings {
 
                     # Joining the settings together
                     try {
-                        $joinedSettings = Join-PSCustomObject -Left $Script:defaultSettings -Right $settings -AddPropertiesFromRight -MergePSCustomObjects -MergeHashtables #-MergeArrays
+                        $joinedSettings = Merge-PSCustomObject -Left $Script:defaultSettings -Right $settings -AddPropertiesFromRight -MergePSCustomObjects -MergeHashtables #-MergeArrays
                     } catch {
                         Write-Error -Message "Settings cannot be joined"
                         throw $_
