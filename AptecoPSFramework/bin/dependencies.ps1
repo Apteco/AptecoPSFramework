@@ -1,7 +1,7 @@
 
 $psScripts = [Array]@(
     "Install-Dependencies"
-    "Import-Dependencies"
+    #"Import-Dependencies"
 )
 
 $psModules = [Array]@(
@@ -20,6 +20,7 @@ $psModules = [Array]@(
     "SimplySql" # Added to use for job management instead of DuckDB which only support x64
     "MergeHashtable"
     "MergePSCustomObject"
+    "ImportDependency"
 )
 
 

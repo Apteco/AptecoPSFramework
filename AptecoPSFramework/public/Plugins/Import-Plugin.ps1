@@ -277,7 +277,7 @@
                 #    $mod = $_
                 #    Import-Module -Name $mod -ErrorAction Stop
                 #}
-                Import-Dependencies @dependencyParams
+                Import-Dependency @dependencyParams
             } catch {
                 Write-Warning "Error loading module, script and package dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now" -Verbose
             }

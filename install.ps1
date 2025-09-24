@@ -282,11 +282,14 @@ try {
 
 try {
 
-    install-module writelog
+    install-module WriteLog
     Write-Verbose "[OK] Installed module WriteLog" -Verbose
 
-    install-script install-dependencies, import-dependencies
-    Write-Verbose "[OK] Installed scripts 'Install-Dependencies' and 'Import-Dependencies'" -Verbose
+    install-script install-dependencies
+    Write-Verbose "[OK] Installed scripts 'Install-Dependencies'" -Verbose
+
+    install-module ImportDependency
+    Write-Verbose "[OK] Installed module ImportDependency" -Verbose
 
     Install-Dependencies -module aptecopsframework
     Write-Verbose "[OK] Installed module AptecoPSFramework and dependencies" -Verbose
