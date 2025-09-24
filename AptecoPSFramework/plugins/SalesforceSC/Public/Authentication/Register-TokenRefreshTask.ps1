@@ -102,6 +102,7 @@
             $credCounter = 0
             Do {
                 $taskCred = Get-Credential -UserName $env:Username -Message "Credentials for executing the task"
+                # TODO This function is not save to use on Linux
                 $taskCredTest = Test-Credential -Credentials $taskCred
                 $credCounter += 1
             } Until ( $taskCredTest -eq $true -or $credCounter -ge 3) # max 3 tries
