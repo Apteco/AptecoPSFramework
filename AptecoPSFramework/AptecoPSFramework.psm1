@@ -235,8 +235,9 @@ try {
         Import-Module -Name $mod -ErrorAction Stop
     }
 } catch {
-    Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' now"
-    Exit 0
+    #Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' now"
+    #Exit 0
+    throw "Error loading dependencies. Please execute 'Install-AptecoPSFramework' now"
 }
 
 <#
