@@ -491,7 +491,9 @@ Especially to test things on Windows Sandbox, somehow the default PSGallery repo
 
 ```PowerShell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+# This registers also PSGallery automatically
 Register-PackageSource -Name "PSGall" -Location "https://www.powershellgallery.com/api/v2/" -ProviderName PowerShellGet
-install-module powershellget -force -Repository PSGall
+Unregister-PSRepository -Name PSGall
+install-module powershellget
 remove-item "C:\Program Files\WindowsPowerShell\Modules\PowerShellGet\1.0.0.1" -force
 ```
