@@ -484,3 +484,14 @@ get-childitem -Recurse -Include "*.ps1" | Unblock-File
 ## Create user for services
 
 To create a user that works with encryption and can be used with the FastStats Service, please create a user in the users group. It should have the local policy user rights assignments: `Allow log on locally`, `Log on as a batch job`, `Log on as a service`
+
+## No PowerShell Repository available yet
+
+Especially to test things on Windows Sandbox, somehow the default PSGallery repository is missing. You can add it via
+
+```PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+Register-PackageSource -Name "PSGall" -Location "https://www.powershellgallery.com/api/v2/" -ProviderName PowerShellGet
+install-module powershellget -force -Repository PSGall
+remove-item "C:\Program Files\WindowsPowerShell\Modules\PowerShellGet\1.0.0.1" -force
+```
