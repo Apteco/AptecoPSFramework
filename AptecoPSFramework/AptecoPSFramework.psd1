@@ -67,6 +67,7 @@ PowerShellVersion = '5.1'
 # Using our own dependency module later for more scripts/modules/packages
 RequiredModules = @(
     "WriteLog"
+    "ImportDependency"
     #"PowerShellGet"
     #"SqlServer"
     #"EncryptCredential"

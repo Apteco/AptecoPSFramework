@@ -108,7 +108,10 @@ $Env:Path = @( $scriptPath | Sort-Object -unique ) -join ";"
 #-----------------------------------------------
 
 Import-Module WriteLog
-Set-Logfile -Path "$( $Env:TEMP )\AptecoPSFramework.log"
+Import-Module ImportDependency
+
+$tmpdir = Get-TemporaryPath
+Set-Logfile -Path "$( $tmpdir )\AptecoPSFramework.log"
 #[System.Environment]::GetEnvironmentVariables() TEMP/TMP
 
 # Log the params, if existing

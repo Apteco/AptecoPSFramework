@@ -394,7 +394,8 @@ function Invoke-Upload{
                     $start = $i * $Script:settings.upload.uploadSize
                     $end = $start + $Script:settings.upload.uploadSize -1
 
-                    $lf = Join-Path -Path $Env:tmp -ChildPath "lead_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
+                    $tmpdir = Get-TemporaryPath
+                    $lf = Join-Path -Path $tmpdir -ChildPath "lead_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
                     $leadCsvContent = $leadCsv[$start..$end] | convertto-csv -NoTypeInformation -Delimiter "`t"
                     [IO.File]::WriteAllLines( $lf, $leadCsvContent )
                     [void]$leadFilesToUpload.Add( $lf )
@@ -417,7 +418,8 @@ function Invoke-Upload{
 
                     Write-Log "Starting with run $( $i ) and file '$( $leadFilesToUpload[$i] )'"
 
-                    $successfulFilename = Join-Path -Path $Env:tmp -ChildPath "successful_$( [guid]::newguid().toString() )_$( $i ).csv"
+                    $tmpdir = Get-TemporaryPath
+                    $successfulFilename = Join-Path -Path $tmpdir -ChildPath "successful_$( [guid]::newguid().toString() )_$( $i ).csv"
                     $lJobParams = [Hashtable]@{
                         "Object" = "Lead"
                         "Path" = $leadFilesToUpload[$i]
@@ -499,7 +501,8 @@ function Invoke-Upload{
                 $start = $i * $Script:settings.upload.uploadSize
                 $end = $start + $Script:settings.upload.uploadSize -1
 
-                $nf = Join-Path -Path $Env:tmp -ChildPath "cm_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
+                $tmpdir = Get-TemporaryPath
+                $nf = Join-Path -Path $tmpdir -ChildPath "cm_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
                 $cmCsvContent = $newCsv[$start..$end] | Sort-Object CampaignID | convertto-csv -NoTypeInformation -Delimiter "`t" # TODO maybe do the sorting earlier?
                 [IO.File]::WriteAllLines( $nf, $cmCsvContent )
                 [void]$campaignMemberFilesToUpload.Add( $nf )

@@ -19,7 +19,7 @@ Function Set-JobLogDatabase {
 
         $connectDatabase = $true
         try {
-            $c = Get-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
+            $c = SimplySql\Get-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
             If ( $c.State -eq "Open" ) {
                 $connectDatabase = $false
             }
@@ -33,14 +33,14 @@ Function Set-JobLogDatabase {
             $absolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($script:settings.joblogDB)
 
             # Open the connection
-            Open-SQLiteConnection -ConnectionName "JobLog" -DataSource $absolutePath
+            SimplySql\Open-SQLiteConnection -ConnectionName "JobLog" -DataSource $absolutePath
 
             # Create the database, if not exists
             $joblogCreateStatementPath = Join-Path -Path $Script:moduleRoot -ChildPath "sql/joblog_create.sql"
             $joblogCreateStatement = Get-Content -Path $joblogCreateStatementPath -Encoding UTF8 -Raw
             #Invoke-DuckDBQueryAsNonExecute -Query $joblogCreateStatement -ConnectionName "JobLog"
 
-            $u = Invoke-SqlUpdate -ConnectionName "JobLog" -Query $joblogCreateStatement
+            $u = SimplySql\Invoke-SqlUpdate -ConnectionName "JobLog" -Query $joblogCreateStatement
 
         }
 

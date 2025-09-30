@@ -152,7 +152,7 @@
 
         #$query = "update logjob set process = 'abc' where id = $( $JobId )"
         #Invoke-DuckDBQueryAsNonExecute -Query $sb.ToString() -ConnectionName "JobLog"
-        $sqlUpdate = Invoke-SqlUpdate -Query $sb.ToString() -ConnectionName "JobLog"
+        $sqlUpdate = SimplySql\Invoke-SqlUpdate -Query $sb.ToString() -ConnectionName "JobLog"
 
     }
 

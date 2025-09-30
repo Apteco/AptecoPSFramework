@@ -21,6 +21,8 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 # GENERAL
 #-----------------------------------------------
 
+# TODO rewrite the whole script with importdependency
+
 $isError = $false
 $scriptSourceUrl = "https://raw.githubusercontent.com/Apteco/AptecoPSFramework/main/install.ps1"
 $tempScriptFile = Join-Path $Env:Temp -ChildPath "install_aptecopsframework.ps1"
@@ -282,16 +284,13 @@ try {
 
 try {
 
-    install-module WriteLog
+    install-module WriteLog -AllowClobber
     Write-Verbose "[OK] Installed module WriteLog" -Verbose
 
     install-script install-dependencies
     Write-Verbose "[OK] Installed scripts 'Install-Dependencies'" -Verbose
 
-    install-module ImportDependency
-    Write-Verbose "[OK] Installed module ImportDependency" -Verbose
-
-    Install-Dependencies -module aptecopsframework
+    Install-Dependencies -module aptecopsframework -AllowClobber
     Write-Verbose "[OK] Installed module AptecoPSFramework and dependencies" -Verbose
 
 } catch {

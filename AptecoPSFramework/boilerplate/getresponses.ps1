@@ -50,6 +50,8 @@ bla bla
 
 Write-Verbose "Check PowerShell and Operating system" -Verbose
 
+# TODO this could be changed to ImportDependency later, no need to import all paths now
+
 # Check if this is Pwsh Core
 $isCore = ($PSVersionTable.Keys -contains "PSEdition") -and ($PSVersionTable.PSEdition -ne 'Desktop')
 

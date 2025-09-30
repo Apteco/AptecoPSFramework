@@ -399,7 +399,8 @@ function Invoke-UploadWithAccounts {
                 $start = $i * $Script:settings.upload.uploadSize
                 $end = $start + $Script:settings.upload.uploadSize -1
 
-                $nf = Join-Path -Path $Env:tmp -ChildPath "cm_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
+                $tmpdir = Get-TemporaryPath
+                $nf = Join-Path -Path $tmpdir -ChildPath "cm_$( $Script:processId )_$( $i ).csv" # TODO delete afterwards
                 $cmCsvContent = $newCsv[$start..$end] | convertto-csv -NoTypeInformation -Delimiter "`t" # skipped the sorting by campaign id here as in other processes
                 [IO.File]::WriteAllLines( $nf, $cmCsvContent )
                 [void]$campaignMemberFilesToUpload.Add( $nf )

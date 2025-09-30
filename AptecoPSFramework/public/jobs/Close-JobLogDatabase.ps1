@@ -13,7 +13,7 @@ Function Close-JobLogDatabase {
 
         # just try it
         try {
-            Close-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
+            SimplySql\Close-SqlConnection -ConnectionName "JobLog" -ErrorAction SilentlyContinue
         } catch {
 
         }

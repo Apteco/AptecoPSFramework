@@ -29,13 +29,13 @@
                                                             # To make sure to use the 64 bit version, change this to an absolute path like
                                                             # This inputs a string into powershell exe at a virtual place "sysnative"
 
-    "psCoreExePath" = "$( $Env:ProgramFiles )\PowerShell\7\pwsh.exe"
+    "psCoreExePath" = "$( (Get-PwshPath) )"
                                                             # The absolute path of PSCore, if you want to use PSCore x86 (32 bit), then change the path to something like
                                                             # "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\PowerShell\7\pwsh.exe"
                                                             # or
                                                             # C:\Program Files (x86)\PowerShell\7\pwsh.exe
 
-    "pythonPath" = "$( $Env:ProgramFiles )\Python\python.exe"
+    "pythonPath" = "$( (Get-PythonPath) )"
 
     # Local lib folder
     "loadlocalLibFolder" = $true

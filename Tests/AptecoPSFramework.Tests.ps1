@@ -1,4 +1,7 @@
 
+BeforeAll {
+    install-script install-dependencies -ErrorAction SilentlyContinue
+    install-module writelog, importdependency -ErrorAction SilentlyContinue -AllowClobber
 
 Describe "AptecoPSFramework Module Import and Installation" {
 

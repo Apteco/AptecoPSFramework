@@ -2,6 +2,8 @@
 
 <#
 
+TODO Remove all checks and replace with ImportDependency get-psenvironment
+
 Calling the function without parameters does the whole part
 
 Calling with one of the Flags, just does this part

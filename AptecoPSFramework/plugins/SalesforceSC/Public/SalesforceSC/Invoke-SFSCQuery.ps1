@@ -79,7 +79,8 @@ function Invoke-SFSCQuery {
 
         If ( $Bulk -eq $true ) {
 
-            $bulkPath = Join-Path -Path $Env:tmp -ChildPath "$( [guid]::newguid().ToString() ).csv"
+            $tmpdir = Get-TemporaryPath
+            $bulkPath = Join-Path -Path $tmpdir -ChildPath "$( [guid]::newguid().ToString() ).csv"
 
             Write-Log "Writing results to '$( $bulkPath )'"
 

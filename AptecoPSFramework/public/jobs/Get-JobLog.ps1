@@ -38,7 +38,7 @@ Function Get-JobLog {
             'Single' {
 
                 #$job = Read-DuckDBQueryAsReader -Name "JobLog" -Query "SELECT * FROM joblog WHERE id = $( $JobId )" -ReturnAsPSCustom
-                $job = Invoke-SqlQuery -Query "SELECT * FROM joblog WHERE id = $( $JobId )" -ConnectionName "JobLog" -Stream
+                $job = SimplySql\Invoke-SqlQuery -Query "SELECT * FROM joblog WHERE id = $( $JobId )" -ConnectionName "JobLog" -Stream
 
                 If ( $job.count -eq 0 ) {
                     throw "No job found with id $( $JobId )"
@@ -88,7 +88,7 @@ Function Get-JobLog {
                 }
 
                 #$job = Read-DuckDBQueryAsReader -Name "JobLog" -Query  -ReturnAsPSCustom
-                $job = Invoke-SqlQuery -Query $q -ConnectionName "JobLog" -Stream
+                $job = SimplySql\Invoke-SqlQuery -Query $q -ConnectionName "JobLog" -Stream
 
                 If ( $ConvertInput -eq $true -or $ConvertOutput -eq $true ) {
 
