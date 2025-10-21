@@ -69,7 +69,7 @@ class Mailing {
         }
 
         # Use the 2 in the split as a parameter so it only breaks the string on the first occurence
-        $stringParts = $mailingString -split $this.nameConcatChar.trim(),2,"simplematch"
+        $stringParts = $mailingString -split $this.nameConcatChar.trim(),2,"SimpleMatch"
         $this.mailingId = $stringParts[0].trim()
         $this.mailingName = $stringParts[1].trim()
 

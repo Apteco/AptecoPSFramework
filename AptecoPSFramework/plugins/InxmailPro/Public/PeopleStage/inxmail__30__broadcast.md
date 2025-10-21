@@ -191,7 +191,7 @@ $header = @{
 #-----------------------------------------------
 
 # Splitting MailingName and ListName to get Ids
-$mailingIdArray = $params.MessageName -split $settings.nameConcatChar,2
+$mailingIdArray = $params.MessageName -split $settings.nameConcatChar,2 # TODO Maybe use -split "x",2,"SimpleMatch" ?
 #$listIdArray = $params.ListName -split " / "
 
 # TODO [x] use the split character from settings

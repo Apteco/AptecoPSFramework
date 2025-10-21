@@ -127,7 +127,7 @@ class DCSPList {
 
         $this.init()
 
-        $stringParts = $inputString -split [regex]::Escape($this.nameConcatChar.trim()),2
+        $stringParts = $inputString -split [regex]::Escape($this.nameConcatChar.trim()),2 # TODO Maybe use -split "x",2,"SimpleMatch" ?
         $this.id = $stringParts[0].trim()
         $this.name = $stringParts[1].trim()
 
@@ -203,7 +203,7 @@ class DCSPMailing {
 
         $this.init()
 
-        $stringParts = $inputString -split [regex]::Escape($this.nameConcatChar.trim()),2
+        $stringParts = $inputString -split [regex]::Escape($this.nameConcatChar.trim()),2 # TODO Maybe use -split "x",2,"SimpleMatch" ?
         $this.id = $stringParts[0].trim()
         $this.name = $stringParts[1].trim()
 

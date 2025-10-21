@@ -313,7 +313,7 @@ $colsInCsvButNotAttr | where { @( $settings.upload.emailColumnName, $settings.up
 # CHECK IF LIST EXISTS, IF NOT CREATE NEW LIST
 #-----------------------------------------------
 
-$arr = $params.MessageName -split $settings.nameConcatChar,2
+$arr = $params.MessageName -split $settings.nameConcatChar,2 # TODO Maybe use -split "x",2,"SimpleMatch" ?
 
 # TODO [x] use the split character from settings
 # TODO [x] check if list exists before using it

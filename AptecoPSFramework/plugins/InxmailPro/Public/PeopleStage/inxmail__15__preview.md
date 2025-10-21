@@ -179,7 +179,7 @@ $header = @{
 # GET MAILING
 #-----------------------------------------------
 
-$mailingId = $params.MessageName -split " / ",2
+$mailingId = $params.MessageName -split " / ",2 # TODO Maybe use -split "x",2,"SimpleMatch" ?
 $mailingDetailsRaw = Invoke-WebRequest -Method Get -Uri "$( $apiRoot )mailings/$( $mailingId[0] )" -Header $header -ContentType "application/hal+json;charset=utf-8" -Verbose
 $mailingDetails = [System.Text.encoding]::UTF8.GetString($mailingDetailsRaw.Content) | ConvertFrom-Json
 
@@ -188,7 +188,7 @@ $mailingDetails = [System.Text.encoding]::UTF8.GetString($mailingDetailsRaw.Cont
 # GET MAILING AND LIST ID
 #-----------------------------------------------
 
-$arr = $params.MessageName -split " / ",2
+$arr = $params.MessageName -split " / ",2 # TODO Maybe use -split "x",2,"SimpleMatch" ?
 
 # TODO [ ] use the split character from settings
 # TODO [ ] check if list exists before using it

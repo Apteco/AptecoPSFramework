@@ -4,7 +4,7 @@
     "providername" = "PSAptecoemail"
 
     # API
-    "base" = ""             # main url to use for cleverreach, could be changed for newer versions or using API gateways
+    "base" = ""             # main url to use for apteco email, could be changed for newer versions or using API gateways
     "contentType" = "application/json; charset=utf-8"       # content type string that is always used for API requests
     "pageSize" = 100                                       # max pagesize = 100, default 10
     "additionalHeaders" = [PSCustomObject]@{
