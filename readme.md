@@ -22,6 +22,8 @@ Email|Brevo|SendInBlue/Newsletter2Go|REST|Still under development
 Email|Inxmail|Professional|REST|Still in migration
 Email|emarsys (An SAP Company)|Emarsys Core API|REST|Adding Lists and Contacts, get lists, campaigns, fields, contact data
 Print|Bertelsmann eesii||REST|Upload recipients for specific mailings with automatic field matching. This one is not published, so please ask for it.
+Print|Optilyz||REST|Upload recipients for mailing campaigns with custom fields.
+Mobile|LinkMobility|OCM|REST|Upload and match data for RCS communication with SMS/WhatsApp fallback.
 
 You can find more integrations here that could be easily migrated to this framework: https://github.com/Apteco/CustomChannels
 
