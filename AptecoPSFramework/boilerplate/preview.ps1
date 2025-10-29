@@ -155,7 +155,7 @@ try {
 
             # This inputs a string into powershell exe at a virtual place "sysnative"
             # It starts a 64bit version of Windows PowerShell and executes itself with the same input, only encoded as escaped json
-            $j = . $s.psCoreExePath -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -InformationAction "Continue"
+            $j = . $psEnv.DefaultPSCore.Path -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -InputFormat text -OutputFormat text -File $thisScript -JobId $jobId -SettingsFile $settingsfileLocation -ProcessId ( Get-ProcessIdentifier ) -InformationAction "Continue"
 
             break
         }
@@ -184,7 +184,8 @@ try {
             #>
 
             # Then it can be called like this
-            . $s.pythonPath add.py "5.5"
+            $pythonPath = Get-PythonPath
+            . $pythonPath add.py "5.5"
 
             break
         }

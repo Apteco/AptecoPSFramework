@@ -5,38 +5,6 @@
 #
 ################################################
 
-
-#-----------------------------------------------
-# CHECKING PS AND OS
-#-----------------------------------------------
-
-Write-Verbose "Check PowerShell and Operating system"
-
-# Check if this is Pwsh Core
-$isCore = ($PSVersionTable.Keys -contains "PSEdition") -and ($PSVersionTable.PSEdition -ne 'Desktop')
-
-Write-Verbose -Message "Using PowerShell version $( $PSVersionTable.PSVersion.ToString() ) and $( $PSVersionTable.PSEdition ) edition" -Verbose
-
-# Check the operating system, if Core
-if ($isCore -eq $true) {
-    $os = If ( $IsWindows -eq $true ) {
-        "Windows"
-    } elseif ( $IsLinux -eq $true ) {
-        "Linux"
-    } elseif ( $IsMacOS -eq $true ) {
-        "MacOS"
-    } else {
-        throw "Unknown operating system"
-    }
-} else {
-    # [System.Environment]::OSVersion.VersionString()
-    # [System.Environment]::Is64BitOperatingSystem
-    $os = "Windows"
-}
-
-Write-Verbose -Message "Using OS: $( $os )"
-
-
 #-----------------------------------------------
 # ADD MODULE PATH, IF NOT PRESENT
 #-----------------------------------------------
@@ -68,32 +36,19 @@ $Env:PSModulePath = @( $modulePath | Sort-Object -unique ) -join ";"
 
 
 #-----------------------------------------------
-# ADD SCRIPT PATH, IF NOT PRESENT
+# CHECKING PS AND OS
 #-----------------------------------------------
 
-#$envVariables = [System.Environment]::GetEnvironmentVariables()
-$scriptPath = @( [System.Environment]::GetEnvironmentVariable("Path") -split ";" ) + @(
-    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\WindowsPowerShell\Scripts"
-    "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\WindowsPowerShell\Scripts"
-    "$( [System.Environment]::GetEnvironmentVariable("USERPROFILE") )\Documents\WindowsPowerShell\Scripts"
-)
+Import-Module ImportDependency
+$psEnv = Get-PSEnvironment -SkipLocalPackageCheck -SkipBackgroundCheck
 
-# Add the 64bit path, if present. In 32bit the ProgramFiles variables only returns the x86 path
-If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
-    $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\WindowsPowerShell\Scripts"
-}
+Write-Verbose "Check PowerShell and Operating system"
 
-# Add pwsh core path
-If ( $isCore -eq $true ) {
-    If ( [System.Environment]::GetEnvironmentVariables().keys -contains "ProgramW6432" ) {
-        $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramW6432") )\powershell\7\Scripts"
-    }
-    $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles") )\powershell\7\Scripts"
-    $scriptPath += "$( [System.Environment]::GetEnvironmentVariable("ProgramFiles(x86)") )\powershell\7\Scripts"
-}
-
-# Using $env:Path for only temporary override
-$Env:Path = @( $scriptPath | Sort-Object -unique ) -join ";"
+# Check if this is Pwsh Core
+$isCore = $psEnv.IsCore
+Write-Verbose -Message "Using PowerShell version $( $psEnv.PSVersion ) and $( $psEnv.PSEdition ) edition. 64-bit: $( $psEnv.Is64Bit )" -Verbose
+$os = $psEnv.OS
+Write-Verbose -Message "Using OS: $( $os )" -Verbose
 
 
 ################################################
@@ -108,10 +63,8 @@ $Env:Path = @( $scriptPath | Sort-Object -unique ) -join ";"
 #-----------------------------------------------
 
 Import-Module WriteLog
-Import-Module ImportDependency
-
-$tmpdir = Get-TemporaryPath
-Set-Logfile -Path "$( $tmpdir )\AptecoPSFramework.log"
+$temp = Get-TemporaryPath 
+Set-Logfile -Path "$( $temp )\AptecoPSFramework.log"
 #[System.Environment]::GetEnvironmentVariables() TEMP/TMP
 
 # Log the params, if existing
@@ -154,6 +107,8 @@ If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" -and $settingsfileLocation -ne 
     $useJob = $true
 }
 
+$isPsCoreInstalled = $psEnv.IsCoreInstalled
+
 
 #-----------------------------------------------
 # LOGGING
@@ -161,11 +116,12 @@ If ( $PsCmdlet.ParameterSetName -eq "JobIdInput" -and $settingsfileLocation -ne 
 
 Write-Log -Message "This script: $( $thisScript )"
 Write-Log -Message "Using OS: $( $os )"
-Write-Log -Message "64bit OS: $( [System.Environment]::Is64BitOperatingSystem  )"
-Write-Log -Message "64bit Process: $( [System.Environment]::Is64BitProcess  )"
-Write-Log -Message "Using PowerShell version $( $PSVersionTable.PSVersion.ToString() ) and $( $PSVersionTable.PSEdition ) edition" -Verbose
-Write-Log -Message "Running as user: $( [System.Security.Principal.WindowsIdentity]::GetCurrent().Name )"
+Write-Log -Message "64bit OS: $( $psEnv.Is64BitOS  )"
+Write-Log -Message "64bit Process: $( $psEnv.Is64Bit )"
+Write-Log -Message "Using PowerShell version $( $psEnv.PSVersion ) and $( $psEnv.PSEdition ) edition )"
+Write-Log -Message "Running as user: $( $psEnv.ExecutingUser )"
 Write-Log -Message "Debug Mode: $( $debug )"
+Write-Log -Message "Is PSCore installed: $( $isPsCoreInstalled )"
 
 
 ################################################
@@ -278,22 +234,6 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
     Write-Log "No job will be used"
 
 }
-
-
-#-----------------------------------------------
-# FIND OUT ABOUT PS CORE
-#-----------------------------------------------
-
-try {
-    $calc = . $s.psCoreExePath { 1+1 }
-} catch {
-    # just a test, nothing to do
-}
-if ( $calc -eq 2 ) {
-    $isPsCoreInstalled = $true
-}
-
-Write-Log -Message "Is PSCore installed: $( $isPsCoreInstalled )"
 
 
 #-----------------------------------------------
