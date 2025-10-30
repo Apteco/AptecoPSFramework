@@ -93,7 +93,8 @@ Function Add-JobLog {
 
         Set-JobLogDatabase
 
-        SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT last_insert_rowid()"
+        #SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT last_insert_rowid()"
+        SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT id FROM joblog WHERE process = '$( $Script:processId )'"
 
     }
 
