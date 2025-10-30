@@ -30,6 +30,8 @@ Param(
 #-----------------------------------------------
 
 $thisScript = ".\upload.ps1"
+$Env:SkipLocalLibFolder = $false # Skip loading local lib folder to save time and resources
+$Env:SkipDuckDB = $false # If SkipLocalLibFolder is true, DuckDB will also be skipped
 
 
 #-----------------------------------------------

@@ -12,9 +12,6 @@
     process {
 
 
-        #$success = $false
-
-
         #-----------------------------------------------
         # CHECK THE PLUGIN
         #-----------------------------------------------
@@ -49,14 +46,8 @@
         # Add more settings from plugin, e.g. if there are new properties due to an update
         $extendedSettings = Merge-PSCustomObject -Left $pluginSettings -Right $Script:settings -AddPropertiesFromRight -MergePSCustomObjects -MergeHashtables #-MergeArrays
 
-        # Now harmonise them if there are the same attributes with different values
-        #$joinedSettings = Join-Objects -source $extendedSettings -extend $pluginSettings
-
-        #Write-Verbose ( convertto-json $script:settings ) -Verbose
-
         # Put it back into the variable
         $Script:settings = $extendedSettings
-        #$Script:debug = $pluginSettings
         $Script:pluginPath = $plugin.path
 
 
@@ -141,7 +132,6 @@
             # DOT SOURCE PRIVATE PARENT AND PLUGIN SCRIPTS
             #-----------------------------------------------
 
-            #$Plugins  = @( Get-ChildItem -Path "$( $PSScriptRoot )/plugins/*.ps1" -Recurse -ErrorAction SilentlyContinue )
             $PrivateParent = @( Get-ChildItem -Path "$( $moduleRoot )/private/*.ps1" -Recurse -ErrorAction SilentlyContinue )
             $PrivatePlugin = @( Get-ChildItem -Path "$( $plugin.path )/private/*.ps1" -Recurse -ErrorAction SilentlyContinue )
             $PublicPlugin = @( Get-ChildItem -Path "$( $plugin.path )/public/*.ps1" -Recurse -ErrorAction SilentlyContinue )
@@ -168,15 +158,12 @@
             New-Variable -Name pluginDebug -Value $null -Scope Script -Force                    # Debug variable for the scripts
             New-Variable -Name variableCache -Value $null -Scope Script -Force                  # Caching variable for shared plugin information like apiusage
 
-            #Write-verbose ( Convertto-json $Script:settings -dept 99 ) -Verbose
             $Script:variableCache = [Hashtable]@{}
 
 
             #-----------------------------------------------
             # START LOG
             #-----------------------------------------------
-
-            #$InputPlugin | ConvertTo-Json -Depth 99 | Set-Content -Path C:\faststats\Scripts\sf\test.json -Encoding UTF8
 
             Set-Logfile -Path $Script:settings.logfile
             Set-ProcessId -Id $InputPlugin.variables.processId
@@ -189,77 +176,55 @@
             # LOAD PARENT AND PLUGIN DEPENDENCIES
             #-----------------------------------------------
 
-            # TODO only using modules yet, but also look at packages and scripts
-
             # Load dependencies
             . ( Join-Path -Path $moduleRoot -ChildPath "/bin/dependencies.ps1" )
 
-            #try {
-            #    @( $psModules + $plugin.dependencies.psModules ) | ForEach-Object {
-            #        $mod = $_
-            #        Import-Module -Name $mod -ErrorAction Stop
-            #    }
-            #} catch {
-            #    Write-Error "Error loading dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now"
-            #    Exit 0
-            #}
-
-
-            # Load packages from current local libfolder
-            # If you delete packages manually, this can increase performance but there could be some functionality missing
-            #Write-Verbose "Hello test" -verbose
-            #Write-Log "Hello $( $psLocalPackages.Count )"
-            #Write-Verbose " $( ( $settings | convertto-json -Depth 99 ) ) " -Verbose
-            #Get-Variable | % {
-            #    Write-Verbose "Var $( $_.Name ) - $( $_.Value )" -VErbose
-            #}
-            #Write-Verbose "Hello $( ( ) )" -verbose #$InputPlugin.settings.loadlocalLibFolder | convertto-json -Compress
-
-            #Write-Log "Func $((get-command PackageManagement\Get-Package).Parameters.Keys -join ", " ))"
-
+            $loadedModules = Get-Module
             $dependencyParams = [Hashtable]@{
-               "Module" = @( $psModules + $plugin.dependencies.psModules )
+               "Module" = @( $psModules + $plugin.dependencies.psModules ) | Where-Object { $_ -notin $loadedModules.Name }
             }
 
-            $p = get-command "get-package"
-            write-log "Using this PackageManagement to load packages: $( $p.DLL )"
-            #Write-log $p.Version
 
             If ( $psLocalPackages.Count -gt 0  -and $settings.loadlocalLibFolder -eq $true ) {
                 Write-Verbose "Loading local packages" #-verbose
                 try {
 
                     # Work out the local lib folder
-
-                    #$localLibFolder = Resolve-Path -Path $Script:settings.localLibFolder
                     $localLibFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($settings.localLibFolder)
-
-                    #Write-Log "$( ( Get-Package -Name "PackageManagement" ).Version )"
-
                     If ( Test-Path -Path $localLibFolder ) {
-                        Write-Verbose "Loading from $( $localLibFolder )" #-verbose
 
-                        #$localLibFolderItem = get-item $localLibFolder.Path
+                        If ( $Env:SkipLocalLibFolder -ne $true ) {
 
-                        # Remember current location and change folder
-                        #$currentLocation = Get-Location
-                        #Set-Location $localLibFolderItem.Parent.FullName
+                            Write-Verbose "Loading from $( $localLibFolder )" #-verbose
 
-                        # Import the dependencies
-                        Write-Log "Loading lib folder from: '$( $localLibFolder )'"
-                        $dependencyParams.Add("LoadWholePackageFolder", $true)
-                        $dependencyParams.Add("LocalPackageFolder", $localLibFolder)
-                        $dependencyParams.Add("SuppressWarnings", $true)
+                            If ( $Env:SkipDuckDB -eq $true ) {
 
-                         #$localLibFolderItem.fullname
+                                Write-Log "Skipping DuckDB package load as per environment variable 'SkipDuckDB'" #-verbose
+                                $psEnv = Get-PSEnvironment -LocalPackageFolder $localLibFolder -SkipBackgroundCheck
+                                $packagesToLoad = [Array]@( $psEnv.InstalledLocalPackages | where-object { $_.Name -notlike "DuckDB.*" } )
+                                If ( $packagesToLoad.Count -eq 0 ) {
+                                    Write-Log "No packages to load after skipping DuckDB" #-verbose
+                                } else {
+                                    $dependencyParams.Add("LocalPackages", $packagesToLoad)
+                                }
 
-                        # Go back, if needed
-                        #Set-Location -Path $currentLocation.Path
+                            } else {
+
+                                # Import the dependencies
+                                Write-Log "Loading whole lib folder from: '$( $localLibFolder )'"
+                                $dependencyParams.Add("LoadWholePackageFolder", $true)
+                                $dependencyParams.Add("LocalPackageFolder", $localLibFolder)
+                                $dependencyParams.Add("SuppressWarnings", $true)
+                            
+                            }
+
+                        } else {
+                            Write-Verbose "Skipping loading local lib folder as per environment variable 'SkipLocalLibFolder'" #-verbose
+                        }
+
 
                     } else {
-
                         Write-Verbose "You have no local lib folder to load. Not necessary a problem. Proceeding..." #-verbose #-Severity Warning
-
                     }
 
 
@@ -273,10 +238,6 @@
 
             # Load modules and packages
             try {
-                #@( $psModules + $plugin.dependencies.psModules ) | ForEach-Object {
-                #    $mod = $_
-                #    Import-Module -Name $mod -ErrorAction Stop
-                #}
                 Import-Dependency @dependencyParams
             } catch {
                 Write-Warning "Error loading module, script and package dependencies. Please execute 'Install-AptecoPSFramework' or 'Install-Plugin' now" -Verbose
@@ -295,18 +256,7 @@
 
             Export-ModuleMember -Function $PublicPlugin.Basename #-verbose  #+ "Set-Logfile"
 
-            # TODO Check if we need to set the process identifier, because it is already a public function
-            # Get-ProcessId
-            # Set-ProcessIdentifier
-
-
         } | Import-Module -Global
-
-        #$class = $plugin.class #[DemoPlugin]::new($plugin.path)
-        #$class.load()
-        #$Script:plugin = $class
-
-
 
 
         #-----------------------------------------------
@@ -315,10 +265,6 @@
 
         Set-ProcessId -Id $Script:processId
         Write-Log "Plugin successfully loaded" -Severity VERBOSE
-
-        #$success = $true
-
-        #$success
 
 
     }
