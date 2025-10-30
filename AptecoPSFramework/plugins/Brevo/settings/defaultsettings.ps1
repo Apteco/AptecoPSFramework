@@ -5,7 +5,7 @@
 
     # API
     "base" = "https://api.brevo.com/v3/"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
-    "contentType" = "application/json"       # content type string that is always used for API requests
+    "contentType" = "application/json; charset=utf-8"       # content type string that is always used for API requests
     "pageSize" = 10                                        # if paging is used for the API requests, this is the default setting for a pagesize
     "mailingLimit" = 999
     "additionalHeaders" = [PSCustomObject]@{
@@ -39,12 +39,34 @@
 
     # Upload settings
     "upload" = [PSCustomObject]@{
-        defaultListFolder = 0                            # default folder to use for lists, 0 = global
-        addNewAttributes = $true                       # if attributes are found in the data that are not yet in Brevo, add them
+        "defaultListFolderName" = "Apteco Upload"                            # default folder to use for lists, 0 = global
+        "sniffparameter" = "sample_size=1000, delim='\t'"     # duckdb parameter for reading the input csv file, e.g. you could define a date input format or the decimal point character
+        "countRowsInputFile" = $True                          # Count rows of input file -> not needed
+        "reservedFields" = [Array]@("fasdfis")                # If one of these fields are used, the whole process will pause
+        "addNewAttributes" = $true                       # if attributes are found in the data that are not yet in Brevo, add them
+        "urnFieldName" = "Urn"                               # field name in the input file that contains the URN (e.g. ID, partnerid,...)
+        "DisableNotification" = $True                      # Disable notification email on import
+        "EmptyContactsAttributes" = $False                  # Empty attributes that are used, but not filled in the import file
     }
 
     # Broadcast settings
     "broadcast" = [PSCustomObject]@{
+
+        # Release/sending
+        "autoLaunch" = $false                              # Automatically launch the campaign after successful upload
+        "defaultReleaseOffset" = 120                        # Default amount of seconds that are added to the current unix timestamp to release the mailing
+        "waitUntilFinished" = $false
+        "maxWaitForFinishedAfterOffset" = 120           # Wait for another 120 seconds (or more or less) until it is confirmed of send off
+
+        "emailExpirationDate" = -1                             # Default amount of days until the email expires
+        "defaultToField" = "{{DEFAULT_TO}}" #"{{contact.FNAME}} {{contact.LNAME}}"        # Default To field for the broadcast email, should be $null or "{{contact.FNAME}} {{contact.LNAME}}"
+        "mirrorActive" = $false                              # Default setting for mirrorActive in the broadcast
+        "tag" = "Apteco"                                     # Default tag to use for the creation of the broadcast
+        "defaultUpdateFormId" = $null                                  # Default update form id, if needed
+
+        # Exclusions
+        "exclusionListIds" = [Array]@()                           # List of Brevo list Ids to exclude from the broadcast
+        "exclusionSegmentIds" = [Array]@()                        # List of Brevo segment Ids to exclude from the broadcast
 
     }
 

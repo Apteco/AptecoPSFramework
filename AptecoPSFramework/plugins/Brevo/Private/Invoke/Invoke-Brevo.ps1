@@ -133,7 +133,8 @@ function Invoke-Brevo {
         # Prepare Body
         If ( $updatedParameters.ContainsKey("Body") -eq $true ) {
             $bodyJson = ConvertTo-Json -InputObject $Body -Depth 99 -Compress
-            $updatedParameters.Body = $bodyJson
+            # Convert string to UTF-8 byte array instead of just string to avoid encoding issues
+            $updatedParameters.Body = [System.Text.Encoding]::UTF8.GetBytes($bodyJson) #$bodyJson
         }
 
         $finished = $false
@@ -195,7 +196,7 @@ function Invoke-Brevo {
                 #$Script:pluginDebug = $wr
 
                 # When using paging, we want the first subobject
-                $wrItems = $wr.psobject.properties.where({ $_.MemberType -eq "NoteProperty" })[0].Value
+                $wrItems = $wr.psobject.properties.where({ $_.MemberType -eq "NoteProperty" -AND $_.Name -ne "count" })[0].Value
 
                 # If the result equals the pagesize, try it one more time with the next page
                 If ( $wrItems.Count -eq $currentPagesize ) {
@@ -222,7 +223,7 @@ function Invoke-Brevo {
                 }
 
                 # Add result to return collection
-                [void]$res.Add($wrItems)
+                [void]$res.AddRange( @( $wrItems ) )
 
             } else {
 
@@ -237,7 +238,7 @@ function Invoke-Brevo {
             
             # documentation: https://developers.brevo.com/docs/api-limits
 
-            $Script:pluginDebug = $req
+            #$Script:pluginDebug = $req
 
             # Prevent problems as some calls do not have rate limiting
             If ( $null -ne $req.Headers."x-sib-ratelimit-limit" ) {

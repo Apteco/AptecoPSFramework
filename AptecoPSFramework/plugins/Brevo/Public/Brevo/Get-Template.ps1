@@ -64,7 +64,7 @@ function Get-Template{
                 # Add paging
                 If ( $All -eq $true ) {
                     $params.Add("Paging", $true)
-                    $params.Add("PageSize", 50)
+                    $params.Add("PageSize", 1000)
                 }
                 
                 break
@@ -85,11 +85,10 @@ function Get-Template{
         $templates = Invoke-Brevo @params
 
         # Return
-        
         switch ($PSCmdlet.ParameterSetName) {
             'Single' {
 
-                $lists
+                $templates
 
                 break
             }

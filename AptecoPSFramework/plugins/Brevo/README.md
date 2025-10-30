@@ -94,6 +94,13 @@ Get-Process
 # Get all processes
 Get-Process -All
 
+# Add a folder for your Apteco uploads
+Add-Folder -Name "Apteco"
+
+# Upload a csv file with already existing columns and show the status of the import processes afterwards
+$p = Import-BrevoCsvContacts -FilePath ".\tmpD89.tmp" -ListId 55 -DisableNotification $false -UpdateExistingContacts $True -EmptyContactsAttributes $false -verbose
+$p.Info
+
 ```
 
 # Notes
@@ -106,8 +113,16 @@ Get-Process -All
 # Webhooks
 
 In order to use webhooks to receive events of Brevo I would recommend to setup a receiver (ask me for a scalable sample code) and then set this webhook up via a call like this
+# Channel configuration
 
 As an example, brevo webhooks need to be created through the API as the UI does not offer the batch parameter:
+You can use the following parameter 
+
+`autoLaunch` = true
+
+`updateFormId` - This one will automatically be used, when used in a template. If not defined here, it will use a default one from settings `defaultUpdateFormId` or throw an exception
+
+`sendAtBestTime` - This one will remove the targeted time for that date and will determine the best time. Should be false or true
 
 ```PowerShell
 $headers = [Hashtable]@{

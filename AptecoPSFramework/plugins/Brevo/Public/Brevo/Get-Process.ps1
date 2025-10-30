@@ -57,6 +57,7 @@ function Get-Process {
         # Return
         
         switch ($PSCmdlet.ParameterSetName) {
+            
             'Single' {
 
                 $processes

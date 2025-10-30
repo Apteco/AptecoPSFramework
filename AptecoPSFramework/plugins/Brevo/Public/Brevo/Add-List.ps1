@@ -2,8 +2,13 @@
 function Add-List {
     [CmdletBinding()]
     param (
-         [Parameter(Mandatory=$true)][String]$Name
-        ,[Parameter(Mandatory=$false)][Int]$FolderId = 1
+
+         [Parameter(Mandatory=$true)]
+         [String]$Name
+
+        ,[Parameter(Mandatory=$false)]
+         [Int]$FolderId = 1
+
     )
 
     begin {

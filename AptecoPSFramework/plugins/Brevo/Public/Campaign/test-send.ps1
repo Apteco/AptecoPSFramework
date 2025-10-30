@@ -1,6 +1,6 @@
-﻿
 
-function Get-Messages {
+
+function Test-Send {
     [CmdletBinding(DefaultParameterSetName = 'Object')]
     param (
 
@@ -21,7 +21,7 @@ function Get-Messages {
         # MODULE INIT
         #-----------------------------------------------
 
-        $moduleName = "MESSAGES"
+        $moduleName = "TESTSEND"
 
 
         #-----------------------------------------------
@@ -130,106 +130,133 @@ function Get-Messages {
         #Open-DuckDBConnection
 
 
-    }
+        #-----------------------------------------------
+        # PARSE MESSAGE
+        #-----------------------------------------------
 
-    process {
+        #$script:debug = $InputHashtable
+        $isUploadOnly = $false
 
-        #Switch ( $InputHashtable.mode ) {
+        If ( "" -eq $InputHashtable.MessageName ) {
 
-            #default {
-
-                # Load mailings data from Brevo
-                $campaigns = Get-Template -TemplateStatus "active" -All
-
-                Write-Log "Loaded $( $campaigns.Count ) campaigns from Brevo" -severity INFO #-WriteToHostToo $false
-
-                # Load and filter list into array of mailings objects
-                $mailingsList = [System.Collections.ArrayList]@()
-                $campaigns | ForEach-Object {
-                    $mailing = $_
-                    $maxLength = $mailing.Name.length
-                    If ($maxLength -lt 20) {
-                        $l = $maxLength
-                    } else {
-                        $l = 20
-                    }
-                    [void]$mailingsList.add(
-                        [Mailing]@{
-                            "mailingId" = $mailing.Id #.substring(11)
-                            "mailingName" = $mailing.Name #.substring(0,$l)
-                        }
-                    )
-                }
-
-            #}
-
-        #}
-
-
-        # fields, id, name, status, type, StartDate, EndDate, ...
-        # Get-SFSCObjectField -object "Campaign" | Out-GridView
-
-        # Transform the mailings array into the needed output format
-        $columns = @(
-            @{
-                name="id"
-                expression={ $_.mailingId }
-            }
-            @{
-                name="name"
-                expression={ $_.toString() }
-            }
-        )
-
-        $return = [System.Collections.ArrayList]@()
-        [void]$return.AddRange(@( $mailingsList | Select-Object $columns ))
-
-        If ( $return.count -gt 0 ) {
-
-            Write-Log "Loaded $( $return.Count ) messages" -severity INFO #-WriteToHostToo $false
+            $isUploadOnly = $true
+            $mailing = [Mailing]::new(999, "UploadOnly")
 
         } else {
 
-            $msg = "No messages loaded -> please check!"
-            Write-Log -Message $msg -Severity ERROR
-            throw [System.IO.InvalidDataException] $msg
+            Write-Log "Parsing message: '$( $InputHashtable.MessageName )' with '$( $Script:settings.nameConcatChar )' as separator"
+            $mailing = [Mailing]::new($InputHashtable.MessageName)
+            Write-Log "Got chosen message entry with id '$( $mailing.mailingId )' and name '$( $mailing.mailingName )'"
+
+            #$mailing = [Mailing]::new($InputHashtable.MessageName)
+            #Write-Log "Got chosen message entry with id '$( $mailing.mailingId )' and name '$( $mailing.mailingName )'"
 
         }
 
 
         #-----------------------------------------------
-        # STOP TIMER
+        # DEFAULT VALUES
         #-----------------------------------------------
-
-        $processEnd = [datetime]::now
-        $processDuration = New-TimeSpan -Start $processStart -End $processEnd
-        Write-Log -Message "Needed $( [int]$processDuration.TotalSeconds ) seconds in total"
 
 
         #-----------------------------------------------
-        # CLOSE DEFAULT DUCKDB CONNECTION
+        # CHECK INPUT FILE
         #-----------------------------------------------
 
-        #Close-DuckDBConnection
+
+    }
+
+    process {
+
+        try {
+
+
+            
+        
+
+            # TODO Upload data to test list beforehand
+
+            $params = [Hashtable]@{
+                "Object" = "emailCampaigns"
+                "Method" = "POST"
+                "Path" = "$( $campaignId )/sendTest"
+                "Body" = [PSCustomObject]$campaignBody
+            }
+
+            # add verbose flag, if set
+            If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
+                $params.Add("Verbose", $true)
+            }
+            $campaign = Invoke-Brevo @params
+
+            
+
+            
+        } catch {
+
+            $msg = "Error during uploading data in code line $( $_.InvocationInfo.ScriptLineNumber ). Reached record $( $i ) Abort!"
+            Write-Log -Message $msg -Severity ERROR -WriteToHostToo $false
+            Write-Log -Message $_.Exception -Severity ERROR
+            throw $_
+
+
+        } finally {
+
+
+            #-----------------------------------------------
+            # STOP TIMER
+            #-----------------------------------------------
+
+            $processEnd = [datetime]::now
+            $processDuration = New-TimeSpan -Start $processStart -End $processEnd
+            Write-Log -Message "Needed $( [int]$processDuration.TotalSeconds ) seconds in total"
+
+
+        }
 
 
         #-----------------------------------------------
         # RETURN VALUES TO PEOPLESTAGE
         #-----------------------------------------------
 
+        # count the number of successful upload rows
+        $recipients = $listDifference # TODO check out how to get the number of successful recipients
+
+        # put in the source id as the listname
+        $transactionId = $processId
+
+        # return object
+        $return = [Hashtable]@{
+
+            # Mandatory return values
+            "Recipients"=$recipients
+            "TransactionId"=$transactionId
+
+            # General return value to identify this custom channel in the broadcasts detail tables
+            "CustomProvider"= $Script:settings.providername
+            "ProcessId" = Get-ProcessId #$Script:processId
+
+        }
+
+        # log the return object into logfile
+        Write-Log -message "RETURN:"
+        $return.Keys | ForEach-Object {
+            $param = $_
+            Write-Log -message "    $( $param ) = '$( $return[$param] )'" -writeToHostToo $false
+        }
+
         # log the return into database and close connection
         $jobReturnParams = [Hashtable]@{
             "JobId" = $JobId
             "Status" = "Finished"
             "Finished" = $true
-            "Successful" = $return.Count
-            "Failed" = 0 # TODO needs correction
+            "Successful" = $recipients
+            "Failed" = $possiblyFailed
             "Totalseconds" = $processDuration.TotalSeconds
-            "OutputArray" = $return
+            "OutputParam" = $return
         }
         Update-JobLog @jobReturnParams
-        Close-JobLogDatabase
-
+        Close-JobLogDatabase -Name "JobLog"
 
         # return the results
         Switch ( $PSCmdlet.ParameterSetName ) {
@@ -239,6 +266,7 @@ function Get-Messages {
             }
             # Otherwise the results are now in the database
         }
+
 
     }
 
