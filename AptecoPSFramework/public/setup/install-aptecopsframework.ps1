@@ -346,6 +346,7 @@ Calling with one of the Flags, just does this part
         Write-Verbose "  ADDITIONAL VARIABLES" -Verbose
         Write-Verbose "    Add all variables that you would like to always upload" -Verbose
         Write-Verbose "Please consider to ask Apteco to look at your settings when you have done your first setup" -Verbose
+        Write-Verbose "Typically your service needs to run with a service user instead of local system to support credential encryption." -Verbose
 
 
 
