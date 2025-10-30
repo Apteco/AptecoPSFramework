@@ -18,7 +18,7 @@ Function Add-DuckDBConnection {
             # Check that the connection not exists yet
             If ( ( $Script:duckDb | Where-Object { $_.name -eq $Name } ).Count -eq 0 ) {
 
-                Write-Log "Adding DuckDB connection named '$( $Name )' to '$( $ConnectionString )'" -Severity INFO
+                Write-Log "Adding DuckDB connection named '$( $Name )' to '$( $ConnectionString )'" #-Severity INFO
                 [void]$Script:duckDb.Add(
                     [PSCustomObject]@{
                         "name" = $Name

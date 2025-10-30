@@ -23,7 +23,7 @@ Function Close-DuckDBConnection {
             If ( $conn.connection.State -eq "Open" ) {
 
                 # Open the connection with the default name
-                Write-Log "Closing DuckDB connection named '$( $conn.name )' to '$( $conn.connection.ConnectionString )'" -Severity INFO
+                Write-Log "Closing DuckDB connection named '$( $conn.name )' to '$( $conn.connection.ConnectionString )'" #-Severity INFO
 
                 $conn.connection.Close()
 
