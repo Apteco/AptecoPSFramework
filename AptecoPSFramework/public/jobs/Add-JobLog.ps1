@@ -93,8 +93,40 @@ Function Add-JobLog {
 
         Set-JobLogDatabase
 
-        #SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT last_insert_rowid()"
-        SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT id FROM joblog WHERE process = '$( $Script:processId )'"
+        $maxRetries = 5
+        $attempt = 0
+        $delayMs = 200
+        $return = $null
+
+        while ($attempt -lt $maxRetries) {
+            try {
+                $attempt++
+                    #SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT last_insert_rowid()"
+                    $return = SimplySql\Invoke-SqlScalar -ConnectionName "JobLog" -Query "INSERT INTO joblog (process) values ('$( $Script:processId )'); SELECT id FROM joblog WHERE process = '$( $Script:processId )'" -ErrorAction Stop
+                break
+            } catch {
+                $ex = $_.Exception
+                $msg = ($ex.Message ?? '').ToLowerInvariant()
+                $typeName = $ex.GetType().FullName
+
+                # treat SQLite busy/locked or sqlite-specific exceptions as transient
+                # typically the message is "database is locked"
+                if ($msg -match 'busy' -or $msg -match 'locked' -or $typeName -match 'sqlite') {
+                    if ($attempt -lt $maxRetries) {
+                        Start-Sleep -Milliseconds $delayMs
+                        # exponential backoff, cap at 5s
+                        $delayMs = [Math]::Min($delayMs * 2, 5000)
+                        continue
+                    }
+                }
+
+                # non-transient or out of retries -> rethrow
+                throw
+            }
+        }
+
+        $return
+
 
     }
 

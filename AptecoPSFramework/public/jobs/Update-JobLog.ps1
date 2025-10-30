@@ -154,6 +154,43 @@
         #Invoke-DuckDBQueryAsNonExecute -Query $sb.ToString() -ConnectionName "JobLog"
         $sqlUpdate = SimplySql\Invoke-SqlUpdate -Query $sb.ToString() -ConnectionName "JobLog"
 
+
+        #-----------------------------------------------
+        # UPDATE THE DATA (with retry on busy/locked)
+        #-----------------------------------------------
+
+        $updateQuery = $sb.ToString()
+        $maxRetries = 5
+        $attempt = 0
+        $delayMs = 200
+        $sqlUpdate = $null
+
+        while ($attempt -lt $maxRetries) {
+            try {
+                $attempt++
+                $sqlUpdate = SimplySql\Invoke-SqlUpdate -Query $updateQuery -ConnectionName "JobLog" -ErrorAction Stop
+                break
+            } catch {
+                $ex = $_.Exception
+                $msg = ($ex.Message ?? '').ToLowerInvariant()
+                $typeName = $ex.GetType().FullName
+
+                # treat SQLite busy/locked or sqlite-specific exceptions as transient
+                # typically the message is "database is locked"
+                if ($msg -match 'busy' -or $msg -match 'locked' -or $typeName -match 'sqlite') {
+                    if ($attempt -lt $maxRetries) {
+                        Start-Sleep -Milliseconds $delayMs
+                        # exponential backoff, cap at 5s
+                        $delayMs = [Math]::Min($delayMs * 2, 5000)
+                        continue
+                    }
+                }
+
+                # non-transient or out of retries -> rethrow
+                throw
+            }
+        }
+
     }
 
 
