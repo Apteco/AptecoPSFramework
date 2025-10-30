@@ -175,6 +175,7 @@ PrivateData = @{
       Feature: Added new modules Merge-PSCustomObject and Merge-Hashtable to merge two objects together -> Install-AptecoPSFramework is definitely needed again
       Feature: Replaced Import-Dependencies script with newer Import-Dependency module that also works with pwsh
       Feature: Skip the loading of local packages or duckdb packages via environment variables -> look at the boilerplate for more information
+      Fix: Removed log severity from info to verbose when opening and closing a duckdb connection
 0.4.7 Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
       Feature: Enhanced the boilerplate to output more information about the current process
       Fix CleverReach: Changed some datatypes to enhance performance of response gathering
