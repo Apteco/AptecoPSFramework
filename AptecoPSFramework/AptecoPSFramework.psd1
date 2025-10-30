@@ -170,6 +170,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Adding integration for Optilyz
 0.4.7 Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
       Feature: Enhanced the boilerplate to output more information about the current process
       Fix CleverReach: Changed some datatypes to enhance performance of response gathering

@@ -1,11 +1,11 @@
 ﻿[PSCustomObject]@{
 
     # General
-    "providername" = "PSXPro"
+    "providername" = "Optilyz"
 
     # API
-    "base" = "https://api.inxmail.com/#ACCOUNT#/rest/v1"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
-    "contentType" = "application/hal+json;charset=utf-8"       # content type string that is always used for API requests
+    "base" = "https://www.optilyz.com/api/v2/"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
+    "contentType" = "application/json"       # content type string that is always used for API requests
     "pageSize" = 1000                                          # max pagesize = 1000, default 1000
     "additionalHeaders" = [PSCustomObject]@{
         #"X-API" = "abcdef"
