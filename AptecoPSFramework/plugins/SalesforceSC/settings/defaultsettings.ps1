@@ -5,7 +5,7 @@
 
     # API
     "base" = "my.salesforce.com"                            # will be combined with the account domain
-    "apiversion" = "58.0"                                   # Salesforce API version
+    "apiversion" = "65.0"                                   # Salesforce API version
     "instanceId" = "FS0"                                    # This is the 3 to 6 character in a salesforce ID, there can be multiplic instances/orgs, so this is maybe to check later
     #"contentType" = "application/json; charset=utf-8"      # content type string that is always used for API requests
     #"pageSize" = 500                                       # if paging is used for the API requests, this is the default setting for a pagesize
