@@ -4,7 +4,7 @@
     "providername" = "Optilyz"
 
     # API
-    "base" = "https://www.optilyz.com/api/v2/"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
+    "base" = "https://www.optilyz.com/api/"             # main url to use for cleverreach, could be changed for newer versions or using API gateways
     "contentType" = "application/json"       # content type string that is always used for API requests
     "pageSize" = 1000                                          # max pagesize = 1000, default 1000
     "additionalHeaders" = [PSCustomObject]@{

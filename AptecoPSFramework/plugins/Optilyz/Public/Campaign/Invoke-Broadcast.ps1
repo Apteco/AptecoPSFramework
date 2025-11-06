@@ -1,1 +1,2 @@
-Write-Log -message "Nothing to do in the broadcast script"
+
+#Write-Log -message "Nothing to do in the broadcast script"

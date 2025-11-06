@@ -82,7 +82,7 @@ Import-Module "AptecoPSFramework"
 # CHOOSE A PLUGIN
 #-----------------------------------------------
 
-$plugin = Get-Plugins | Where-Object { $_.name -like "Inxmail Professional" }
+$plugin = Get-Plugins | Where-Object { $_.name -like "Optilyz" }
 
 
 #-----------------------------------------------
@@ -97,10 +97,8 @@ Import-Plugin $plugin.guid
 #-----------------------------------------------
 
 $settings = get-settings
-$settings.logfile = ".\inx.log"
-$settings.base = "https://api.inxmail.com/<account>/rest/v1"    # Please ask Apteco for this one
-$settings.login.username = ""
-$settings.login.password = Convert-PlaintextToSecure -String "abcdef"
+$settings.logfile = ".\optilyz.log"
+$settings.login.token = Convert-PlaintextToSecure -String "abcdef"
 
 
 #-----------------------------------------------
@@ -108,7 +106,7 @@ $settings.login.password = Convert-PlaintextToSecure -String "abcdef"
 #-----------------------------------------------
 
 Set-Settings $settings
-export-settings -Path ".\inx.yaml"
+export-settings -Path ".\optilyz.yaml"
 
 ```
 
@@ -122,7 +120,7 @@ export-settings -Path ".\inx.yaml"
 
 import-module AptecoPSFramework
 import-module C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFramework
-import-settings ".\inx.yaml"
+import-settings ".\optilyz.yaml"
 
 
 #-----------------------------------------------

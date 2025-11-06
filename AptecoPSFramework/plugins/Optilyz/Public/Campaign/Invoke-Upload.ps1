@@ -1,3 +1,6 @@
+
+<#
+
 $batchsize = $settings.upload.rowsPerUpload # Is 1000 in optilyz documentation
 $maxTimeout = $settings.upload.timeout # normally the results should be sent back in less than 15 seconds
 
@@ -6,41 +9,7 @@ $maxTimeout = $settings.upload.timeout # normally the results should be sent bac
 #-----------------------------------------------
 # LOAD FIELDS
 #-----------------------------------------------
-
-$fields = Invoke-RestMethod -Verbose -Uri "$( $settings.base )/v1/dataMappingFields" -Method Get -Headers $headers -ContentType $contentType #-Body $bodyJson -TimeoutSec $maxTimeout
-
-# TODO [ ] decisions to make: fullName or firstName+lastName / address1 or street+houseNumber / companyName if no fullname or lastname -> automatically checked from optilyz at upload
-
-# Add fields for matching that are missing in the previous API call
-$moreFields = @()
-$moreFields += "address1"
-1..99 | ForEach {
-    $moreFields += "individualisation$( $_ )"
-}
-
-
-<#
-label                 fieldName          required type      
------                 ---------          -------- ----
-Title                 jobTitle              False string
-Salutation            title                 False string
-First Name            firstName             False string
-Last Name             lastName               True string
-Company Name          companyName1          False string
-Company Name 2        companyName2          False string
-Company Name 3        companyName3          False string
-Street                street                 True string    
-House Number          houseNumber           False string
-Other address details address2              False string
-More address details  address3              False string
-Zip Code              zipCode                True string
-City                  city                   True string
-Country               country               False string
-Individualisation     individualisations    False collection
-c/o (care of)         careOf                False string
-Gender                gender                False string
-Other titles          otherTitles           False string
-#>
+Get-Field
 
 Write-Log -message "Loaded attributes $( $fields.fieldName -join ", " )"
 
@@ -65,29 +34,7 @@ $dataCsv | ForEach {
     $recipient = [PSCustomObject]@{
         "urn" = $addr.$urnFieldName
         "communicationkey" = $addr.$commkeyFieldName #[guid]::NewGuid()
-        "address" = $address <#[PSCustomObject]@{
-            #"title" = ""
-            #"otherTitles" = ""
-            #"jobTitle" = ""
-            #"gender" = ""
-            #"companyName1" = ""
-            #"companyName2" = ""
-            #"companyName3" = ""
-            #"individualisation1" = ""
-            #"individualisation2" = ""
-            #"individualisation3" = "" # could be used also with 4,5,6....
-            #"careOf" = ""
-            "firstName" = $firstnames | Get-Random
-            "lastName" = $lastnames | Get-Random
-            #"fullName" = ""
-            "houseNumber" = $addr.hnr
-            "street" = $addr.strasse
-            #"address1" = ""
-            #"address2" = ""
-            "zipCode" = $addr.plz
-            "city" = $addr.stadtbezirk
-            #"country" = ""
-        }#>
+        "address" = $address
         "variation" = $addr.variation #$variations | Get-Random 
         "vouchers" = @() # array of @{"code"="XCODE123";"name"="voucher1"}
     }
@@ -212,3 +159,5 @@ $return = [Hashtable]@{
     "RecipientsQueued" = $queued
 
 }
+
+#>
