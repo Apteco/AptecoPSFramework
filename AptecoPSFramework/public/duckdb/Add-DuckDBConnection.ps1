@@ -7,8 +7,13 @@ Function Add-DuckDBConnection {
     #>
         [cmdletbinding()]
         param(
-             [Parameter(Mandatory=$true)][String]$Name
-            ,[Parameter(Mandatory=$true)][String]$ConnectionString
+             
+             [Parameter(Mandatory=$true)]
+             [String]$Name
+            
+            ,[Parameter(Mandatory=$false)]
+             [String]$ConnectionString = "Data Source=:memory:;"
+            
             # TODO also allow use other connection strings as input parameter?
         )
 
