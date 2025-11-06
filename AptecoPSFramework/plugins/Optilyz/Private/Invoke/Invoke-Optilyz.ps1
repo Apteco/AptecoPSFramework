@@ -175,7 +175,7 @@ function Invoke-Optilyz {
                     "MaxTriesSpecific" = $Script:settings.errorhandling.MaximumRetriesOnHttpErrorList
                     "MaxTriesGeneric" = $Script:settings.errorhandling.MaximumRetriesGeneric
                     "MillisecondsDelay" = $Script:settings.errorhandling.HttpErrorDelay
-                    "ForceUTF8Return" = $false
+                    "ForceUTF8Return" = $true
                 }
                 $req = @( Invoke-WebRequestWithErrorHandling @wrInput )
                 
