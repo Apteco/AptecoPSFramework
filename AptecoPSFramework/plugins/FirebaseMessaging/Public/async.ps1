@@ -67,9 +67,22 @@ $base = "https://fcm.googleapis.com"
 Set-Logfile "C:\FastStats\Scripts\fcm\fcm.log"
 $processId = Get-ProcessId
 
-$maxNotificationsPerSecond = 50
+$maxNotificationsPerSecond = 100
+$checkEveryNotifications = 200
 $lockfile = "C:\temp\push.lock"
 $maxLockfileAge = 3 #hours
+$exclusionFolder = "C:\FastStats\Scripts\fcm\exclusions"
+
+Write-Log "----------------------------------------------------"
+Write-Log "Using process id $( $processId )"
+Write-Log "Using this file '$( $Path )'"
+
+$urnFieldName = "PU Id"
+$informTokens = @(
+
+    # Florian DE
+    "620967"
+)
 
 
 ################################################
@@ -81,6 +94,8 @@ $maxLockfileAge = 3 #hours
 #-----------------------------------------------
 # LOAD KERNEL32
 #-----------------------------------------------
+
+Write-Log "Loading Kernel32..."
 
 Add-Type -Language CSharp -TypeDefinition @"
 using System;
@@ -94,9 +109,14 @@ public static class Kernel32 {
 }
 "@
 
+Write-Log "[OK] Loaded Kernel32"
+
+
 #-----------------------------------------------
 # LOAD DUCKDB
 #-----------------------------------------------
+
+Write-Log "Loading DuckDB..."
 
 # Load duck DB
 add-type -Path "C:\FastStats\Scripts\fcm\lib\DuckDB.NET.Bindings.Full.1.4.1\lib\net8.0\DuckDB.NET.Bindings.dll"
@@ -106,13 +126,18 @@ Add-Type -Path "C:\FastStats\Scripts\fcm\lib\DuckDB.NET.Data.Full.1.4.1\lib\net8
 [void][Kernel32]::LoadLibrary("C:\FastStats\Scripts\fcm\lib\DuckDB.NET.Bindings.Full.1.4.1\runtimes\win-x64\native\duckdb.dll")
 
 # Add DuckDB connection
-$duck = [DuckDB.NET.Data.DuckDBConnection]::new("Data Source=:memory:") # TODO maybe add parameter to only load strings
+$connectionString = "Data Source=:memory:"
+$duck = [DuckDB.NET.Data.DuckDBConnection]::new($connectionString) # TODO maybe add parameter to only load strings
 $duck.open()
+
+Write-Log "[OK] DuckDB loaded and connection open to '$( $connectionString )'"
 
 
 #-----------------------------------------------
 # LOAD PUSH LIBRARIES
 #-----------------------------------------------
+
+Write-Log "Loading bouncy castle..."
 
 # Load bouncy castle for push
 Add-Type -Path "C:\Program Files\PackageManagement\NuGet\Packages\BouncyCastle.Cryptography.2.5.0\lib\net461\BouncyCastle.Cryptography.dll"
@@ -128,15 +153,25 @@ $rsa = [System.Security.Cryptography.RSA]::Create()
 $rsa.ImportParameters($rsaParams)
 
 $Script:accessToken = ""
+$Script:exp = 0
+
+Write-Log "[OK] Bouncy castle loaded"
 
 
 #-----------------------------------------------
 # LOAD DATA
 #-----------------------------------------------
 
+Write-Log "Loading input file with DuckDB..."
+
 $duckCommand = $duck.createCommand()
 # TODO load exclusion list into the statement?
-$duckCommand.CommandText = "Select * from read_csv('$( $Path )') ;"
+$sb = [System.Text.StringBuilder]::new()
+$sb.Append( "SELECT * FROM read_csv('$( $Path )')" ) | Out-Null
+If ( (Get-ChildItem -Path $exclusionFolder -Filter "*.csv").Count -gt 0 ) {
+    $sb.Append( "WHERE token not in ( SELECT token from read_csv('$( $exclusionFolder )/*.csv', union_by_name = true) WHERE error = '404' )" ) | Out-Null
+}
+$duckCommand.CommandText = $sb.toString()
 $reader = $duckCommand.ExecuteReader()
 
 $returnPSCustomArrayList = [System.Collections.ArrayList]@()
@@ -157,19 +192,33 @@ While ($reader.read()) {
 
 }
 $notifications = [System.Collections.ArrayList]@()
-$notifications.addrange( $returnPSCustomArrayList[0..6000] ) | Out-Null
-#$notifications.addrange( $returnPSCustomArrayList ) | Out-Null
+#$notifications.addrange( $returnPSCustomArrayList[0..6000] ) | Out-Null
+$notifications.addrange( $returnPSCustomArrayList ) | Out-Null
 
 #$returnPSCustomArrayList.CopyTo($notifications)
 
 # TODO Maybe create single files that will be used for sendout
 
+Write-Log "[OK] Input file loaded (already with exclusions):"
+
+
+#-----------------------------------------------
+# LOGGING
+#-----------------------------------------------
+
+$totalRows = measure-rows -Path $Path -SkipFirstRow
+
+#Write-Log "Input data:"
+Write-Log "  Total token: $( $totalRows )"
+Write-Log "  Exclusions: $( $totalRows - $notifications.count )"
+Write-Log "  Remaining token: $( $notifications.count )"
+
+
 #-----------------------------------------------
 # LOAD EXCLUSIONS
 #-----------------------------------------------
 
-$exclusionFolder = "C:\FastStats\Scripts\fcm\exclusions"
-
+<#
 # Delete exclusion files older than x days
 Get-ChildItem -Path $exclusionFolder -Filter "*.csv" | ForEach-Object {
     $path = $_.FullName
@@ -207,14 +256,65 @@ If (( Get-Childitem -Path $exclusionFolder -Filter "*.csv" ).Count -gt 0) {
     $exlusionlist.AddRange( $returnPSCustomArrayList ) |Out-Null
 
 }
-
+#>
 
 #-----------------------------------------------
 # PREPARE HTTPCLIENT
 #-----------------------------------------------
 
+Write-Log "Opening HttpClient..."
+
 # HttpClient
 $Script:client = [System.Net.Http.HttpClient]::new()
+
+Write-Log "[OK] HttpClient ready"
+
+
+#-----------------------------------------------
+# BUILDING UPLOAD DATA
+#-----------------------------------------------
+
+
+$Script:fcmUrl = "$( $base )/$( $apiVersion )/projects/$( $projectId )/messages:send"
+
+Write-Log "Using this url '$( $Script:fcmUrl )'"
+Write-Log "Transforming data:"
+
+$notificationsArr = [System.Collections.ArrayList]@()
+$i = 0
+$notifications | ForEach-Object {
+
+    $notif = $_
+
+    # TODO implement image
+    $payload = [Ordered]@{
+        "message" = [Ordered]@{
+            "notification" = [Ordered]@{
+                "title" = $notif."PN.Title"
+                "body" = $notif."PN.Text"
+            }
+            "data" = [Ordered]@{
+                "route" = $notif."route"
+                "type" = $notif."type"
+                "url" = $notif."url"
+            }
+            "token" = $notif.token
+        }
+    }
+
+    $notifObj = [Ordered]@{
+        "token" = $notif.token
+        "payload" = ConvertTo-Json -InputObject $payload -Compress -Depth 99
+    }
+
+    $notificationsArr.Add( [PSCustomObject]$notifObj ) | Out-Null
+    $i += 1
+
+    If ( $notificationsArr.Count % 1000 -eq 0 -or $notifications.Count -eq $i ) { # TODO change to 10k later
+        Write-Log "  $( $i ) done"
+    }
+
+}
 
 
 #-----------------------------------------------
@@ -225,40 +325,48 @@ $Script:client = [System.Net.Http.HttpClient]::new()
 #$postedTasks = [System.Collections.ArrayList]@()
 function Send-FcmNotification {
     
-    param(
+    [CmdletBinding(DefaultParameterSetName = 'PayloadToParse')]
+    param (
+
+         [Parameter(Mandatory=$true, ParameterSetName = 'ParsedPayload')]
+         [String]$NotificationJson
         
-        [PSCustomObject]$notification
+        ,[Parameter(Mandatory=$true, ParameterSetName = 'PayloadToParse')]
+         [PSCustomObject]$NotificationObject
 
     )
 
     begin {
 
+
+
     }
 
     process {
 
+        # TODO create a separate function for that?
         # refresh the token when it expires or there is no accesstoken
-        If ( $Script:accessToken -eq "" -or ( $exp - [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() -lt 60 ) ) {
+        If ( $Script:accessToken -eq "" -or ( $Script:exp - [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() -lt 60 ) ) {
             
             # Erstelle das JWT
             $now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-            $exp = $now + 3600
+            $Script:exp = $now + 3600
             $header = @{
                 alg = "RS256"
                 typ = "JWT"
             }
             $claimSet = @{
-                iss = $json.client_email
+                iss = $Script:json.client_email
                 scope = "https://www.googleapis.com/auth/cloud-platform"
                 aud = "https://oauth2.googleapis.com/token"
                 iat = $now
-                exp = $exp
+                exp = $Script:exp
             }
             $headerJson = $header | ConvertTo-Json -Compress
             $claimSetJson = $claimSet | ConvertTo-Json -Compress
             $headerBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($headerJson))
             $claimSetBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($claimSetJson))
-            $unsignedToken = "$headerBase64.$claimSetBase64"
+            $unsignedToken = "$( $headerBase64 ).$( $claimSetBase64 )"
 
             # Signiere das JWT
             $signature = $rsa.SignData([System.Text.Encoding]::UTF8.GetBytes($unsignedToken), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
@@ -278,34 +386,48 @@ function Send-FcmNotification {
 
         }
 
-        $fcmUrl = "$( $base )/$( $apiVersion )/projects/$( $projectId )/messages:send"
-        # TODO implement image and more flexibility
-        $payload = [Ordered]@{
-            "message" = [Ordered]@{
-                "notification" = [Ordered]@{
-                    "title" = $notification."PN.Title"
-                    "body" = $notification."PN.Text"
+        # replacing json
+        switch ($PSCmdlet.ParameterSetName) {
+
+            'ParsedPayload' {
+
+                # Create params
+                $payloadJson = $NotificationJson
+
+                break
+            }
+
+            'PayloadToParse' {
+
+                $payload = [Ordered]@{
+                    "message" = [Ordered]@{
+                        "notification" = [Ordered]@{
+                            "title" = $NotificationObject."PN.Title"
+                            "body" = $NotificationObject."PN.Text"
+                        }
+                        "data" = [Ordered]@{
+                            "route" = $NotificationObject."route"
+                            "type" = $NotificationObject."type"
+                            "url" = $NotificationObject."url"
+                            #"firstname" = $notification.firstname
+                            #"PU Id" = $notif."PU Id"
+                        }
+                        "token" = $NotificationObject.token
+                    }
                 }
-                "data" = [Ordered]@{
-                    "route" = $notification.route
-                    "type" = $notification.type
-                    "url" = $notification.url
-                    "firstname" = $notification.firstname
-                    "PU Id" = $notification."PU Id"
-                }
-                "token" = $notification.token
+
+                $payloadJson = ConvertTo-Json -InputObject $payload -Compress -Depth 99
+                
+                break
             }
         }
-        $payloadJson = ConvertTo-Json -InputObject $payload -Compress -Depth 99
-        #Write-Verbose $payloadJson -verbose
 
-        #return
         $responseTask = $null
         try {
 
             #Write-Verbose $fcmUrl -Verbose
             $content = [System.Net.Http.StringContent]::new($payloadJson, [System.Text.Encoding]::UTF8, "application/json")
-            $responseTask = $Script:client.PostAsync($fcmUrl, $content)
+            $responseTask = $Script:client.PostAsync($Script:fcmUrl, $content)
 
         } catch {
             # TODO do something else here
@@ -326,7 +448,7 @@ function Send-FcmNotification {
 # Only proceed if no lock file is present
 While ( (Test-Path -Path $lockfile) -eq $True  ) {  
     
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 20
     Write-Log "Waiting for lockfile '$( $lockfile )' to be removed."
 
     # Remove lockfile if too old
@@ -345,6 +467,7 @@ While ( (Test-Path -Path $lockfile) -eq $True  ) {
 # CREATE LOCKFILE
 #-----------------------------------------------
 
+Write-Log "Lockfile is removed, creating a new one at '$( $lockfile )'"
 Get-ProcessId | Set-Content -Path $lockfile -encoding utf8
 
 
@@ -352,44 +475,57 @@ Get-ProcessId | Set-Content -Path $lockfile -encoding utf8
 # SEND PUSH
 #-----------------------------------------------
 
+Write-Log "Start sending notifications with max $( $maxNotificationsPerSecond ) per second and checking every $( $checkEveryNotifications ) notifications..."
+
 [int]$initialDelaySeconds = 1
 $delay = $initialDelaySeconds
 $i = 0
 $successful = 0
 $batches = 0
 $tasks = [System.Collections.ArrayList]@()
+$tasksToRemove = [System.Collections.ArrayList]@()
 $notificationsRepeat = [System.Collections.ArrayList]@()
 $failedToken = [System.Collections.ArrayList]@()
 $increaseDelay = $false
+$startBeforeUpload = [datetime]::now
+$success = $False
 Try {
 
     # Main sending loop with rate control
-    $interval = 1 / $maxNotificationsPerSecond  # seconds per message
+    $interval = 1 / $maxNotificationsPerSecond * 1000  # milliseconds per message
     Do {
 
-        $notifications | Where-Object { $_.token -notin $exlusionlist.token } | ForEach-Object {
+        #$notifications | Where-Object { $_.token -notin $exlusionlist.token } | ForEach-Object {
+        $notificationsArr | ForEach-Object {
 
             $notif = $_
 
-            $responseTask = Send-FcmNotification -notification $notif
+            $taskDuration = Measure-Command {
+                $responseTask = Send-FcmNotification -NotificationJson $notif.payload
+            }
             $responseObj = [Ordered]@{
                 "id" = $i
                 "task" = $responseTask
                 "notification" = $notif
             }
             $tasks.Add( $responseObj ) | Out-Null
+            $i += 1
             
             # Count and sleep
-            $i += 1
-            Start-Sleep -Seconds $interval
+            $remainingTime = $interval - $taskDuration.TotalMilliseconds
+            Start-Sleep -Milliseconds ( [Math]::Max(0, $remainingTime) ) # The /2 is just from testing. In there we uploaded 6000 records in 120 seconds, which is 50 records per second, but 100 was the setting
+
+            If ( $i % 1000 -eq 0 -or $i -eq $notificationsArr.Count ) {
+                Write-Log "  Already done $( $i )"
+            }
 
             # Check the results every n calls or at the end
-            If ( $i % 100 -eq 0 -or $i -eq $notifications.Count ) {
+            If ( $i % $checkEveryNotifications -eq 0 -or $i -eq $notificationsArr.Count ) {
 
-                Write-Log "Already done $( $i )"
+                #Write-Log "  Checking at $( $i )"
 
-                # Go through tasks in reverse order
-                for ( $j = $tasks.Count -1; $j -ge 0; $j-- ) {
+                # Go through tasks
+                for ( $j = 0; $j -lt $tasks.Count; $j++ ) {
 
                     $t = $tasks[$j]
                     
@@ -405,7 +541,7 @@ Try {
 
                             # 429 to repeat
                             429 {
-                                $notificationsRepeat.Add( $t.notification )
+                                $notificationsRepeat.Add( $t.notification ) | Out-Null
                                 $increaseDelay = $True
                                 break
                             }
@@ -417,7 +553,7 @@ Try {
                                     "token" = $t.notification.token # TODO rework the token thing here
                                     "message" = "Not found"
                                 }
-                                $failedToken.add( [PSCustomObject]$failObj  ) | Out-Null 
+                                $failedToken.add( [PSCustomObject]$failObj ) | Out-Null 
                                 break
                             }
 
@@ -427,26 +563,36 @@ Try {
                                 $failObj = [Ordered]@{
                                     "error" = $t.result.StatusCode.value__
                                     "token" = $t.notification.token # TODO rework the token thing here
+                                    "message" = ""
                                 }
-                                $failedToken.add( [PSCustomObject]$failObj  ) | Out-Null 
+                                $failedToken.add( [PSCustomObject]$failObj ) | Out-Null 
                                 #$tbody = $t.Content.ReadAsStringAsync().Result
                             }
 
                         }
 
-                        # All done, remove task
-                        $tasks.RemoveAt($j)
+                        $tasksToRemove.Add($j) | Out-Null
                     
                     }
+
+                    # All done, remove task in reverse order
+                    for ( $j = $tasksToRemove.Count -1; $j -ge 0; $j-- ) {
+                        $tasks.RemoveAt($tasksToRemove[$j])
+                    }
+                    $tasksToRemove.Clear()
 
                 }
 
                 # Exponential backoff (double delay, capped at 32 seconds)
                 If ( $increaseDelay -eq $True ) {
+                    $delayBefore = $delay
                     $delay = [Math]::Min($delay * 2, 32)
+                    Write-Log "Increasing delay from $( $delayBefore ) to $( $delay )"
                     Start-Sleep -Seconds $delay
                     $increaseDelay = $False
                 }
+
+                #Write-Log "  Checking done $( $i )"
 
             }
 
@@ -455,35 +601,79 @@ Try {
         $batches += 1
 
         # prepare the next batch
-        $notifications.Clear()
-        $notificationsRepeat.CopyTo($notifications)
+        $notificationsArr.Clear()
+        $notificationsRepeat.CopyTo($notificationsArr)
 
-    } While ( $notifications.count -ne 0 )
+    } While ( $notificationsArr.count -ne 0 )
 
-    Write-Log "Needed $( $batches ) batches"
+    $success = $True
 
 } catch {
-    # TODO catch it
+
+    $msg = "Error during uploading data in line $( $i ). Abort!"
+    Write-Log -Message $msg -Severity ERROR #-WriteToHostToo $false
+    Write-Log -Message $_.Exception -Severity ERROR
+    throw $_
+
 } finally {
 
+    Write-Log "Removing lockfile now"
     Remove-Item -Path $lockfile -Force
 
+    $totalTimeUpload = New-TimeSpan -Start $startBeforeUpload -End ( [DateTime]::now )
+
+    Write-Log "Results:"
+    Write-Log "  $( [math]::ceiling($totalTimeUpload.TotalSeconds) ) seconds to upload $( $i ) notifications"
+    Write-Log "  $( [math]::ceiling( $i / $totalTimeUpload.TotalSeconds )) average notifications per second"
+    Write-Log "  $( $batches ) batches to upload"
+    Write-Log "  $( $successful ) successful token"
+    Write-Log "  $( $failedToken.Count ) failed token"
+
+    Write-Log "Writing exclusion file, when more than 0 failed token"
     If ($failedToken.Count -gt 0 ) {
-        $failedToken | Export-Csv -Path "$( $exclusionFolder )\$( $processId ).csv" -Encoding utf8 -Delimiter "`t" -NoTypeInformation
+        $exclusionFile = "$( $exclusionFolder )\$( $processId ).csv"
+        Write-Log "  Writing exclusion file to '$( $exclusionFile )'"
+        $failedToken | Export-Csv -Path $exclusionFile -Encoding utf8 -Delimiter "`t" -NoTypeInformation
     }
 
 }
-
-exit 0
 
 #-----------------------------------------------
 # FORCE FOLLOW PROCESSES TO DO NOTHING
 #-----------------------------------------------
 
-# Rewrite original file with just one line
-Move-Item -Path $Path -Destination "$( $Path ).moved"
-# TODO save duckdb with headers and one line into this file
+If ( $success -eq $True ) {
 
+    $sb = [System.Text.StringBuilder]::new()
+    $sb.Append( "COPY (" ) | Out-Null
+    If ( $informTokens.Count -gt 0 ) {
+        $sb.Append( "SELECT * Exclude(""PN.Text""), 'Successfully uploaded $( $successful ) tokens' as ""PN.Text"" FROM read_csv('$( $Path )') WHERE ""$( $urnFieldName )"" in ('$( $informTokens -join "', '" )')" ) | Out-Null
+    } else {
+        # Just use a random record
+        $sb.Append( "SELECT * FROM read_csv('$( $Path )') ORDER BY RANDOM() LIMIT 1" ) | Out-Null
+    }
+    $sb.Append( ") TO '$( $Path ).new' (FORMAT CSV, DELIMITER '\t', QUOTE '')" ) | Out-Null
+
+    $duckCommand = $duck.createCommand()
+    $duckCommand.CommandText = $sb.ToString()
+    $result = $duckCommand.ExecuteNonQuery()
+
+    Write-Log "Result of original file creation: $( $result )"
+
+    $duck.Close()
+
+    # Wait for 5 seconds until file is released
+    Start-Sleep -Seconds 5
+
+    # Replace original file, if a new one was created
+    If ( Test-Path -Path "$( $Path ).new" ) {
+        If ( (get-item "$( $Path ).new" ).Length -gt 0 ) {
+            Move-Item -Path $Path -Destination "$( $Path ).moved" -Force
+            Move-Item -Path  "$( $Path ).new" -Destination $Path -Force
+        }
+    }
+    
+}
 
 ################################################
 #
@@ -491,6 +681,8 @@ Move-Item -Path $Path -Destination "$( $Path ).moved"
 #
 ################################################
 
-exit 0
-
-
+If ( $success -eq $True ) {
+    Exit 0
+} Else {
+    Exit 4
+}
