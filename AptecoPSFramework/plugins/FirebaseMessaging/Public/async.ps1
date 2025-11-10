@@ -59,8 +59,8 @@ To be defined
 #
 ################################################
 
-$serviceAccountKey = "C:\FastStats\Scripts\fcm\loyalityapppos-firebase-adminsdk-9bsua-7df6c10a3a.json"
-$projectId = "loyalityapppos"
+$serviceAccountKey = "C:\FastStats\Scripts\fcm\fcmproject-firebase-adminsdk-9bsua-7df6c10a3a.json"
+$projectId = "fcmproject"
 $apiVersion = "v1"
 $base = "https://fcm.googleapis.com"
 
@@ -232,10 +232,7 @@ function Send-FcmNotification {
     )
 
     begin {
-        # todo put them outside the functions
-        $projectId = "loyalityapppos"
-        $apiVersion = "v1"
-        $base = "https://fcm.googleapis.com"
+
     }
 
     process {
@@ -282,12 +279,12 @@ function Send-FcmNotification {
         }
 
         $fcmUrl = "$( $base )/$( $apiVersion )/projects/$( $projectId )/messages:send"
-        # TODO implement image
+        # TODO implement image and more flexibility
         $payload = [Ordered]@{
             "message" = [Ordered]@{
                 "notification" = [Ordered]@{
                     "title" = $notification."PN.Title"
-                    "body" = $notification."PN.Text" #"Hallo, dies ist ein Test von Apteco. Bitte Alex Bescheid geben."
+                    "body" = $notification."PN.Text"
                 }
                 "data" = [Ordered]@{
                     "route" = $notification.route
