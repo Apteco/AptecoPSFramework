@@ -171,6 +171,7 @@ PrivateData = @{
 
         # 'ReleaseNotes' des Moduls
         ReleaseNotes = '
+      Feature: Adding support to use Firebase Cloud Messaging to send push notifications to mobile devices through Extras.xml in PeopleStage/Orbit
       Feature: Removed Join-PSCustomObject and Join-Hashtable in favour of Merge-PSCustomObject and Merge-Hashtable
       Feature: Added new modules Merge-PSCustomObject and Merge-Hashtable to merge two objects together -> Install-AptecoPSFramework is definitely needed again
       Feature: Replaced Import-Dependencies script with newer Import-Dependency module that also works with pwsh
