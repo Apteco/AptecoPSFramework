@@ -69,7 +69,13 @@ function Invoke-EmarsysCore {
         #-----------------------------------------------
 
         # Extract credentials
-        $secret = Convert-SecureToPlaintext $Script:settings.login.secret
+        If ( $Script:settings.encryptCredentials -eq $true ) {
+            # Decrypt credentials
+            $secret = Convert-SecureToPlaintext $Script:settings.login.secret
+        } else {
+            # Just use plaintext
+            $secret = $Script:settings.login.secret
+        }
         $username = $Script:settings.login.username
 
         # Create nonce

@@ -21,7 +21,9 @@
     # Network and Security
     "changeTLS" = $true                                     # change TLS automatically to a newer version
     "allowedProtocols" = @(,"Tls12")                        # Protocols that should be used like Tls12, Tls13, SSL3
-    "keyfile" = ""                                          # Define a path in here, if you use another keyfile for https://www.powershellgallery.com/packages/EncryptCredential/0.0.2
+    "keyfile" = ""                                          # Define a path in here, if you use another keyfile for https://www.powershellgallery.com/packages/EncryptCredential
+    "encryptCredentials" = $true                            # If true, then credentials will be decrypted with the current users keyfile/encryption
+                                                            # If false it just tries to use the saved tokens as they are saved
 
     # PowerShell/Python
     "powershellExePath" =  "$( $Env:SystemRoot )\sysnative\WindowsPowerShell\v1.0\powershell.exe"

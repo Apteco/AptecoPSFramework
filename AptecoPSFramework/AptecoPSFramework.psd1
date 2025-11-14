@@ -177,6 +177,7 @@ PrivateData = @{
       Feature: Skip the loading of local packages or duckdb packages via environment variables -> look at the boilerplate for more information
       Feature: Change default Salesforce API Version to 65 to support newer objects
       Feature: Adding a default duckdb connection when adding it
+      Feature: Adding a new setting to disable account specific encryption for tokens and credentials for easier handling in dev environments
       Fix: Removed log severity from info to verbose when opening and closing a duckdb connection
       Fix: Adding Salesforce UTF8 handling by default
 0.4.7 Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload

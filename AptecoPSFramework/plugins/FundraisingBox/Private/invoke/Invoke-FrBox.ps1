@@ -69,7 +69,13 @@ function Invoke-FrBox {
         #-----------------------------------------------
 
         # Extract credentials
-        $token = Convert-SecureToPlaintext $Script:settings.login.token
+        If ( $Script:settings.encryptCredentials -eq $true ) {
+            # Decrypt credentials
+            $token = Convert-SecureToPlaintext $Script:settings.login.token
+        } else {
+            # Just use plaintext
+            $token = $Script:settings.login.token
+        }
         $pair = "$( $token ):dummypwd"
         $bytes = [System.Text.Encoding]::ASCII.GetBytes($pair)
         $base64 = [System.Convert]::ToBase64String($bytes)

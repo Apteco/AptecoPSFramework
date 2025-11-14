@@ -71,7 +71,13 @@ Function Invoke-Dynamics {
                 $token = $rawToken
             }
         } elseif ( $Script:settings.token.tokenUsage -eq "generate" ) {
-            $token = Convert-SecureToPlaintext -String $Script:settings.login.accesstoken
+            If ( $Script:settings.encryptCredentials -eq $true ) {
+                # Decrypt credentials
+                $token = Convert-SecureToPlaintext -String $Script:settings.login.accesstoken
+            } else {
+                # Just use plaintext
+                $token = $Script:settings.login.accesstoken
+            }
         } else {
             throw "No token available!"
             exit 0 # TODO check, if this token is needed or should be another exit code

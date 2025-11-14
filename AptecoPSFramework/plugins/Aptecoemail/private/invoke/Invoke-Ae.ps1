@@ -57,7 +57,13 @@ function Invoke-Ae {
         }
 
         # Prepare Authentication
-        $authString = "$( $Script:settings.login.apikey ):$( ( Convert-SecureToPlaintext -String $Script:settings.login.apisecret ) )"
+        If ( $Script:settings.encryptCredentials -eq $true ) {
+            # Decrypt credentials
+            $authString = "$( $Script:settings.login.apikey ):$( ( Convert-SecureToPlaintext -String $Script:settings.login.apisecret ) )"
+        } else {
+            # Just use plaintext
+            $authString = "$( $Script:settings.login.apikey ):$( $Script:settings.login.apisecret )"
+        }
         $auth = [Convert]::ToBase64String( [System.Text.Encoding]::UTF8.GetBytes( $authString ) )
 
         # Build up header

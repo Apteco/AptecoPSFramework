@@ -57,7 +57,13 @@ function Invoke-XPro {
         }
 
         # Prepare Authentication
-        $authString = "$( $Script:settings.login.username ):$( ( Convert-SecureToPlaintext -String $Script:settings.login.password ) )"
+        If ( $Script:settings.encryptCredentials -eq $true ) {
+            # Decrypt credentials
+            $authString = "$( $Script:settings.login.username ):$( ( Convert-SecureToPlaintext -String $Script:settings.login.password ) )"
+        } else {
+            # Just use plaintext
+            $authString = "$( $Script:settings.login.username ):$( $Script:settings.login.password )"
+        }
         $auth = [Convert]::ToBase64String( [System.Text.Encoding]::UTF8.GetBytes( $authString ) )
 
         # Build up header
