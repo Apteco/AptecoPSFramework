@@ -261,12 +261,12 @@ function Invoke-SFSC {
             }
 
             # Increase page and add results to the collection
-            If ( $wr.headers.Keys -contains "Sforce-Locator" ) {
-                If ( $wr.headers."Sforce-Locator" -ne "null" ) {
+            If ( $wr.OriginalResponse.headers.Keys -contains "Sforce-Locator" ) {
+                If ( $wr.OriginalResponse.headers."Sforce-Locator" -ne "null" ) {
                    If ( $Query.PsObject.properties.name -contains "locator" ) {
-                        $Query."locator" = $wr.headers."Sforce-Locator"
+                        $Query."locator" = $wr.OriginalResponse.headers."Sforce-Locator"
                    } else {
-                        $Query | Add-Member -MemberType NoteProperty -Name "locator" -Value $wr.headers."Sforce-Locator"
+                        $Query | Add-Member -MemberType NoteProperty -Name "locator" -Value $wr.OriginalResponse.headers."Sforce-Locator"
                    }
                 } else {
                     $finished = $true
@@ -276,7 +276,7 @@ function Invoke-SFSC {
             }
 
             # Add result to return collection
-            Switch -Wildcard ( $wr.headers.'Content-Type' ) {
+            Switch -Wildcard ( $wr.OriginalResponse.headers.'Content-Type' ) {
                 "text/csv*" {
                     [void]$res.AddRange(@( ConvertFrom-Csv -Delimiter "`t" -InputObject $wr.Content ))
                     break
@@ -293,7 +293,7 @@ function Invoke-SFSC {
             }
 
             If ( $PSBoundParameters["Verbose"].IsPresent -eq $true ) {
-                Write-log $wr.Headers."Sforce-Limit-Info" -severity verbose #api-usage=2/15000
+                Write-log $wr.OriginalResponse.Headers."Sforce-Limit-Info" -severity verbose #api-usage=2/15000
             }
 
 
@@ -302,9 +302,9 @@ function Invoke-SFSC {
             #-----------------------------------------------
 
             If ( $Script:variableCache.Keys -contains "api_rate_limit" ) {
-                $Script:variableCache.api_rate_limit = $wr.Headers."Sforce-Limit-Info".trim()
+                $Script:variableCache.api_rate_limit = $wr.OriginalResponse.Headers."Sforce-Limit-Info".trim()
             } else {
-                $Script:variableCache.Add("api_rate_limit",$wr.Headers."Sforce-Limit-Info".trim())
+                $Script:variableCache.Add("api_rate_limit",$wr.OriginalResponse.Headers."Sforce-Limit-Info".trim())
             }
 
 
