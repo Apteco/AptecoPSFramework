@@ -209,6 +209,7 @@ function Invoke-SFSC {
                     "MaxTriesSpecific" = $Script:settings.errorhandling.MaximumRetriesOnHttpErrorList
                     "MaxTriesGeneric" = $Script:settings.errorhandling.MaximumRetriesGeneric
                     "MillisecondsDelay" = $Script:settings.errorhandling.HttpErrorDelay
+                    "ForceUTF8Return" = $True
                 }
                 $wr = @( Invoke-WebRequestWithErrorHandling @wrInput )
                 #$wr = Invoke-WebRequest @updatedParameters -UseBasicParsing

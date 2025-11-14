@@ -178,6 +178,7 @@ PrivateData = @{
       Feature: Change default Salesforce API Version to 65 to support newer objects
       Feature: Adding a default duckdb connection when adding it
       Fix: Removed log severity from info to verbose when opening and closing a duckdb connection
+      Fix: Adding Salesforce UTF8 handling by default
 0.4.7 Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
       Feature: Enhanced the boilerplate to output more information about the current process
       Fix CleverReach: Changed some datatypes to enhance performance of response gathering

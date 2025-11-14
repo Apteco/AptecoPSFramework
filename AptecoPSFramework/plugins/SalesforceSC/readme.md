@@ -121,3 +121,21 @@ Get-SFSCObjectData -Object "Campaign" -Fields "id", "name" -Limit 100
 Remove-SFSCObjectData -Object "Campaign" -Id "701KB000000cPiiYAE"
 
 ```
+
+# Additional hints on Salesforce NPC
+
+In Salesforce NPC we do have accounts, that have the boolean flag `IsPersonAccount` and a Contact ID named `PersonContactId`. As the CampaignMembers object only allows contacts and leads by default, we should refer only to the ContactId and use the function `Invoke-UploadWithAccounts` rather than `Invoke-Upload` in the `upload.ps1` script at the end.
+
+There is also an option available to activate accounts for CampaignMember. Then you need to reflect that change in the settings.
+
+# Channel-Settings in Orbit
+
+Besides the default settings, your integration parameters should look like this
+
+```
+settingsFile=C:\FastStats\Scripts\AptecoPSFramework\settings\npc.yaml;Operation=insert
+```
+
+and you should integrate additional variables like here
+
+![Additional variables](https://gist.github.com/user-attachments/assets/41fa3a49-97b2-41e6-be88-34384e9a2d08)
