@@ -294,12 +294,14 @@ function Invoke-UploadWithAccounts {
                 }
 
                 # Add a new subcampaign
-                $campaign = [PSCustomObject]@{
+                $newCampaign = [PSCustomObject]@{
                     "Name" = $subCampaignName # TODO add a switch to append datetime or use an existing one
                     "Type" = $campaignType
                     "ParentId" = $campaign.id
                 }
-                $subCampaign = Add-SFSCObjectData -Object "Campaign" -Attributes $campaign
+                $subCampaign = Add-SFSCObjectData -Object "Campaign" -Attributes $newCampaign
+                Write-Log "Using subcampaign '$( $subCampaign.id )' with name '$( $subCampaignName )' and parent '$( $campaign.id )' now" -Severity INFO
+
 
             }
 
@@ -373,10 +375,10 @@ function Invoke-UploadWithAccounts {
 
             }
 
-            Write-Log "Stats after converting file"
-            Write-Log "  Checked $( $c ) lines in total"
-            Write-Log "  Converted $( $newCsv.count ) accounts lines"
-            Write-Log "  Skipped $( $skippedLines ) accounts lines" # TODO should this trigger an error?
+            Write-Log "Stats after converting file" -Severity INFO
+            Write-Log "  Checked $( $c ) lines in total" -Severity INFO
+            Write-Log "  Converted $( $newCsv.count ) accounts/contacts lines" -Severity INFO
+            Write-Log "  Skipped $( $skippedLines ) accounts/contacts lines"  -Severity INFO # TODO should this trigger an error?
 
             # Checking the campaigns stats
             # Write-Log -Severity VERBOSE -Message "Campaign summmary:"
