@@ -4,7 +4,7 @@ function Test-IsGuid {
     [OutputType([bool])]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$StringGuid
+        [String]$StringGuid
     )
 
    $ObjectGuid = [System.Guid]::empty

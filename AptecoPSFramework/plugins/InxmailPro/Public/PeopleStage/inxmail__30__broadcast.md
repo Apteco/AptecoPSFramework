@@ -196,7 +196,7 @@ $mailingIdArray = $params.MessageName -split $settings.nameConcatChar,2 # TODO M
 
 # TODO [x] use the split character from settings
 # TODO [x] check if mailing exists before using it
-if([string]::IsNullOrEmpty($params.MessageName)){
+if([String]::IsNullOrEmpty($params.MessageName)){
     Write-Log -message "Mailing does not exist"
     throw "Mailing does not exist"
 }

@@ -9,8 +9,8 @@ https://gist.github.com/ksumrall/3b7010a9fbc9c5cb19e9dc8b9ee32fb1
 Function Import-Settings {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$false)][string]$Path = "./settings.yaml"
-        ,[Parameter(Mandatory=$false)][string]$ProcessId = ""               # The process id can also be set via this call
+        [Parameter(Mandatory=$false)][String]$Path = "./settings.yaml"
+        ,[Parameter(Mandatory=$false)][String]$ProcessId = ""               # The process id can also be set via this call
     )
 
     Process {

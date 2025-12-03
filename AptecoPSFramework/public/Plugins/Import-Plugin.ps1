@@ -2,7 +2,7 @@
     [CmdletBinding()]
     param (
          [Parameter(Mandatory=$true)][String]$Guid
-        ,[Parameter(Mandatory=$false)][string]$ProcessId = ""               # The process id can also be set via this call
+        ,[Parameter(Mandatory=$false)][String]$ProcessId = ""               # The process id can also be set via this call
     )
 
     begin {

@@ -317,7 +317,7 @@ $arr = $params.MessageName -split $settings.nameConcatChar,2 # TODO Maybe use -s
 
 # TODO [x] use the split character from settings
 # TODO [x] check if list exists before using it
-if([string]::IsNullOrEmpty($params.ListName)){
+if([String]::IsNullOrEmpty($params.ListName)){
     Write-Log -message "Mailing does not exist"
     throw "Mailing does not exist"
 }

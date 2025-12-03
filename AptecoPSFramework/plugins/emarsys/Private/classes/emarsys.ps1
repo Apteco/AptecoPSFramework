@@ -828,7 +828,7 @@ class Emarsys : DCSP {
 
     }
 
-    [string] newField([String]$fieldname, [EmarsysFieldApplicationTypes]$dataType) {
+    [String] newField([String]$fieldname, [EmarsysFieldApplicationTypes]$dataType) {
 
         # TODO [] implement this one https://dev.emarsys.com/v2/fields/create-a-field
 

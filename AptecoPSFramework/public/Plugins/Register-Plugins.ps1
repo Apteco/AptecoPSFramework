@@ -1,10 +1,8 @@
 function Register-Plugins {
+
     [CmdletBinding()]
     param (
     )
-
-    begin {
-    }
 
     process {
 
@@ -60,6 +58,4 @@ function Register-Plugins {
 
     }
 
-    end {
-    }
 }

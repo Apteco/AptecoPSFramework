@@ -1,8 +1,8 @@
 Function Request-Choice {
 
     param(
-         [Parameter(Mandatory=$true)][string]$title
-        ,[Parameter(Mandatory=$true)][string]$message
+         [Parameter(Mandatory=$true)][String]$title
+        ,[Parameter(Mandatory=$true)][String]$message
         ,[Parameter(Mandatory=$true)][string[]]$choices
         ,[Parameter(Mandatory=$false)][int]$defaultChoice = 0
     )

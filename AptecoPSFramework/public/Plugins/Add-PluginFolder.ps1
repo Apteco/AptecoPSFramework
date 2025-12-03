@@ -1,12 +1,13 @@
 ﻿function Add-PluginFolder {
+
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)][String] $Folder
+
+        [Parameter(Mandatory=$true)]
+        [String]$Folder
+
     )
 
-    begin {
-
-    }
 
     process {
 
