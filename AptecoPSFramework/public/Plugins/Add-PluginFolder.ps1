@@ -20,30 +20,26 @@
 
         # Resolve the path to an absolute path
         #Write-Host "$( $Folder )"
-        $resolvedPath = Resolve-Path -Path $Folder
-        #Write-Host "$( $resolvedPath )"
+        
+        # Resolve the path (even if it does not exist)
+        $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Folder) #Resolve-Path -Path $Folder
 
-        # Check the path
-        If ( ( Test-Path -Path $resolvedPath ) -eq $false ) {
-            Write-Error -Message "There is a problem with '$( $resolvedPath.Path )'"
-            throw "There is a problem with '$( $resolvedPath.Path )'"
+        # Test it
+        If ( ( Test-Path -Path $resolvedPath ) -eq $True ) {
+
+            # Add this folder
+            [void]$Script:pluginFolders.add($resolvedPath.Path)
+
+            # Register all plugins automatically
+            $plugins = Register-Plugins
+
+        } else {
+
+            Write-Error -Message "There is a problem with '$( $resolvedPath )'"
+            throw "There is a problem with '$( $resolvedPath )'"
+
         }
 
-        # Add this folder
-        [void]$Script:pluginFolders.add($resolvedPath.Path)
-
-        # Register all plugins automatically
-        $plugins = Register-Plugins
-
-        # Switch return value
-        #$return = $true
-
-        # Return
-        #$return
-
     }
 
-    end {
-
-    }
 }
