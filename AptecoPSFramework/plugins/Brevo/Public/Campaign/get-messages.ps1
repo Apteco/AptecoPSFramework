@@ -54,7 +54,7 @@ function Get-Messages {
             "Object" {
 
                 # To save performance this can be skipped from the boilerplate files, but only when Paramatertype Object is used
-                If ( $Env:SkipJobLog = $true ) {
+                If ( $Env:SkipJobLog -eq $true ) {
 
                     Write-Log "Skipping JobLog"
                 
@@ -235,7 +235,7 @@ function Get-Messages {
         #-----------------------------------------------
 
         # To save performance this can be skipped from the boilerplate files, but only when Paramatertype Object is used
-        If ( $Env:SkipJobLog = $true -and $PSCmdlet.ParameterSetName -eq "Object" ) {
+        If ( $Env:SkipJobLog -eq $true -and $PSCmdlet.ParameterSetName -eq "Object" ) {
             Write-Log "Skipping return infos into JobLog"
         } else {
             # log the return into database and close connection
