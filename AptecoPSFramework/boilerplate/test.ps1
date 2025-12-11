@@ -56,7 +56,7 @@ if ( $debug -eq $true ) {
         Password = 'def'
         #scriptPath = 'D:\Scripts\CleverReach\PSCleverReachModule'
         MessageName = '8088752 ~ Demo_Fundraising'
-        TestRecipient = '{"Email":"reply@apteco.de","Sms":null,"Personalisation":{"Kunden ID":"","email":"florian.von.bracht@apteco.de","Vorname":"","Communication Key":"93d02a55-9dda-4a68-ae5b-e8423d36fc20"}}'
+        TestRecipient = '{"Email":"reply@apteco.de","Sms":null,"Personalisation":{"Kunden ID":"","email":"test@apteco.de","Vorname":"","Communication Key":"93d02a55-9dda-4a68-ae5b-e8423d36fc20"}}'
         Username = 'abc'
         mode = 'prepare'
         ListName = ''

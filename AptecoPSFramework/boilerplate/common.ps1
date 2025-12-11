@@ -46,7 +46,7 @@ Write-Verbose "Check PowerShell and Operating system"
 
 # Check if this is Pwsh Core
 $isCore = $psEnv.IsCore
-Write-Verbose -Message "Using PowerShell version $( $psEnv.PSVersion ) and $( $psEnv.PSEdition ) edition. 64-bit: $( $psEnv.Is64Bit )" -Verbose
+Write-Verbose -Message "Using PowerShell version $( $psEnv.PSVersion ) and $( $psEnv.PSEdition ) edition. 64-bit: $( $psEnv.Is64BitProcess )" -Verbose
 $os = $psEnv.OS
 Write-Verbose -Message "Using OS: $( $os )" -Verbose
 
@@ -117,8 +117,8 @@ $isPsCoreInstalled = $psEnv.IsCoreInstalled
 Write-Log -Message "This script: $( $thisScript )"
 Write-Log -Message "Using OS: $( $os )"
 Write-Log -Message "64bit OS: $( $psEnv.Is64BitOS  )"
-Write-Log -Message "64bit Process: $( $psEnv.Is64Bit )"
-Write-Log -Message "Using PowerShell version $( $psEnv.PSVersion ) and $( $psEnv.PSEdition ) edition )"
+Write-Log -Message "64bit Process: $( $psEnv.Is64BitProcess )"
+Write-Log -Message "Using PowerShell version $( $psEnv.PSVersion ) and $( $psEnv.PSEdition ) edition"
 Write-Log -Message "Running as user: $( $psEnv.ExecutingUser )"
 Write-Log -Message "Debug Mode: $( $debug )"
 Write-Log -Message "Is PSCore installed: $( $isPsCoreInstalled )"
@@ -234,6 +234,23 @@ If ( $params.UseJob -eq "true" -or $useJob -eq $true) {
     Write-Log "No job will be used"
 
 }
+
+
+#-----------------------------------------------
+# FIND OUT ABOUT PS CORE
+#-----------------------------------------------
+<#
+try {
+    $calc = . $s.psCoreExePath { 1+1 }
+} catch {
+    # just a test, nothing to do
+}
+if ( $calc -eq 2 ) {
+    $isPsCoreInstalled = $true
+}
+#>
+$isPsCoreInstalled = $psEnv.IsCoreInstalled
+Write-Log -Message "Is PSCore installed: $( $isPsCoreInstalled )"
 
 
 #-----------------------------------------------

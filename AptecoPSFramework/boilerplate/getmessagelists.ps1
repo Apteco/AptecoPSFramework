@@ -32,6 +32,7 @@ Param(
 $thisScript = ".\getmessagelists.ps1"
 $Env:SkipLocalLibFolder = $true # Skip loading local lib folder to save time and resources
 $Env:SkipDuckDB = $true # If SkipLocalLibFolder is true, DuckDB will also be skipped
+$Env:SkipJobLog = $true # Skip loading joblog functions to save time and resources
 
 
 #-----------------------------------------------
@@ -62,7 +63,7 @@ if ( $debug -eq $true ) {
         #ForceCore = "true"
         #ForcePython = "true"
         #UseJob = "true"
-        settingsFile = "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc2\settings.yaml"
+        settingsFile = "C:\FastStats\Scripts\AptecoPSFramework\settings\Brevo\brevo.yaml"
 
     }
 

@@ -32,6 +32,7 @@ Param(
 $thisScript = ".\getmessages.ps1"
 $Env:SkipLocalLibFolder = $true # Skip loading local lib folder to save time and resources
 $Env:SkipDuckDB = $true # If SkipLocalLibFolder is true, DuckDB will also be skipped
+$Env:SkipJobLog = $true # Skip loading joblog functions to save time and resources
 
 
 #-----------------------------------------------
@@ -59,10 +60,10 @@ if ( $debug -eq $true ) {
 
         # Integration parameters
         Force64bit = "true"
+        settingsFile = "C:\FastStats\Scripts\AptecoPSFramework\settings\Brevo\brevo_demo.yaml"
         #ForceCore = "true"
         #ForcePython = "true"
         #UseJob = "true"
-        settingsFile = "C:\FastStats\Scripts\AptecoPSFramework\settings\sfnpc2\settings.yaml"
 
     }
 

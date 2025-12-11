@@ -72,7 +72,7 @@ if ( $debug -eq $true ) {
         #ForceCore = "true"
         #ForcePython = "true"
         #UseJob = "true"
-        settingsFile = '.\inx.yaml'
+        settingsFile = 'C:\FastStats\Scripts\AptecoPSFramework\settings\Brevo\brevo_demo.yaml'
 
     }
 
