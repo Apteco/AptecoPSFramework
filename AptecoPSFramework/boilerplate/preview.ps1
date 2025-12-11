@@ -32,6 +32,7 @@ Param(
 $thisScript = ".\preview.ps1"
 $Env:SkipLocalLibFolder = $true # Skip loading local lib folder to save time and resources
 $Env:SkipDuckDB = $true # If SkipLocalLibFolder is true, DuckDB will also be skipped
+$Env:SkipJobLog = $true # Skip loading joblog functions to save time and resources
 
 
 #-----------------------------------------------
