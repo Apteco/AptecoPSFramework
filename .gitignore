@@ -6,3 +6,5 @@
 *_archive*
 *.bak
 *.debug
+*.exe
+*.duckdb
