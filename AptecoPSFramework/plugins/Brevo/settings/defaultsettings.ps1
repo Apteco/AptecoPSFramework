@@ -39,7 +39,7 @@
 
     # Upload settings
     "upload" = [PSCustomObject]@{
-        "defaultListFolderName" = "Apteco Upload"                            # default folder to use for lists, 0 = global
+        "defaultListFolderName" = "Apteco"                            # default folder to use for lists, 0 = global
         "sniffparameter" = "sample_size=1000, delim='\t'"     # duckdb parameter for reading the input csv file, e.g. you could define a date input format or the decimal point character
         "countRowsInputFile" = $True                          # Count rows of input file -> not needed
         "reservedFields" = [Array]@("fasdfis")                # If one of these fields are used, the whole process will pause
@@ -54,13 +54,13 @@
 
         # Release/sending
         "autoLaunch" = $false                              # Automatically launch the campaign after successful upload
-        "defaultReleaseOffset" = 120                        # Default amount of seconds that are added to the current unix timestamp to release the mailing
-        "waitUntilFinished" = $false
-        "maxWaitForFinishedAfterOffset" = 120           # Wait for another 120 seconds (or more or less) until it is confirmed of send off
+        "defaultReleaseOffset" = 300                        # Default amount of seconds that are added to the current unix timestamp to release the mailing
+        "waitUntilFinished" = $true                     # Wait until the mail is sent out
+        "maxWaitForFinishedAfterOffset" = 240           # Wait for another 120 seconds (or more or less) until it is confirmed of send off
 
         "emailExpirationDate" = -1                             # Default amount of days until the email expires
         "defaultToField" = "{{DEFAULT_TO}}" #"{{contact.FNAME}} {{contact.LNAME}}"        # Default To field for the broadcast email, should be $null or "{{contact.FNAME}} {{contact.LNAME}}"
-        "mirrorActive" = $false                              # Default setting for mirrorActive in the broadcast
+        "mirrorActive" = $True                              # Default setting for mirrorActive in the broadcast, this is the Online-Link that you can click to view the email in the browser
         "tag" = "Apteco"                                     # Default tag to use for the creation of the broadcast
         "defaultUpdateFormId" = $null                                  # Default update form id, if needed
 

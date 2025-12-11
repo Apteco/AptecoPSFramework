@@ -48,32 +48,49 @@ function Get-Messages {
         #-----------------------------------------------
         # CHECK INPUT AND SET JOBLOG
         #-----------------------------------------------
-
-        # Log the job in the database
-        Set-JobLogDatabase
-        Write-Log "Joblog database connected"
-
+        
         Switch ( $PSCmdlet.ParameterSetName ) {
 
             "Object" {
-                Write-log "adding a new job in function"
 
-                # Create a new job
-                $JobId = Add-JobLog
-                $jobParams = [Hashtable]@{
-                    "JobId" = $JobId
-                    "Plugin" = $script:settings.plugin.guid
-                    "InputParam" = $InputHashtable
-                    "Status" = "Starting"
-                    "DebugMode" = $debugMode #$Script:debugMode
-                    "Type" = $moduleName
+                # To save performance this can be skipped from the boilerplate files, but only when Paramatertype Object is used
+                If ( $Env:SkipJobLog = $true ) {
+
+                    Write-Log "Skipping JobLog"
+                
+                } else {
+
+                    # Log the job in the database
+                    Set-JobLogDatabase
+                    Write-Log "Joblog database connected"
+
+                    Write-log "adding a new job in function"
+
+                    # Create a new job
+                    $JobId = Add-JobLog
+                    $jobParams = [Hashtable]@{
+                        "JobId" = $JobId
+                        "Plugin" = $script:settings.plugin.guid
+                        "InputParam" = $InputHashtable
+                        "Status" = "Starting"
+                        "DebugMode" = $debugMode #$Script:debugMode
+                        "Type" = $moduleName
+                    }
+                    Update-JobLog @jobParams
+
+                    break
+
                 }
-                Update-JobLog @jobParams
 
-                break
+                
             }
 
             "Job" {
+
+                # Log the job in the database
+                Set-JobLogDatabase
+                Write-Log "Joblog database connected"
+
                 Write-log "updating existing job"
 
                 # Get the jobs information
@@ -217,19 +234,23 @@ function Get-Messages {
         # RETURN VALUES TO PEOPLESTAGE
         #-----------------------------------------------
 
-        # log the return into database and close connection
-        $jobReturnParams = [Hashtable]@{
-            "JobId" = $JobId
-            "Status" = "Finished"
-            "Finished" = $true
-            "Successful" = $return.Count
-            "Failed" = 0 # TODO needs correction
-            "Totalseconds" = $processDuration.TotalSeconds
-            "OutputArray" = $return
+        # To save performance this can be skipped from the boilerplate files, but only when Paramatertype Object is used
+        If ( $Env:SkipJobLog = $true -and $PSCmdlet.ParameterSetName -eq "Object" ) {
+            Write-Log "Skipping return infos into JobLog"
+        } else {
+            # log the return into database and close connection
+            $jobReturnParams = [Hashtable]@{
+                "JobId" = $JobId
+                "Status" = "Finished"
+                "Finished" = $true
+                "Successful" = $return.Count
+                "Failed" = 0 # TODO needs correction
+                "Totalseconds" = $processDuration.TotalSeconds
+                "OutputArray" = $return
+            }
+            Update-JobLog @jobReturnParams
+            Close-JobLogDatabase
         }
-        Update-JobLog @jobReturnParams
-        Close-JobLogDatabase
-
 
         # return the results
         Switch ( $PSCmdlet.ParameterSetName ) {
@@ -239,10 +260,6 @@ function Get-Messages {
             }
             # Otherwise the results are now in the database
         }
-
-    }
-
-    end {
 
     }
 

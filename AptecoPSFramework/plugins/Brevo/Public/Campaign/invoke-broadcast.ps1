@@ -212,7 +212,8 @@ function Invoke-Broadcast {
             #-----------------------------------------------
 
             # https://developers.brevo.com/reference/updateemailcampaign
-            $campaignName = "$( $mailing.mailingName ) - Broadcast $( Get-Date -Format "yyyy-MM-dd HH:mm:ss" )"
+            # TODO make this name changeable from settings yaml file
+            $campaignName = "$( $ProcessStart.toString("yyyy-MM-dd") )_$( $mailing.mailingName )_$( $ProcessStart.toString("HH:mm") )"
             $campaignBody = [Ordered]@{
                 "tag" = $Script:settings.broadcast.tag
                 "sender" = [PSCustomObject]@{
