@@ -180,6 +180,7 @@ PrivateData = @{
       Feature: Adding a new setting to disable account specific encryption for tokens and credentials for easier handling in dev environments
       Fix: Removed log severity from info to verbose when opening and closing a duckdb connection
       Fix: Adding Salesforce UTF8 handling by default
+      Fix: When using WindowsPowerShell, a shorter version of an if statement was not working for Add-JobLog and Update-JobLog
 0.4.7 Feature CleverReach: Added new function to batch load responses by day in a loop to avoid a too high workload
       Feature: Enhanced the boilerplate to output more information about the current process
       Fix CleverReach: Changed some datatypes to enhance performance of response gathering

@@ -106,8 +106,17 @@ Function Add-JobLog {
                 break
             } catch {
                 $ex = $_.Exception
-                $msg = ($ex.Message ?? '').ToLowerInvariant()
-                $typeName = $ex.GetType().FullName
+                if ($null -ne $ex -and $null -ne $ex.Message) {
+                    $msg = $ex.Message.ToLowerInvariant()
+                } else {
+                    $msg = ''
+                }
+
+                if ($null -ne $ex) {
+                    $typeName = $ex.GetType().FullName
+                } else {
+                    $typeName = ''
+                }
 
                 # treat SQLite busy/locked or sqlite-specific exceptions as transient
                 # typically the message is "database is locked"
@@ -126,7 +135,6 @@ Function Add-JobLog {
         }
 
         $return
-
 
     }
 
