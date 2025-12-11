@@ -1,17 +1,33 @@
 
-# https://developers.brevo.com/reference/getsmtptemplates
+# https://developers.brevo.com/reference/getemailcampaigns-1
 # TODO Add a sort criteria - can be done in API for creation date, otherwise in PS
+# TODO Add statistics parameter
 function Get-Campaign {
     [CmdletBinding(DefaultParameterSetName = 'Collection')]
     param (
 
-         [Parameter(Mandatory=$true, ParameterSetName = 'Single')][Int]$Id
-        
-        ,[Parameter(Mandatory=$false)]
-         [ValidateSet("all", "active", "inactive", IgnoreCase = $false)]
-         [String]$TemplateStatus = "all"      # batch_email|transactional_email
+         [Parameter(Mandatory=$true, ParameterSetName = 'Single')]
+         [Int]$Id
 
-        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')][Switch]$All = $false
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [ValidateSet("all", "classic", "trigger", IgnoreCase = $false)]
+         [String]$Type = "all"      # batch_email|transactional_email
+
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [ValidateSet("all", "suspended", "archive", "sent", "queued", "draft", "inProcess", "inReview", IgnoreCase = $false)]
+         [String]$Status = "all"      # batch_email|transactional_email
+
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [Switch]$IncludeHtml = $false
+
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [String]$StartDate = ""                        # string like YYYY-MM-DDTHH:mm:ss.SSSZ
+        
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [String]$EndDate = ""                          # string like YYYY-MM-DDTHH:mm:ss.SSSZ
+
+        ,[Parameter(Mandatory=$false, ParameterSetName = 'Collection')]
+         [Switch]$All = $false
 
     )
 
@@ -19,11 +35,36 @@ function Get-Campaign {
         
         $query = [Ordered]@{}
 
+
+        If ( $StartDate -ne "" ) {
+            $f = [Datetime]::Today
+            If ( [Datetime]::TryParse($StartDate,[ref]$f) -eq $true ) {
+                $query | Add-Member -MemberType NoteProperty -Name "StartDate" -Value $f.ToString("yyyy-MM-ddTHH:mm:ss.fff")
+            } else {
+                throw "StartDate is not valid"
+            }
+        } else {
+            # Set nothing
+        }
+
+
+        If ( $EndDate -ne "" ) {
+            $t = [Datetime]::Today
+            If ( [Datetime]::TryParse($EndDate,[ref]$t) -eq $true ) {
+                $query | Add-Member -MemberType NoteProperty -Name "EndDate" -Value $t.ToString("yyyy-MM-ddTHH:mm:ss.fff")
+            } else {
+                throw "EndDate is not valid"
+            }
+        } else {
+            # Set nothing
+        }
+
     }
 
     process {
 
         switch ($PSCmdlet.ParameterSetName) {
+
             'Single' {
 
                 # Create params
@@ -40,31 +81,31 @@ function Get-Campaign {
 
                 # Create params
                 $params = [Hashtable]@{
-                    "Object" = "smtp/templates"
+                    "Object" = "emailCampaigns"
                     "Method" = "GET"
                 }
 
-                # Just add the filter for template status
-                switch ($TemplateStatus) {
+                # Just add the filter for campaign type
+                If ( $Type -ne "all" ) {
+                    $query.Add("type", $Type)
+                }
 
-                    "active" {
-                        $query.Add("templateStatus", "true")
-                        break
-                    }
-                    "inactive" {
-                        $query.Add("templateStatus", "false")
-                        break
-                    }
-                    default {
+                # Just add the filter for campaign status
+                If ( $Status -ne "all" ) {
+                    $query.Add("status", $Status)
+                }
 
-                    }
-
+                # Include HTML content
+                If ( $IncludeHtml -eq $true ) {
+                    $query.Add("excludeHtmlContent", "false")
+                } else {
+                    $query.Add("excludeHtmlContent", "true")
                 }
 
                 # Add paging
                 If ( $All -eq $true ) {
                     $params.Add("Paging", $true)
-                    $params.Add("PageSize", 1000)
+                    $params.Add("PageSize", 100)
                 }
                 
                 break
@@ -73,7 +114,7 @@ function Get-Campaign {
 
         # Add query, if existing
         If ( $Query.Count -gt 0 ) {
-            $params.Add("Query", $query)
+            $params.Add("Query", [PSCustomObject]$query)
         }
 
         # add verbose flag, if set
@@ -82,13 +123,13 @@ function Get-Campaign {
 		}
 
         # Request list(s)
-        $templates = Invoke-Brevo @params
+        $campaigns = Invoke-Brevo @params
 
         # Return
         switch ($PSCmdlet.ParameterSetName) {
             'Single' {
 
-                $templates
+                $campaigns
 
                 break
             }
@@ -97,9 +138,9 @@ function Get-Campaign {
 
                 # return
                 If ( $All -eq $true ) {
-                    $templates
+                    $campaigns
                 } else {
-                    $templates.templates
+                    $campaigns.campaigns #| Select-Object -Property * -ExcludeProperty htmlContent
                 }
 
                 break

@@ -73,7 +73,7 @@ function Get-Template{
 
         # Add query, if existing
         If ( $Query.Count -gt 0 ) {
-            $params.Add("Query", $query)
+            $params.Add("Query", [PSCustomObject]$query)
         }
 
         # add verbose flag, if set
