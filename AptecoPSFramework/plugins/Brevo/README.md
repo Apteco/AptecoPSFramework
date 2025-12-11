@@ -13,7 +13,7 @@ Import-Module "C:\Users\Florian\Documents\GitHub\AptecoPSFramework\AptecoPSFrame
 #Add-PluginFolder "C:\faststats\scripts\AptecoPSPlugins"
 
 # Choose a plugin
-$plugin = get-plugins | Select guid, name, version, update, path | Out-GridView -PassThru | Select -first 1
+$plugin = get-plugins | Select guid, name, version, update, path | where-object { $_.name -like "*Brevo*" } | Select -first 1
 
 # Install the plugin before loading it (installing dependencies)
 #Install-Plugin -Guid $plugin.guid

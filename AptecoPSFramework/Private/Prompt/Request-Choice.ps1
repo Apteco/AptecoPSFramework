@@ -5,14 +5,14 @@
 Example to use
 
 $stringArray = @("Frankfurt","Aachen","Braunschweig")
-$choice = Prompt-Choice -title "City" -message "Which city would you prefer?" -choices $stringArray
+$choice = Request-Choice -title "City" -message "Which city would you prefer?" -choices $stringArray
 $choiceMatchedWithArray = $stringArray[$choice -1]
 
 # TODO [ ] put this into a module
 
 #>
 
-Function Prompt-Choice {
+Function Request-Choice {
 
     param(
          [Parameter(Mandatory=$true)][string]$title

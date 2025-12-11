@@ -463,7 +463,7 @@ function Invoke-Upload {
             $attributesEqualGlobalSqlPath = Join-Path -Path $Script:pluginRoot -ChildPath "Sql/attributes_equal_global.sql"
             $attributesEqualGlobalSql = Get-Content -Path $attributesEqualGlobalSqlPath -Encoding UTF8 -Raw
             $attributesEqualGlobal = [Array]@( Read-DuckDBQueryAsReader -Query $attributesEqualGlobalSql -ReturnAsPSCustom )
-            Write-Log "  $( $attributesEqualGlobal.count )  columns csv and global API list: $( $attributesEqualGlobal.name -join ', ' )"
+            Write-Log "  $( $attributesEqualGlobal.count ) columns csv and global API list: $( $attributesEqualGlobal.name -join ', ' )"
 
             # Columns that are in CSV, but not in API
             $attributesInCsvNotApiSqlPath = Join-Path -Path $Script:pluginRoot -ChildPath "Sql/attributes_in_csv_not_in_api.sql"
