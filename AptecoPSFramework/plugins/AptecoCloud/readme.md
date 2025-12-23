@@ -70,3 +70,16 @@ import-settings ".\ae.yaml"
 ...
 
 ```
+
+
+Add Data to Designer via Queries
+
+- [ ] Change this to read data from S3 directly
+
+```SQL
+create table response as select * from read_parquet('C:\Users\flo\Downloads\20251223\response\**\*.parquet', union_by_name=True);
+
+```
+
+
+ 
