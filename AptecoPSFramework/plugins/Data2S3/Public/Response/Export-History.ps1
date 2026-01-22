@@ -1,28 +1,17 @@
-
-
-
-
-
 function Export-History {
 
-    [CmdletBinding()]
     param(
-
-        #[Parameter(Mandatory=$false)]
-        #[string]$ScriptPath = "C:\FastStats\Scripts\Data2S3"
         
-        #[Parameter(Mandatory=$false)][string]$HanaSettingsFile = "C:\faststats\scripts\hana\check-connection\settings.json"
-        
-        # String of data sources to extract
-        #,[Parameter(Mandatory=$false)]
-        # [String[]]$Include = [Array]@()
-        
-         [Parameter(Mandatory=$false)]
-         [String]$StartDate = [DateTime]::Today.AddDays(-1).ToString("yyyy-MM-dd")
+        [Parameter(Mandatory=$false)]
+        [String]$StartDate = [DateTime]::Today.AddDays(-1).ToString("yyyy-MM-dd")
 
     )
 
-    begin {
+    Begin {
+
+        #-----------------------------------------------
+        # CHECK INPUT PARAMETERS
+        #-----------------------------------------------
 
         # Check the input date
         Write-Log "  StartDate: $( $StartDate )"
@@ -34,10 +23,14 @@ function Export-History {
             Exit 4
         }
 
-        #Import-Module WriteLog, EncryptCredential, powershell-yaml, SQLPS, ImportDependency, ConvertStrings, awspowershell, MeasureRows
-
         $processStart = [datetime]::now
+
+        #-----------------------------------------------
+        # CHECK ENVIRONMENT
+        #-----------------------------------------------
+
         $psEnv = Get-PSEnvironment -SkipBackgroundCheck
+
 
         #-----------------------------------------------
         # FIND OUT ABOUT 64bit
@@ -54,6 +47,9 @@ function Export-History {
         #-----------------------------------------------
         # PREPARE SETTINGS
         #-----------------------------------------------
+
+        # Log
+        $Script:logDivider = "----------------------------------------------------" # String used to show a new part of the log
 
         # SqlServer
         $sqlParams = [Hashtable]@{
@@ -79,15 +75,23 @@ function Export-History {
             'x-amz-meta-department' = $Script:settings.S3.Meta.Department
         }
 
-        $processId = [guid]::NewGuid()
+        $processId = Get-ProcessId
         $tempPath = Get-TemporaryPath
         $tempDir = New-Item -Path $tempPath -Name $processId -ItemType Directory
 
 
+        #-----------------------------------------------
+        # SETUP LOG
+        #-----------------------------------------------
+
+        Write-Log -message $Script:logDivider
+
+        Write-Log "Check input parameter"
+
 
     }
 
-    process {
+    Process {
 
         try {
 
@@ -96,7 +100,7 @@ function Export-History {
             # GET RESPONSE HISTORY
             #-----------------------------------------------
 
-            $sqlResponseHistoryQuery = Get-Content -Path ".\sql\10_response_history.sql" -Encoding utf8 -Raw
+            $sqlResponseHistoryQuery = Get-Content -Path "$( $moduleRoot )\sql\10_response_history.sql" -Encoding utf8 -Raw
 
             Write-Log "Loading response history"
 
@@ -159,7 +163,7 @@ function Export-History {
             # EXPORT CAMPAIGN METADATA AND OVERWRITE FILES
             #-----------------------------------------------
 
-            $sqlMessageCampaignQuery = Get-Content -Path ".\sql\15_decode_message_campaign.sql" -Encoding utf8 -Raw
+            $sqlMessageCampaignQuery = Get-Content -Path "$( $moduleRoot )\sql\15_decode_message_campaign.sql" -Encoding utf8 -Raw
 
             Write-Log "Loading message and campaign decodes"
 
@@ -179,7 +183,7 @@ function Export-History {
             # EXPORT CHANNEL METADATA AND OVERWRITE FILES
             #-----------------------------------------------
 
-            $sqlChannelQuery = Get-Content -Path ".\sql\16_decode_channel.sql" -Encoding utf8 -Raw
+            $sqlChannelQuery = Get-Content -Path "$( $moduleRoot )\sql\16_decode_channel.sql" -Encoding utf8 -Raw
 
             Write-Log "Loading channel decodes"
 
@@ -232,15 +236,12 @@ function Export-History {
 
         }
 
-
     }
 
-    end {
+    End {
+
+        Write-Log -message "Done"
 
     }
-
+    
 }
-
-
-
-

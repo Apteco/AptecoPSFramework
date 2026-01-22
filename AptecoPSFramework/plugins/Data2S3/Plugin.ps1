@@ -2,34 +2,39 @@
     [PSCustomObject]@{
 
         # identifier for this plugin - please do not change or use this twice
-        "guid" = "52ccae94-7f10-435b-89a1-3e0604545a27"
+        "guid" = "b2290429-3da7-49b6-9960-de083aa38a88"
 
         # general information about this plugin
-        "name" = "Apteco Cloud"
-        "version" = "0.0.1"
-        "lastUpdate" = "2025-12-22"
+        "name" = "Data2S3"
+        "version" = "0.1.0"
+        "lastUpdate" = "2026-01-22"
         "category" = "data"
         "type" = "transfer"
-        "stage" = "dev"
+        "stage" = "test"
 
         # have a look at ./bin/dependencies if you need more information about how to define this
         "dependencies" = [PSCustomObject]@{
             "psScripts" = @()
             "psModules" = @(
+                #"WriteLog"
+                #"EncryptCredential"
+                #"powershell-yaml"
                 "SQLPS"
+                #"ImportDependency"
                 "ConvertStrings"
                 "awspowershell"
+                "MeasureRows"
             )
             "psPackages" = @()
         }
 
         # Supported functions
         "functions" = [PSCustomObject]@{
-            "mailings" = $false
+            "mailings" = $true
             "lists" = $false
             "preview" = $false
-            "upload" = $false
-            "broadcast" = $false
+            "upload" = $true
+            "broadcast" = $true
             "responses" = $false
         }
 
